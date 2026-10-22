@@ -1,0 +1,1235 @@
+[
+    {
+        "city": "Bengaluru",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Bangalore Palace",
+                "famous_food_spot": "MTR (Mavalli Tiffin Room)",
+                "speciality_dish": "Rava Idli and Filter Coffee",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "An iconic culinary landmark established in 1924, legendary among tourists and locals alike for inventing the Rava Idli and serving pristine traditional South Indian tiffins.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=MTR+Lalbagh+Road+Bangalore"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Cubbon Park",
+                "famous_food_spot": "Airlines Hotel",
+                "speciality_dish": "South Indian Filter Coffee and Mirchi Bajji / Bonda",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An open-air, drive-in heritage restaurant nestled under large shade trees near Cubbon Park, serving classic hot snacks like crunchy mirchi bajjis and filter coffee in a unique natural ambiance.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Airlines+Hotel+Bangalore"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Vidhana Soudha & High Court",
+                "famous_food_spot": "Sri Raghavendra Stores",
+                "speciality_dish": "Khali Dosa with Chutney",
+                "rating_as_per_google": "4.6 / 5",
+                "description": "A world-famous street-side stall near Malleshwaram known for drawing massive tourist crowds for its legendary, buttery khali dosas served right on the pavement.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Raghavendra+Stores+Malleshwaram+Bangalore"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Lalbagh Botanical Garden",
+                "famous_food_spot": "Janatha Hotel",
+                "speciality_dish": "Bisi Bele Bath and Mangalore Buns",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Located in Malleshwaram, this heritage eatery is a must-visit for tourists seeking authentic Karnataka breakfast and tiffin items like comforting Bisi Bele Bath and sweet-crispy Mangalore buns.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Janatha+Hotel+Malleshwaram+Bangalore"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Tipu Sultan's Summer Palace",
+                "famous_food_spot": "New Krishna Bhavan",
+                "speciality_dish": "Ragi Dosa, Set Dosa, and Bonda Soup",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A historic vegetarian haven near the city center famous for offering wholesome Karnataka staples, including nutritious ragi-based dosas and piping hot bonda soup.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Krishna+Bhavan+Sampige+Road+Bangalore"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Bannerghatta Biological Park",
+                "famous_food_spot": "Nandana Palace",
+                "speciality_dish": "Andhra Meals and Nati Style Chicken Biryani",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A well-known regional dining spot popular with visitors heading towards Bannerghatta, famous for rich spice-infused southern meals and flavorful local non-vegetarian preparations.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nandana+Palace+Bannerghatta+Road+Bangalore"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Ulsoor Lake",
+                "famous_food_spot": "Kaveri Mess",
+                "speciality_dish": "Ragi Mudde with Nati Mutton Curry and Girmit",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "The quintessential destination for food explorers wanting to experience authentic rural Karnataka comfort food, serving hot Ragi Mudde paired with robust country-style mutton and spicy snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kaveri+Mess+Bangalore"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Commercial Street & MG Road",
+                "famous_food_spot": "Vidyarthi Bhavan",
+                "speciality_dish": "Masale Dosa and Filter Coffee",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "An absolute pilgrimage site for every food tourist visiting Bengaluru, operating since 1943 in Gandhi Bazaar and famous for its legendary, ghee-drenched, golden-crisp Masale Dosa.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Vidyarthi+Bhavan+Gandhi+Bazaar+Bangalore"
+            }
+        ]
+    },
+    {
+        "city": "Mysuru",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Mysore Palace (Amba Vilas Palace)",
+                "famous_food_spot": "Guru Sweets",
+                "speciality_dish": "Original Mysore Pak",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "Located near the historic Devaraja Market right next to the Palace, this legendary heritage shop is run by descendants of the royal kitchen chefs who invented the authentic ghee-laden Mysore Pak.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Guru+Sweets+Devaraja+Market+Mysore"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "St. Philomena's Church",
+                "famous_food_spot": "Original Vinayaka Mylari",
+                "speciality_dish": "Mylari Butter Dosa with Coconut Chutney",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "An absolute must-visit tourist institution a short drive from the cathedral, famous for serving pillow-soft, butter-soaked dosas on banana leaves with freshly ground paste-like coconut chutney.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Original+Vinayaka+Mylari+Nazarbad+Mysore"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Chamundi Hills & Chamundeshwari Temple",
+                "famous_food_spot": "Hotel Halli Hatti",
+                "speciality_dish": "Soft Idli, Kesari Bath, and Traditional Kashaya Tea",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "Situated near the foothills of Chamundi Hill with rustic village-hut decor, heavily frequented by tourists and locals for authentic traditional Karnataka breakfast items.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Halli+Hatti+KC+Layout+Mysore"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Jaganmohan Palace Art Gallery",
+                "famous_food_spot": "Hotel RRR",
+                "speciality_dish": "Nati-style Chicken Biryani and Pepper Chicken",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A legendary tourist landmark near Gandhi Square renowned for authentic Karnataka non-vegetarian meals and spicy local-style biryanis served on banana leaves.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+RRR+Gandhi+Square+Mysore"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Mysore Zoo & Karanji Lake",
+                "famous_food_spot": "Hotel Hanumanthu Pulav",
+                "speciality_dish": "Mutton Pulav and Kheema Balls",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A mandatory stop for food tourists near Mandi Mohalla, serving legendary aromatic spice-infused mutton pulao and local delicacies since 1930.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hanumanthu+Mutton+Pulav+Mandi+Mohalla+Mysore"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Brindavan Gardens & KRS Dam",
+                "famous_food_spot": "SPR Veg Restaurant",
+                "speciality_dish": "Traditional Karnataka Thali & Bisi Bele Bath",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A prominent family restaurant on the transit route towards Brindavan Gardens offering extensive traditional South Indian thalis and Karnataka comfort meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=SPR+Veg+Gokulam+Mysore"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Kukkarahalli Lake",
+                "famous_food_spot": "Tegu Mess",
+                "speciality_dish": "Ragi Mudde with Nati Mutton Saaru / Chicken Curry",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "The quintessential destination for tourists seeking authentic rural Karnataka cuisine, famous for its piping hot Ragi Mudde paired with spicy country-style mutton and chicken gravies.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tegu+Mess+Mysore"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Lalitha Mahal Palace",
+                "famous_food_spot": "Shree Mahalakshmi Sweets",
+                "speciality_dish": "Badam Milk, Dharwad Pedha, and Savories",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A premier heritage sweet house across the city trusted by tourists to sample regional Karnataka sweets, rich milk beverages, and traditional snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shree+Mahalakshmi+Sweets+Ashoka+Road+Mysore"
+            }
+        ]
+    },
+    {
+        "city": "Hassan",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Hasanamba Temple",
+                "famous_food_spot": "Ayyappa Swami Canteen",
+                "speciality_dish": "Traditional South Indian Meals and Crispy Vada",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located right near the famous Hasanamba Temple circle, this revered local canteen is a mandatory stop for pilgrims and tourists looking for authentic and comforting temple-town tiffins.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ayyappa+Swami+Canteen+Hassan"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Belur & Halebidu Temples (Gateway from Hassan)",
+                "famous_food_spot": "Hotel Sanman",
+                "speciality_dish": "Masale Dosa and Sambar Idli",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "Situated conveniently near the main bus stand, this landmark vegetarian spot has been serving tourists heading out to the Hoysala architectural sites with classic Karnataka breakfast favorites for years.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Municipal+Office+Rd+Hassan"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Shravanabelagola Jain pilgrimage (Channarayapatna)",
+                "famous_food_spot": "Sharada Mess",
+                "speciality_dish": "Unlimited Bale Yele Oota (Banana Leaf Meals) with Ragi Mudde",
+                "rating_as_per_google": "4.6 / 5",
+                "description": "A celebrated hidden gem in Krishnaraja Pura serving wholesome, traditional home-style banana leaf meals featuring piping hot Ragi Mudde paired with regional gravies and palyas.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharada+Mess+Krishnaraja+Pura+Hassan"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Gorur Dam / Hemavathi Reservoir",
+                "famous_food_spot": "Hotel Mamatha",
+                "speciality_dish": "Nati-style Koli Saaru (Chicken Curry) with Ragi Mudde",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A legendary culinary haven capturing true Malnad and local non-vegetarian flavors, famous for serving fiery country-style chicken and mutton gravies paired with nutritious ragi balls.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mamatha+Hassan"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Maharaja Park Hassan",
+                "famous_food_spot": "HVR Veg",
+                "speciality_dish": "Benne Khali Dosa, Open Pudi Masala Dosa, and Uddina Vade",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "An exceptionally popular spot among locals and food tourists alike, famous for its buttery soft khali dosas loaded with gunpowder (pudi) and crispy lentil vadas.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=HVR+Veg+Basettikoppal+Main+Rd+Hassan"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Shettihalli Rosary Church",
+                "famous_food_spot": "Shri Gajanana Refreshments",
+                "speciality_dish": "Filter Coffee, Mangalore Buns, and Akki Rotti",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A classic refreshment spot in the heart of the city serving iconic Malnad breakfast items like soft rice flour akki rottis and sweet-fermented fried buns.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Gajanana+Refreshments+Hassan"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Hassan District Museum",
+                "famous_food_spot": "Harsha Sweets",
+                "speciality_dish": "Special Gulab Jamun and Champakali Sweets",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "A legendary sweet institution in Gandhi Bazaar where fresh, piping-hot jamuns and traditional pastries generate massive daily queues and sell out within the hour.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Harsha+Sweets+Gandhi+Bazar+Hassan"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Bisu Naadu Heritage Trails",
+                "famous_food_spot": "Hoysala Village Resort Restaurant (The Kokum)",
+                "speciality_dish": "Malnad Special Thali and Local Spice-Infused Delicacies",
+                "rating_as_per_google": "3.6 / 5",
+                "description": "An upscale heritage dining environment reflecting Malnad architectural themes, offering travelers authentic regional vegetarian and non-vegetarian thalis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road+Hassan"
+            }
+        ]
+    },
+    {
+        "city": "Hampi",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Virupaksha Temple",
+                "famous_food_spot": "Taste of Brahmins",
+                "speciality_dish": "Paddu, Soft Idli, and Masala Dosa",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Located in a quaint local alley right next to the historic Virupaksha Temple, this beloved family-run home eatery is legendary among tourists for fresh, traditional South Indian breakfast items.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taste+of+Brahmins+Hampi"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Hampi Bazaar & Monolithic Nandi",
+                "famous_food_spot": "Mango Tree Restaurant",
+                "speciality_dish": "South Indian Thali, Fresh Fruit Juices, and Egg Bhurji",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An iconic traveler institution situated near Hampi Bazaar, famous for its relaxed ambiance, traditional seating mats, and comforting vegetarian and continental fare.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mango+Tree+Restaurant+Hampi"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Vittala Temple & Stone Chariot",
+                "famous_food_spot": "Laughing Buddha Restaurant",
+                "speciality_dish": "Wood-fired Pizza, Banana Pancakes, and Thalis",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A popular riverside café spot across the boulder landscape, widely frequented by backpackers and tourists exploring the eastern ruins for relaxed meals and scenic views.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Laughing+Buddha+Restaurant+Hampi"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Lotus Mahal & Elephant Stables (Royal Enclosure)",
+                "famous_food_spot": "Hotel Mayura Bhuvaneswari (KSTDC)",
+                "speciality_dish": "Authentic Karnataka Thali and Bisi Bele Bath",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "Operated by the state tourism board near Kamalapura, this is a dependable, spacious restaurant offering traditional regional vegetarian meals right near the royal complex.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Bhuvaneswari+Kamalapura+Hampi"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Matanga Hill (Sunrise/Sunset Viewpoint)",
+                "famous_food_spot": "Gopi Guest House & Rooftop Restaurant",
+                "speciality_dish": "Akki Rotti, Masala Chai, and South Indian Breakfast",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A classic rooftop dining option near the base of Matanga Hill where tourists gather to refuel with hot tea and local flatbreads after an early morning trek.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gopi+Guest+House+Rooftop+Restaurant+Hampi"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Anjanadri Hill (Monkey Temple)",
+                "famous_food_spot": "German Bakery (Hippie Island side)",
+                "speciality_dish": "Fresh Lemon Soda, Apple Pie, and Shakes",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located across the Tungabhadra river near the foothills of Anjanadri Hill, this laid-back tourist hotspot is famous for refreshing beverages and baked treats.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=German+Bakery+Virupapur+Gaddi+Hampi"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Anegundi Village & Pampa Sarovar",
+                "famous_food_spot": "Hoova Cafe & Restaurant",
+                "speciality_dish": "Local Country-Style Chicken Curry and Jolada Rotti",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Situated in the historic village of Anegundi, this rustic spot offers travelers a rare chance to sample authentic rural North Karnataka cuisine, including jowar rotis and regional curries.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoova+Cafe+Anegundi+Hampi"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Queen's Bath & Underground Temple",
+                "famous_food_spot": "Sagar Hotel",
+                "speciality_dish": "Idli Sambar, Vada, and Filter Coffee",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A straightforward, highly convenient local eatery near the central ruins zone popular among sightseers for quick, filling, and authentic South Indian tiffins.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Hampi"
+            }
+        ]
+    },
+    {
+        "city": "Coorg (Kodagu)",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Madikeri Fort & Raja's Seat",
+                "famous_food_spot": "Coorg Cuisine Restaurant",
+                "speciality_dish": "Authentic Pandi Curry with Akki Roti and Kadambuttu",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located right in the heart of Madikeri near Raja's Seat, this rustic Kodava-themed restaurant is a mandatory food stop for tourists wanting to try authentic spiced pork curry with rice flour dumplings.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Coorg+Cuisine+Restaurant+Madikeri"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Abbey Falls",
+                "famous_food_spot": "Raintree Restaurant",
+                "speciality_dish": "Mutton Sagwala with Appam and Elaneer Payasam",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "Nestled inside a scenic coffee plantation atmosphere close to Abbey Falls, offering travelers traditional local delicacies and rich regional curries in a serene environment.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Raintree+Restaurant+Madikeri"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Namdroling Monastery (Golden Temple, Bylakuppe)",
+                "famous_food_spot": "Tibet Kitchen",
+                "speciality_dish": "Buff Thukpa, Steamed/Fried Momos, and Thukpa Soup",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "Located just outside the famous Tibetan Golden Temple complex, this popular spot offers tourists a unique taste of authentic Himalayan cuisine right in the heart of Karnataka.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tibet+Kitchen+Namdroling+Monastery+Bylakuppe"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Dubare Elephant Camp",
+                "famous_food_spot": "Atithi Comforts",
+                "speciality_dish": "Akki Roti with Tomato Curry, Aloo Curry, and Coconut Chutney",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A popular breakfast haven near Kushalnagar and Dubare camp, serving traditional banana-leaf breakfast items featuring freshly flattened rice flatbreads and comforting local curries.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Atithi+Comforts+Kushalnagar+Coorg"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Talacauvery & Bhagamandala",
+                "famous_food_spot": "Hotel Green Land",
+                "speciality_dish": "Traditional South Indian Meals and Kerala-style Fish Curry",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A dependable dining stop for pilgrims and tourists visiting the birthplace of River Cauvery, known for comforting hot meals and regional spice-infused dishes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Green+Land+Madikeri"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Omkareshwara Temple",
+                "famous_food_spot": "Taalaya Restaurant",
+                "speciality_dish": "Mutton Chops with Nool Puttu (String Hoppers) and Passion Fruit Soda",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Situated a short distance from the historic temple in Madikeri, famous for serving tender, melt-in-the-mouth mutton chops paired with light rice string hoppers.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taalaya+Restaurant+Madikeri"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Nisargadhama Eco Island",
+                "famous_food_spot": "Beans n Brews Cafe",
+                "speciality_dish": "Coorg Specialty Coffee, Wood-fired Pizzas, and Burgers",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A vibrant cafe in Madikeri town popular with tourists looking to unwind with authentic locally grown estate coffee blends and continental comfort snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Beans+n+Brews+Cafe+Madikeri"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Mandalpatti Peak Viewpoint",
+                "famous_food_spot": "Paksala Restaurant",
+                "speciality_dish": "Pure Veg South Indian Thali, Bisi Bele Bath, and Filter Coffee",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A premier pure vegetarian dining destination in Madikeri town, heavily frequented by travelers returning from the rugged Mandalpatti jeep trails for wholesome vegetarian comfort food.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paksala+Restaurant+Madikeri"
+            }
+        ]
+    },
+    {
+        "city": "Chikkamagaluru",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Mullayanagiri Peak",
+                "famous_food_spot": "Hotel Mayura Velapuri (KSTDC)",
+                "speciality_dish": "South Indian Thali, Akki Rotti, and Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A dependable state-run restaurant stop conveniently positioned for travelers descending from the highest peak in Karnataka, offering hot traditional meals and local estate coffee.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Chikkamagaluru"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Baba Budangiri & Datta Peeta",
+                "famous_food_spot": "Olympia Restaurant",
+                "speciality_dish": "Malnad Special Non-Veg Meals, Chicken Biryani, and Pepper Fry",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "An absolute legendary landmark in Chikkamagaluru town famous for serving robust, spice-packed Malnad-style non-vegetarian dishes that tourists flock to after mountain trails.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Olympia+Restaurant+Chikkamagaluru"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Hebbe Falls",
+                "famous_food_spot": "Planters' Court (Hale Coffee Bar)",
+                "speciality_dish": "Authentic Chikmagalur Filter Coffee and Banana Fritters",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Located near the coffee plantation belts, this cafe experience offers tourists aromatic brews made directly from local beans paired with light regional snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Planters+Court+Chikkamagaluru"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Bhadra Wildlife Sanctuary & Muthodi",
+                "famous_food_spot": "Town Canteen",
+                "speciality_dish": "Benne Masala Dosa and Filter Coffee",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "A historic culinary institution in Chikkamagaluru town operating for decades, legendary for its golden, crispy, butter-drenched dosas that draw food lovers from all over the state.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Town+Canteen+Chikkamagaluru"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Kudremukh National Park",
+                "famous_food_spot": "Annapoorna Hotel",
+                "speciality_dish": "Ragi Mudde with Nati Chicken Curry and Akki Rotti",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A popular rustic dining spot serving authentic Malnad home-style comfort food, highly recommended for trekkers wanting wholesome ragi balls and fiery country curries.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Annapoorna+Hotel+Kudremukh+Road+Chikkamagaluru"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Kemmangundi Hill Station & Z Point",
+                "famous_food_spot": "The Serai Dining / Estate Café",
+                "speciality_dish": "Malnad Thali, Bamboo Shoot Curry (Kilikrutha), and Coffee Infused Desserts",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "An upscale estate dining experience offering tourists a curated taste of traditional Malnad gourmet preparations amidst picturesque coffee plantations.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=The+Serai+Chikkamagaluru"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Manikyadhara Falls",
+                "famous_food_spot": "KG Food Camp",
+                "speciality_dish": "Mirchi Bajji, Hot Bonda, and Spiced Ginger Tea",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A bustling cluster of snack shacks near the waterfall paths where tourists enjoy piping hot, crunchy street-style mirchi bajjis paired with steaming tea in the cool mountain mist.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Manikyadhara+Falls+Snacks+Chikkamagaluru"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Coffee Museum Chikkamagaluru",
+                "famous_food_spot": "Cafe Agape",
+                "speciality_dish": "Espresso, Cold Coffee Blends, and Continental Pastries",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Situated right near the coffee museum hub, this contemporary cafe provides visitors with an aromatic conclusion to their coffee trail journey through the district.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+Agape+Chikkamagaluru"
+            }
+        ]
+    },
+    {
+        "city": "Udupi",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Udupi Sri Krishna Matha",
+                "famous_food_spot": "Sri Krishna Matha Annadana Shala",
+                "speciality_dish": "Traditional Sattvic Banana Leaf Meal (Prasadam)",
+                "rating_as_per_google": "4.8 / 5",
+                "description": "A sacred 700-year-old culinary tradition where thousands of pilgrims and tourists are served free, wholesome, onion-and-garlic-free South Indian meals off fresh banana leaves.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Krishna+Matha+Annadana+Udupi"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Car Street Udupi",
+                "famous_food_spot": "Mitra Samaj",
+                "speciality_dish": "Bullet Idli, Goli Baje, Mangalore Buns, and Filter Coffee",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "An absolute historic tiffin institution operating since 1947 right on Car Street, famous for authentic local evening snacks like sweet banana buns and fluffy fried dough balls.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mitra+Samaj+Car+Street+Udupi"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Malpe Beach & St. Mary's Island Ferry Point",
+                "famous_food_spot": "Thimmappa Fish Hotel",
+                "speciality_dish": "Rava-crusted Kane Fry (Lady Fish) and Fish Curry Meals",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A legendary coastal seafood haven near the main highway and beach routes, heavily frequented by tourists wanting to experience authentic Udupi-style coastal fish preparations.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thimmappa+Fish+Hotel+Udupi"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Kaup Beach & Lighthouse",
+                "famous_food_spot": "Diana Restaurant",
+                "speciality_dish": "Gadbad Ice Cream, Veg Cutlets, and Dahi Vada",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "A legendary family restaurant in Udupi town famous for inventing the multi-layered iconic 'Gadbad' ice cream sundae in the 1960s alongside classic crispy vegetarian cutlets.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Diana+Restaurant+Udupi"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Anegudde Sri Vinayaka Temple",
+                "famous_food_spot": "Mathuram Cafe (Brahmavara)",
+                "speciality_dish": "Ghee Podi Thatte Idli, South Indian Thali, and Kumbakonam Filter Coffee",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "Located on the prime temple highway trail in Brahmavara just north of Udupi, popular with pilgrims for authentic cloud-like idlis drenched in ghee and spice podi.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mathuram+Cafe+Brahmavara+Udupi"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Kajpe Sri Durgaparameshwari Temple",
+                "famous_food_spot": "Woodlands Restaurant",
+                "speciality_dish": "Crispy Masala Dosa and Filter Coffee",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A heritage pure-vegetarian dining landmark right by the temple zone, widely credited for perfecting the benchmark crispy Udupi masala dosa served with fresh coconut chutney.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Woodlands+Restaurant+Udupi"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Pattabhirama Temple / City Center",
+                "famous_food_spot": "Thamboolam",
+                "speciality_dish": "Kori Rotti (Crisp Rice Wafers with Spicy Chicken Curry) and Donne Biryani",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "An elegant setting on Maruthi Veethika showcasing authentic coastal non-vegetarian delicacies, particularly famous for crunchy rice wafers drenched in fiery local chicken curry.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thamboolam+Maruthi+Veethika+Udupi"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Kundapura Varaha River Bridges",
+                "famous_food_spot": "Shetty Lunch Home",
+                "speciality_dish": "Chicken Ghee Roast, Prawn Ghee Roast, and Rava Fry Kane",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A legendary culinary pilgrimage destination near Kundapura known across the state for inventing and serving world-renowned spicy ghee roast delicacies.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shetty+Lunch+Home+Kundapura+Udupi"
+            }
+        ]
+    },
+    {
+        "city": "Gokarna",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Mahabaleshwar Temple",
+                "famous_food_spot": "Mantra Cafe ( Kudle Beach View / Namaste Cafe area )",
+                "speciality_dish": "Wood-Fired Pizzas, Shakshuka, and Fresh Fruit Smoothies",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "An iconic traveler hub overlooking the coastline near the main beach trails, famous for relaxed beachside dining, continental comfort foods, and backpacker vibes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mantra+Cafe+Zostel+Gokarna"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Kudle Beach",
+                "famous_food_spot": "Namaste Cafe",
+                "speciality_dish": "Seafood Platter, Prawn Fried Rice, and Cold Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "The quintessential beachside dining landmark right on Kudle Beach where tourists gather to enjoy ocean views, coastal seafood, and relaxed evening snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Namaste+Cafe+Kudle+Beach+Gokarna"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Om Beach & Rock Formations",
+                "famous_food_spot": "Chez Christophe",
+                "speciality_dish": "Authentic French Crepes, Croissants, and Continental Breakfast",
+                "rating_as_per_google": "4.6 / 5",
+                "description": "A charming, highly-rated hidden culinary gem near the coastal paths of Om Beach run by European expats, offering incredible baked goods and artisanal treats.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Chez+Christophe+Gokarna"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Gokarna Main Beach & Temple Town Streets",
+                "famous_food_spot": "Café 1973",
+                "speciality_dish": "Akki Rotti, South Indian Filter Coffee, and North Karnataka Meals",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Situated close to the main temple bazaar lanes, offering travelers an authentic taste of local regional breakfast items and traditional Karnataka flavors.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+1973+Gokarna"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Half Moon Beach & Paradise Beach Trek Trails",
+                "famous_food_spot": "Little Paradise Guest House & Restaurant",
+                "speciality_dish": "Catch-of-the-day Fish Fry, Prawn Curry, and Rice",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A secluded cliffside dining spot tucked along the famous beach-trek route, popular with hikers looking for freshly prepared local coastal seafood and cold beverages.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paradise+Beach+Shack+Gokarna"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Mirjan Fort (Day Trip from Gokarna)",
+                "famous_food_spot": "Hotel Gokarna International Restaurant",
+                "speciality_dish": "Fish Thali, Kane Rava Fry, and Prawn Masala",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A dependable dining stop near the town center heavily frequented by tourists exploring the region, serving hearty coastal Karnataka fish meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Gokarna+International+Gokarna"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Yana Caves (Day Trip from Gokarna)",
+                "famous_food_spot": "Durgamba Veg & Non-Veg Restaurant",
+                "speciality_dish": "Karavali Style Chicken Sukka, Ragi Mudde, and Fish Curry Meals",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A prominent highway and town junction eatery serving authentic coastal Karnataka non-vegetarian and vegetarian specialties for travelers returning from forest excursions.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Durgamba+Restaurant+Gokarna"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Nirvana Beach & Belekan",
+                "famous_food_spot": "Pai Hotel",
+                "speciality_dish": "Crispy Masala Dosa, Idli Vada, and Mangalore Buns",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A classic local vegetarian haven in Gokarna town known for authentic Udupi-style tiffins and quick snacks before heading out to pristine northern beaches.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pai+Hotel+Gokarna"
+            }
+        ]
+    },
+    {
+        "city": "Dandeli",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Kali River Rafting & Adventure Point",
+                "famous_food_spot": "Oyster Serai Restaurant",
+                "speciality_dish": "Karavali Fish Curry, Prawn Fry, and North Karnataka Thali",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A premier dining spot located near the river adventure hubs, highly popular among tourists for enjoying fresh coastal fish preparations and wholesome local thalis after water sports.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Oyster+Serai+Restaurant+Dandeli"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Dandeli Wildlife Sanctuary",
+                "famous_food_spot": "Hotel Shere Punjab",
+                "speciality_dish": "Chicken Biryani, Tandoori Platters, and North Indian Curries",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A bustling and reliable dining stop right in Dandeli town, heavily frequented by jungle safari tourists looking for hearty, flavorful meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Shere+Punjab+Dandeli"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Kavala Caves",
+                "famous_food_spot": "Sri Ganesh Veg & Non-Veg Hotel",
+                "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Chicken Sukka",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A local favorite serving authentic North Karnataka jowar rotis and spicy regional curries, giving tourists a true taste of local rustic cuisine near the forest trails.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Ganesh+Hotel+Dandeli"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Syntheri Rocks",
+                "famous_food_spot": "Al-Ameen Fast Food & Restaurant",
+                "speciality_dish": "Mutton Biryani, Fried Chicken, and Kebabs",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A popular roadside eatery visited by tourists returning from Syntheri Rocks canyon excursions for quick, flavorful, and filling non-vegetarian meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Al-Ameen+Restaurant+Dandeli"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Supa Dam Viewpoint",
+                "famous_food_spot": "Kamat Upachar Dandeli",
+                "speciality_dish": "Idli Vada, Masala Dosa, and South Indian Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A trusted highway-style vegetarian haven on the routes towards Supa Dam, offering clean, quick, and authentic South Indian breakfast and tiffin favorites.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Dandeli"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Anshi National Park (Kali Tiger Reserve)",
+                "famous_food_spot": "Hornbill River Resort Dining",
+                "speciality_dish": "Malnad Style Fish Curry, Bamboo Shoot Delicacies, and Local Forest Thali",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Nestled deep in the forest near the riverbanks, offering tourists an immersive dining experience featuring authentic regional recipes and local specialties.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hornbill+River+Resort+Dandeli"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Shiroli Peak",
+                "famous_food_spot": "Green View Restaurant",
+                "speciality_dish": "Akki Rotti, Egg Curry, and Local Chai",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A scenic dining stop appreciated by trekkers and road-trippers for piping hot home-style rice flatbreads and comforting beverages in the cool canopy breeze.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Green+View+Restaurant+Dandeli"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Dandeli Crocodile Park",
+                "famous_food_spot": "Hotel Chandrakant",
+                "speciality_dish": "Crispy Mirchi Bajji, Girmit, and South Indian Meals",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A classic local haunt near the town center where tourists stop to sample popular street-side North Karnataka snacks like crunchy girmit and spicy mirchi bajjis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Chandrakant+Dandeli"
+            }
+        ]
+    },
+    {
+        "city": "Shivamogga (Shimoga)",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Jog Falls",
+                "famous_food_spot": "Sharavathi Hotel (Jog Falls viewpoint area)",
+                "speciality_dish": "Akki Rotti with Spicy Chutney, Bisi Bele Bath, and Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A popular tourist dining spot located near the majestic Jog Falls, offering travelers comforting hot rice rotis and regional vegetarian tiffins overlooking the valley.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharavathi+Hotel+Jog+Falls"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Sakrebyle Elephant Camp",
+                "famous_food_spot": "Mandara Restaurant",
+                "speciality_dish": "Malnad Style Fish Curry, Ragi Mudde, and Chicken Sukka",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A well-known dining destination near the highway routes towards Sakrebyle camp, heavily frequented by tourists wanting to sample authentic Malnad non-vegetarian preparations.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mandara+Restaurant+Shimoga"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Koodli (Confluence of Tunga and Bhadra Rivers)",
+                "famous_food_spot": "Hotel Jewel Rock",
+                "speciality_dish": "Prawn Ghee Roast, Chicken Biryani, and Coastal Seafood Thali",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An iconic multi-cuisine institution in Shivamogga town popular with tourists exploring historical temple routes for rich, spice-infused regional dishes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jewel+Rock+Shimoga"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Shivappa Naik Palace & Museum",
+                "famous_food_spot": "Idli House",
+                "speciality_dish": "Ghee Thattte Idli, Khali Dosa, and Maddur Vada",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Located centrally in Shivamogga town close to the palace museum, heavily visited by tourists for soft butter-soaked idlis and crispy traditional snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Idli+House+Shimoga"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Tunga Anicut Dam",
+                "famous_food_spot": "Hotel MTR (Mayura) Shivamogga",
+                "speciality_dish": "Sambar Idli, Rava Dosa, and Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A reliable and clean establishment favored by families and road-trippers for classic Karnataka tiffins and pure vegetarian meals near the river banks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Tunga+Shimoga"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Agumbe Rainforest (Sunset Viewpoint & Waterfalls)",
+                "famous_food_spot": "Doddamane (Agumbe House)",
+                "speciality_dish": "Authentic Malnad Brahmin Home-Style Rice Meals, Patrode, and Kasthuri Tea",
+                "rating_as_per_google": "4.6 / 5",
+                "description": "A legendary 150-year-old heritage home in Agumbe made famous by Malgudi Days, offering tourists simple, organic, and traditional forest-region vegetarian meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Doddamane+Agumbe"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Kundadri Hill Jain Temple",
+                "famous_food_spot": "Sneha Hotel (Thirthahalli Road)",
+                "speciality_dish": "Jackfruit Kadubu, Akki Rotti, and Local Style Chicken Curry",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A rustic pitstop along the winding roads toward Kundadri and Thirthahalli, serving seasonal Malnad specialties and authentic home-style rural delicacies.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sneha+Hotel+Thirthahalli+Road+Shimoga"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Tyavarekoppa Lion and Tiger Safari",
+                "famous_food_spot": "Sagar Hotel Shimoga",
+                "speciality_dish": "Masala Dosa, Mangalore Buns, and Filter Coffee",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A classic city-center landmark serving generations of tourists quick, reliable, and authentic Karnataka tiffin items before heading out to wildlife reserves.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Shimoga"
+            }
+        ]
+    },
+    {
+        "city": "Belur-Halebidu",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Chennakesava Temple, Belur",
+                "famous_food_spot": "Hotel Mayura Velapuri Belur (KSTDC)",
+                "speciality_dish": "Traditional South Indian Thali, Akki Rotti, and Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "Located right near the monumental Hoysala temple complex in Belur, offering tourists clean, reliable regional vegetarian meals and refreshing filter coffee right by the heritage site.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Belur"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Hoysaleswara Temple, Halebidu",
+                "famous_food_spot": "Kamat Upachar Halebidu",
+                "speciality_dish": "Idli Vada, Masala Dosa, and Bisi Bele Bath",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Situated conveniently close to the famous temple ruins in Halebidu, heavily frequented by tourists for classic, reliable highway-style Karnataka breakfast and tiffin favorites.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Halebidu"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Dasa Gopura & Temple Entrance, Belur",
+                "famous_food_spot": "Sri Guru Raghavendra Prasanna Hotel",
+                "speciality_dish": "Crispy Benne Masala Dosa, Mangalore Buns, and Uddina Vade",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A popular local eatery near the Belur temple lanes beloved by sightseers for serving piping-hot, butter-laden dosas and sweet-fermented traditional fried buns.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Raghavendra+Prasanna+Hotel+Belur"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Yagachi Dam & Water Sports Hub",
+                "famous_food_spot": "Yagachi View Restaurant",
+                "speciality_dish": "Fish Curry Meals, Chicken Sukka, and Fried Rice",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A scenic dining stop located right along the backwaters near the Yagachi water sports center, offering visitors hearty local meals and refreshing beverages overlooking the reservoir.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Yagachi+View+Restaurant+Belur"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Kedareshwara Temple, Halebidu",
+                "famous_food_spot": "Hotel Hoysala",
+                "speciality_dish": "Ragi Mudde with Nati Chicken Curry and Jolada Rotti",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A rustic local dining establishment near the heritage trails of Halebidu, providing tourists with an authentic taste of rural Malnad and Karnataka non-vegetarian comfort food.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Hoysala+Halebidu"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Belavadi Veeranarayana Temple (Heritage Trail)",
+                "famous_food_spot": "Shri Vinayaka Refreshments",
+                "speciality_dish": "Akki Rotti, Lemon Rice, and Spiced Ginger Tea",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "A charming pitstop along the rural temple trail between Belur and Halebidu, famous for serving freshly pressed rice flatbreads and hot local tea to heritage explorers.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Vinayaka+Refreshments+Belavadi"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Shanthala Drop (Basadihalli Viewpoint)",
+                "famous_food_spot": "Hoysala Village Resort Restaurant (The Kokum - Nearby)",
+                "speciality_dish": "Malnad Special Thali and Bamboo Shoot Delicacies",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An upscale resort dining option on the arterial highway connecting Belur and Hassan, offering travelers an authentic and hygienic exploration of regional Malnad recipes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Jain Basadis of Halebidu",
+                "famous_food_spot": "New Basaveshwara Canteen",
+                "speciality_dish": "Bisi Bele Bath, Idli Sambar, and Uppittu",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A trusty, unpretentious local staple near the architectural monuments of Halebidu providing quick, authentic, and satisfying South Indian tiffins for travelers.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Canteen+Halebidu"
+            }
+        ]
+    },
+    {
+        "city": "Vijayapura (Bijapur)",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Gol Gumbaz",
+                "famous_food_spot": "Pearl Hotel & Restaurant",
+                "speciality_dish": "Jolada Rotti Oota with Ennegayi, Pulao, and North Karnataka Thali",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located conveniently close to the historic Gol Gumbaz complex, this popular family restaurant offers tourists authentic North Karnataka meals featuring traditional jowar rotis and regional curries.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pearl+Hotel+Restaurant+Vijayapura"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Ibrahim Rauza",
+                "famous_food_spot": "Hotel Jam Jam",
+                "speciality_dish": "Mutton Biryani, Chicken Kababs, and Shahi Haleem",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A legendary dining spot in Vijayapura renowned for its rich Deccani and Mughlai non-vegetarian preparations, heavily frequented by heritage tourists exploring the city's Sultanate architecture.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jam+Jam+Vijayapura"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Bara Kaman",
+                "famous_food_spot": "Ashoka Restaurant",
+                "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A classic local establishment in the heart of the town near the monuments, famous for traditional North Karnataka evening snacks like spicy puffed rice girmit and crispy mirchi bajjis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ashoka+Restaurant+Vijayapura"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Malik-e-Maqdan (Cannon) & Citadel",
+                "famous_food_spot": "Kamat Upachar Vijayapura",
+                "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A trusted, clean, and popular highway-style vegetarian haven offering tourists quick and authentic South Indian tiffin items right near the main sightseeing circuits.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Vijayapura"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Upali Burj (Tower)",
+                "famous_food_spot": "New Taj Restaurant",
+                "speciality_dish": "Authentic Hyderabadi Biryani and Chicken Fry",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "A bustling culinary favorite among travelers looking for flavorful, spice-rich Deccani non-vegetarian dishes after touring historical bastions.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Restaurant+Vijayapura"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Jumma Masjid Vijayapura",
+                "famous_food_spot": "Shri Guru Sainath Canteen",
+                "speciality_dish": "Jolada Rotti, Shenga Chutney (Peanut Chutney), and Pallya",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "An authentic local eatery praised by food tourists for serving genuine home-style North Karnataka village meals complete with spicy dry peanut chutney and millet bread.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Canteen+Vijayapura"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Chand Bawdi (Ancient Stepwell)",
+                "famous_food_spot": "Meenakshi Sweets & Bakery",
+                "speciality_dish": "Dharwad Pedha, Badam Milk, and Traditional Sweets",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A landmark sweet house near the old town center where tourists stop to enjoy rich regional milk sweets and refreshing warm beverages.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Meenakshi+Sweets+Vijayapura"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Asar Mahal",
+                "famous_food_spot": "Hotel Madhuvan International",
+                "speciality_dish": "North Karnataka Thali, Bisi Bele Bath, and North Indian Curries",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A well-known upscale multi-cuisine dining spot in Vijayapura providing comfortable seating, hygienic regional meals, and excellent service for families and travelers.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Madhuvan+International+Vijayapura"
+            }
+        ]
+    },
+    {
+        "city": "Bidar",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Bidar Fort",
+                "famous_food_spot": "Hotel Al-Baik",
+                "speciality_dish": "Hyderabadi Chicken Biryani, Tandoori Chicken, and Rumali Roti",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located close to the historic fort gates, this popular local eatery serves flavorful Deccani and Mughlai non-vegetarian dishes loved by history explorers and food tourists.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Al+Baik+Bidar"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Mahmud Gawan Madrassa",
+                "famous_food_spot": "Shahi Darbar Restaurant",
+                "speciality_dish": "Mutton Haleem, Shahi Paneer, and Butter Naan",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "Situated within walking distance of the magnificent medieval ruins of Mahmud Gawan Madrassa, offering rich regional gravies and traditional festive delicacies.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shahi+Darbar+Restaurant+Bidar"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Gurudwara Nanak Jhira Sahib",
+                "famous_food_spot": "Gurudwara Langar Hall",
+                "speciality_dish": "Divine Dal Makhani, Kadha Prasad, and Hot Roti (Langar Prasadam)",
+                "rating_as_per_google": "4.9 / 5",
+                "description": "A sacred and deeply revered pilgrimage stop where thousands of visitors partake in the community langar serving pure, wholesome, and comforting vegetarian meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gurudwara+Nanak+Jhira+Sahib+Bidar"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Bahmani Tombs (Chaukhandi)",
+                "famous_food_spot": "New Taj Hotel & Bakery",
+                "speciality_dish": "Osmania Biscuits, Irani Chai, and Maska Bun",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A classic Bidar heritage bakery spot where tourists stop to enjoy traditional Hyderabadi-style sweet-salty biscuits dipped in piping hot Irani tea.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Bakery+Bidar"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Rangin Mahal & Royal Enclosure",
+                "famous_food_spot": "Hotel Mayura Haritha Bidar (KSTDC)",
+                "speciality_dish": "North Karnataka Thali, Jolada Rotti, and South Indian Meals",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "Operated by the state tourism board near the fort complex, offering travelers hygienic regional thalis and comforting local vegetarian dishes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Haritha+Bidar"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Papnash Shiva Temple",
+                "famous_food_spot": "Shri Guru Raghavendra Veg Hotel",
+                "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A popular local vegetarian haven near the temple valley known for authentic North Karnataka village meals featuring millet rotis and spicy peanut condiments.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Raghavendra+Veg+Hotel+Bidar"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Solah Khamba Mosque",
+                "famous_food_spot": "Royal Palace Restaurant",
+                "speciality_dish": "Chicken Biryani, Fried Fish, and Special Thali",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A trusted dining establishment near the main city center popular with sightseers for flavorful multi-cuisine preparations and hearty meals.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Royal+Palace+Restaurant+Bidar"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Bidriware Craft Workshops & Bazaar",
+                "famous_food_spot": "Mahalaxmi Sweets & Namkeen",
+                "speciality_dish": "Dharwad Pedha, Holige (Obbattu), and Mixture Savories",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "A well-known sweet house in the bustling local shopping lanes where tourists buy authentic regional sweets and traditional festival delicacies.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Bidar"
+            }
+        ]
+    },
+    {
+        "city": "Chitradurga",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Chitradurga Fort (Kallina Kote)",
+                "famous_food_spot": "Hotel Kamyab",
+                "speciality_dish": "Jolada Rotti Oota with Ennegayi, Shenga Chutney, and Spicy Chicken Sukka",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located near the city center close to the historic fort pathways, this popular restaurant serves authentic North Karnataka meals featuring millet rotis and robust regional curries.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Kamyab+Chitradurga"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Chandravalli Archaeological Site",
+                "famous_food_spot": "Sri Guru Kottureshwara Military Hotel",
+                "speciality_dish": "Nati Mutton Biryani, Mutton Chops, and Ragi Mudde",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "A legendary local non-vegetarian military hotel in Chitradurga famous for serving authentic country-style mutton dishes paired with piping hot ragi balls.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Kottureshwara+Military+Hotel+Chitradurga"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Ankalamma Temple & Chitradurga Town Bazaars",
+                "famous_food_spot": "Gayathri Tiffin Room",
+                "speciality_dish": "Benne Khali Dosa, Idli Sambar, and Filter Coffee",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A classic, long-standing breakfast establishment in the town center heavily frequented by tourists for crispy, buttery dosas and traditional South Indian tiffins.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gayathri+Tiffin+Room+Chitradurga"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Vani Vilasa Sagara Dam (Mari Kanive)",
+                "famous_food_spot": "Kamat Upachar Hiriyur (Near Chitradurga Highway)",
+                "speciality_dish": "Idli Vada, Masala Dosa, and Bisi Bele Bath",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A reliable and clean highway-style vegetarian haven popular with tourists driving towards the historic Vani Vilasa Sagara dam reservoir.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Hiriyur+Chitradurga"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Jogimatti Hill Station & Adventure Camp",
+                "famous_food_spot": "Hotel Mayura Durgama Chitradurga (KSTDC)",
+                "speciality_dish": "North Karnataka Thali, Akki Rotti, and South Indian Meals",
+                "rating_as_per_google": "4.0 / 5",
+                "description": "Operated by the state tourism board near the foothills of Jogimatti, offering travelers hygienic regional thalis and comforting local meals in a serene environment.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Durgama+Chitradurga"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Hidimbeshwara Temple inside Chitradurga Fort",
+                "famous_food_spot": "Shri Durgamba Refreshments",
+                "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A popular local snack stop near the fort boundaries where tourists enjoy classic North Karnataka evening snacks like spicy puffed rice girmit and hot mirchi bajjis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Durgamba+Refreshments+Chitradurga"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Bheema's Gateway (Fort Bastion)",
+                "famous_food_spot": "Hotel Naveen Palace",
+                "speciality_dish": "Chicken Biryani, Pepper Dry, and North Indian Curries",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A prominent multi-cuisine dining spot in Chitradurga town favored by tourists and road-trippers for hearty lunch and dinner spreads.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Naveen+Palace+Chitradurga"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Chitradurga Windmill Farms Corridor",
+                "famous_food_spot": "Mahalaxmi Sweets & Bakery Chitradurga",
+                "speciality_dish": "Dharwad Pedha, Badam Milk, and Traditional Sweets",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A well-known sweet house in the bustling town lanes where tourists stop to purchase regional sweets and refreshing milk beverages before heading out to the windmill hills.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Chitradurga"
+            }
+        ]
+    },
+    {
+        "city": "Belagavi (Belgaum)",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Belgaum Fort (Kote)",
+                "famous_food_spot": "Hotel Milan",
+                "speciality_dish": "Belagavi Kunda, North Karnataka Thali, and Jolada Rotti Oota",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "Located centrally in the city near the fort routes, this popular spot is ideal for tourists wanting to sample authentic local meals and the world-famous sweet Kunda.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Milan+Belgaum"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Kamal Basadi & Jain Mandir inside Belgaum Fort",
+                "famous_food_spot": "Purohit Sweets (RTC Area)",
+                "speciality_dish": "Authentic Traditional Belagavi Kunda and Dharwad Pedha",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "A legendary sweet house in Belagavi where every tourist stops to purchase fresh, rich, milk-based Kunda prepared using traditional heritage recipes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Belgaum"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Sogal Waterfalls & Ancient Temple",
+                "famous_food_spot": "Hotel New Royal Palace",
+                "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A favored highway and town stop serving genuine North Karnataka village meals featuring millet breads and spicy dry peanut accompaniments.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+New+Royal+Palace+Belgaum"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Godchinamalaki Falls & Gokak Falls",
+                "famous_food_spot": "Kamat Upachar Gokak Road",
+                "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "A reliable and clean vegetarian haven heavily frequented by sightseers heading out towards the magnificent waterfalls around Gokak and surrounding districts.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Belgaum"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Rajhansgad Yellur Fort",
+                "famous_food_spot": "Nartaki Restaurant",
+                "speciality_dish": "Mutton Biryani, Chicken Sukka, and North Indian Curries",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A prominent dining establishment near the city center popular with tourists returning from historical hilltop fort excursions for hearty lunches and dinners.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nartaki+Restaurant+Belgaum"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Hydel Park & Military Mahadev Temple",
+                "famous_food_spot": "Shri Guru Sainath Refreshments",
+                "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "A favorite local street-food style halt where tourists enjoy popular regional evening snacks like spicy puffed rice girmit and hot, crispy mirchi bajjis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Refreshments+Belgaum"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Kamal Basti Outer Bazaar Lanes",
+                "famous_food_spot": "Hotel Sanman Deluxe",
+                "speciality_dish": "Masala Dosa, Bisi Bele Bath, and Mangalore Buns",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A classic vegetarian tiffin institution in Belagavi town known for serving quick, delicious, and traditional South Indian breakfast favorites.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Deluxe+Belgaum"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Sankey Lake / Central Camp Area",
+                "famous_food_spot": "Eefa Restaurant",
+                "speciality_dish": "Multi-cuisine Platters, Seafood Specials, and Mocktails",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An upscale multi-cuisine dining destination in Belagavi offering a comfortable ambiance and diverse menu choices for travelers looking for a refined dining experience.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Eefa+Restaurant+Belgaum"
+            }
+        ]
+    },
+    {
+        "city": "Hubballi (Hubli)",
+        "top_food_tourism_spots": [
+            {
+                "spot_id": 1,
+                "tourist_attraction": "Nrupatunga Hill (Nrupatunga Betta)",
+                "famous_food_spot": "Padmashree Hotel",
+                "speciality_dish": "Jolada Rotti Oota with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
+                "rating_as_per_google": "4.3 / 5",
+                "image_url": "./images/food/Jollada_Rotti_Oota_HUBLI.jpg",
+                "description": "Located near the city center, this iconic regional restaurant is a mandatory food stop for travelers wanting to experience authentic North Karnataka millet bread meals and spicy peanut condiments.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Padmashree+Hotel+Hubli"
+            },
+            {
+                "spot_id": 2,
+                "tourist_attraction": "Unkal Lake & Swami Vivekananda Statue",
+                "famous_food_spot": "Ananth Cyber Cafe & Girmit Point / Local Street Vendors",
+                "speciality_dish": "Spicy Puffed Rice Girmit with Mirchi Bajji and Khara Mandakki",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Situated right along the breezy lakeside promenade where tourists gather in the evening to enjoy North Karnataka's quintessential street-side snack, girmit paired with hot chili bajjis.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Unkal+Lake+Hubli"
+            },
+            {
+                "spot_id": 3,
+                "tourist_attraction": "Bhavanishankar Temple & Old Hubli Town",
+                "famous_food_spot": "Basaveshwara Khanavali",
+                "speciality_dish": "Unlimited Jolada Rotti Meals with Menthe Pallya and Kosambari",
+                "rating_as_per_google": "4.5 / 5",
+                "description": "A traditional, legendary Khanavali in the heritage town area renowned for serving authentic, wholesome home-style North Karnataka vegetarian meals on banana leaves.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Khanavali+Hubli"
+            },
+            {
+                "spot_id": 4,
+                "tourist_attraction": "Chandramouleshwara Temple (Unkal)",
+                "famous_food_spot": "Kamat's Restaurant Hubli",
+                "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
+                "rating_as_per_google": "4.1 / 5",
+                "description": "A trusted landmark dining spot near the historic 900-year-old Chalukyan temple, heavily frequented by tourists for clean, delicious South Indian tiffins.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Restaurant+Hubli"
+            },
+            {
+                "spot_id": 5,
+                "tourist_attraction": "Indira Gandhi Glass House Garden",
+                "famous_food_spot": "Clarks Inn Hotel Restaurant",
+                "speciality_dish": "North Karnataka Thali, Jolada Rotti, and Mutton Sukka",
+                "rating_as_per_google": "4.2 / 5",
+                "description": "An upscale dining option centrally located near the garden complex, offering travelers a comfortable and hygienic environment to sample both regional specialties and multi-cuisine dishes.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Clarks+Inn+Hubli"
+            },
+            {
+                "spot_id": 6,
+                "tourist_attraction": "Global Glass House / Railway Museum Hubballi",
+                "famous_food_spot": "Sri Durga Hotel",
+                "speciality_dish": "Holige (Obbattu) with Ghee, Girmit, and Mirchi Bajji",
+                "rating_as_per_google": "4.3 / 5",
+                "description": "A popular local haunt near the railway heritage zones where sightseers stop to relish sweet lentil flatbreads (holige) drenched in warm ghee alongside spicy evening snacks.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Durga+Hotel+Hubli"
+            },
+            {
+                "spot_id": 7,
+                "tourist_attraction": "Siddharoodha Math",
+                "famous_food_spot": "Siddharoodha Math Annadana Shala",
+                "speciality_dish": "Sacred Community Prasadam Meals (South Indian Thali)",
+                "rating_as_per_google": "4.8 / 5",
+                "description": "A deeply revered spiritual center where thousands of pilgrims and visitors are served daily free, wholesome, and comforting vegetarian meals as part of the temple's service tradition.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Siddharoodha+Math+Hubli"
+            },
+            {
+                "spot_id": 8,
+                "tourist_attraction": "Hubballi Durgadamma Temple Bazaar",
+                "famous_food_spot": "Purohit Sweets Hubli",
+                "speciality_dish": "Dharwad Pedha, Badam Milk, and Special Sweets",
+                "rating_as_per_google": "4.4 / 5",
+                "description": "Located in the bustling central shopping lanes near the historic temple, serving iconic regional milk sweets that every food tourist makes sure to pack home.",
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Hubli"
+            }
+        ]
+    }
+]
