@@ -17,23 +17,27 @@ import './route-discovery.css';
 import './FoodSpots.css';
 import ItineraryPage from "./ItineraryPage.jsx";
 
-const KEY = 'np_intro_seen';
 
 const reduced = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+const isLandingPageReload = () => {
+  const navigationEntry = performance.getEntriesByType('navigation')[0];
+
+  return (
+    window.location.pathname === '/' &&
+    navigationEntry?.type === 'reload'
+  );
+};
+
+
 export default function App() {
   const [journeyConfig, setJourneyConfig] = useState(null);
 
-  const [intro, setIntro] = useState(() => {
-    try {
-      if (sessionStorage.getItem(KEY)) return false;
-    } catch {
-      // Storage unavailable
-    }
 
-    return !reduced();
-  });
+const [intro, setIntro] = useState(
+  () => isLandingPageReload() && !reduced()
+);
 
   const [panel, setPanel] = useState(null);
   const [active, setActive] = useState('home');
@@ -81,15 +85,11 @@ export default function App() {
   navigate("/itinerary");
 };
 
-  const finishIntro = useCallback(() => {
-    try {
-      sessionStorage.setItem(KEY, '1');
-    } catch {
-      // Ignore storage errors
-    }
+  
+const finishIntro = useCallback(() => {
+  setIntro(false);
+}, []);
 
-    setIntro(false);
-  }, []);
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({
@@ -178,7 +178,10 @@ export default function App() {
 
   // Page 3: Dedicated Food Spots page.
   if (currentPage === '/food-spots') {
-    return <FoodSpots onBack={() => navigate('/')} />;
+    return (
+    <FoodSpots
+     onBack={() => navigate('/route-discovery')} />
+  );
   }
   //page 4 : itinerary page 
   // Page 4: Itinerary page

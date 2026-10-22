@@ -23,6 +23,17 @@ import { HeritageBorder } from './components/Motifs';
 import { getRouteOptions } from './services/routeService';
 import './route-discovery.css';
 
+const ROUTE_DISCOVERY_STATE_KEY = 'np_route_discovery_state';
+
+function getSavedRouteDiscoveryState() {
+  try {
+    const saved = sessionStorage.getItem(ROUTE_DISCOVERY_STATE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (error) {
+    console.error('Unable to restore route discovery state:', error);
+    return {};
+  }
+}
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 ).replace(/\/$/, '');
@@ -228,49 +239,68 @@ export default function RouteDiscoveryPage({
   onOpenItinerary,
 
 }) {
-  const [from, setFrom] = useState(initialFrom);
-  const [to, setTo] = useState(initialTo);
+  const [from, setFrom] = useState( () => getSavedRouteDiscoveryState().from ?? initialFrom);
+  const [to, setTo] = useState( () => getSavedRouteDiscoveryState().to ?? initialTo);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [routes, setRoutes] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [routes, setRoutes] = useState(() => getSavedRouteDiscoveryState().routes ?? null);
+  const [selected, setSelected] = useState(() => getSavedRouteDiscoveryState().selected ?? null);
 
-  const [startDate, setStartDate] = useState(
-    initialStartDate || getLocalDateString()
+  
+const [startDate, setStartDate] = useState(
+  () =>
+    getSavedRouteDiscoveryState().startDate ||
+    initialStartDate ||
+    getLocalDateString()
+);
+
+const [tripDays, setTripDays] = useState(() => {
+  const saved = getSavedRouteDiscoveryState();
+
+  if (saved.tripDays) return saved.tripDays;
+
+  if (!initialStartDate || !initialEndDate) return 1;
+
+  const start = new Date(`${initialStartDate}T12:00:00`);
+  const end = new Date(`${initialEndDate}T12:00:00`);
+
+  return Math.max(
+    1,
+    Math.min(7, Math.floor((end - start) / 86400000) + 1)
   );
-
-  const [tripDays, setTripDays] = useState(() => {
-    if (!initialStartDate || !initialEndDate) return 1;
-
-    const start = new Date(`${initialStartDate}T12:00:00`);
-    const end = new Date(`${initialEndDate}T12:00:00`);
-
-    return Math.max(
-      1,
-      Math.min(7, Math.floor((end - start) / 86400000) + 1)
-    );
-  });
-
+});
   // Resolve all selected destinations while keeping their order.
-  const tourismDestinations = useMemo(() => {
-    const incoming =
-      Array.isArray(initialDestinations) && initialDestinations.length
-        ? initialDestinations
-        : ['bengaluru'];
+  // Restore the cities selected in Plan Your Journey.
+const tourismDestinations = useMemo(() => {
+  const savedDestinations =
+    getSavedRouteDiscoveryState().destinations ?? [];
 
-    const resolved = incoming
-      .map(resolveTourismDestination)
-      .filter(Boolean);
+  const incoming =
+    Array.isArray(initialDestinations) &&
+    initialDestinations.length > 0
+      ? initialDestinations
+      : savedDestinations;
 
-    return resolved.filter(
-      (destination, index, all) =>
-        all.findIndex((item) => item.id === destination.id) === index
-    );
-  }, [initialDestinations]);
+  const resolved = incoming
+    .map(resolveTourismDestination)
+    .filter(Boolean);
 
-  const [activeDestinationId, setActiveDestinationId] = useState(
-    tourismDestinations[0]?.id || 'bengaluru'
+  return resolved.filter(
+    (destination, index, all) =>
+      all.findIndex((item) => item.id === destination.id) === index
   );
+}, [initialDestinations]);
+const [activeDestinationId, setActiveDestinationId] = useState(() => {
+  const saved = getSavedRouteDiscoveryState();
+
+  return (
+    saved.activeDestinationId ||
+    initialDestinations?.[0]?.id ||
+    initialDestinations?.[0] ||
+    saved.destinations?.[0] ||
+    null
+  );
+});
 
   const [attractionsByDestination, setAttractionsByDestination] =
     useState({});
@@ -281,7 +311,9 @@ export default function RouteDiscoveryPage({
   const [errorsByDestination, setErrorsByDestination] =
     useState({});
 
-  const [selectedAttractionIds, setSelectedAttractionIds] = useState([]);
+  const [selectedAttractionIds, setSelectedAttractionIds] = useState(
+  
+    () => getSavedRouteDiscoveryState().selectedAttractionIds ?? []);
 
   const [weatherByDay, setWeatherByDay] = useState({});
   const [weatherLoadingDay, setWeatherLoadingDay] = useState(null);
@@ -328,6 +360,42 @@ export default function RouteDiscoveryPage({
 
     return getLocalDateString(end);
   }, [startDate, tripDays]);
+  
+useEffect(() => {
+  try {
+    sessionStorage.setItem(
+      'np_route_discovery_state',
+      JSON.stringify({
+        from,
+        to,
+        routes,
+        selected,
+        startDate,
+        tripDays,
+        activeDestinationId,
+        selectedAttractionIds,
+        weatherByDay,
+        destinations: tourismDestinations.map(
+  (destination) => destination.id
+),
+tourismDestinations,
+      })
+    );
+  } catch (error) {
+    console.error('Unable to save route discovery state:', error);
+  }
+}, [
+  from,
+  to,
+  routes,
+  selected,
+  startDate,
+  tripDays,
+  activeDestinationId,
+  selectedAttractionIds,
+  weatherByDay,
+]);
+
 
   const resetResults = () => {
     setRoutes(null);
