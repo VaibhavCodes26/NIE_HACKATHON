@@ -15,6 +15,7 @@ import Stays from './Stays';
 import './styles.css';
 import './route-discovery.css';
 import './FoodSpots.css';
+import ItineraryPage from "./ItineraryPage.jsx";
 
 const KEY = 'np_intro_seen';
 
@@ -40,6 +41,17 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(
     () => window.location.pathname
   );
+  const [selectedAttractionIds, setSelectedAttractionIds] = useState(() => {
+  try {
+    const saved = sessionStorage.getItem('np_selected_itinerary');
+    return saved
+      ? JSON.parse(saved).selected_attraction_ids ?? []
+      : [];
+  } catch (error) {
+    console.error('Unable to read saved itinerary:', error);
+    return [];
+  }
+});
 
   // Support browser Back and Forward navigation.
   useEffect(() => {
@@ -65,6 +77,9 @@ export default function App() {
     setPanel(null);
     window.scrollTo(0, 0);
   }, []);
+  const handleOpenItinerary = () => {
+  navigate("/itinerary");
+};
 
   const finishIntro = useCallback(() => {
     try {
@@ -147,6 +162,7 @@ export default function App() {
         initialEndDate={journeyConfig?.endDate}
         onContinue={() => navigate('/plan-journey')}
         onOpenStays={() => navigate('/stays')}
+        onOpenItinerary={() => navigate('/itinerary')}
       />
     );
   }
@@ -164,6 +180,17 @@ export default function App() {
   if (currentPage === '/food-spots') {
     return <FoodSpots onBack={() => navigate('/')} />;
   }
+  //page 4 : itinerary page 
+  // Page 4: Itinerary page
+if (currentPage === '/itinerary') {
+  return (
+    <ItineraryPage
+      journeyConfig={journeyConfig}
+      selectedAttractionIds={selectedAttractionIds}
+      onBack={() => navigate('/route-discovery')}
+    />
+  );
+}
 
   // Default page: Existing landing page.
   return (

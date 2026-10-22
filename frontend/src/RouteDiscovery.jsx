@@ -225,6 +225,8 @@ export default function RouteDiscoveryPage({
   initialEndDate,
   initialFrom = null,
   initialTo = null,
+  onOpenItinerary,
+
 }) {
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
@@ -615,46 +617,46 @@ export default function RouteDiscoveryPage({
     }
   };
 
-  // Save the actual database IDs and travel dates for PlanJourney.
-  const saveItinerarySelection = () => {
-    if (selectedAttractionIds.length === 0) {
-      window.alert('Please select at least one tourist spot first.');
-      return;
-    }
+// Save selected attractions and open the itinerary page.
+const saveItinerarySelection = () => {
+  if (selectedAttractionIds.length === 0) {
+    window.alert('Please select at least one tourist spot first.');
+    return;
+  }
 
-    const payload = {
-      destinations: tourismDestinations.map(
-        (destination) => destination.id
-      ),
-      selected_attraction_ids: selectedAttractionIds,
-      start_date: startDate,
-      end_date: endDate,
-      trip_days: tripDays,
-      selected_places: selectedAttractions.map((place) => ({
-        id: Number(place.id),
-        destination_id: place.destination_id,
-        name: place.name,
-      })),
-    };
-
-    try {
-      sessionStorage.setItem(
-        'np_selected_itinerary',
-        JSON.stringify(payload)
-      );
-
-      window.location.href = '/plan-journey';
-    } catch (error) {
-      console.error(
-        'Unable to save itinerary selection:',
-        error
-      );
-
-      window.alert(
-        'Unable to save your selections. Please try again.'
-      );
-    }
+  const payload = {
+    destinations: tourismDestinations.map(
+      (destination) => destination.id
+    ),
+    selected_attraction_ids: selectedAttractionIds,
+    start_date: startDate,
+    end_date: endDate,
+    trip_days: tripDays,
+    selected_places: selectedAttractions.map((place) => ({
+      id: Number(place.id),
+      destination_id: place.destination_id,
+      name: place.name,
+    })),
   };
+
+  try {
+    sessionStorage.setItem(
+      'np_selected_itinerary',
+      JSON.stringify(payload)
+    );
+
+    if (typeof onOpenItinerary === 'function') {
+      onOpenItinerary();
+    } else {
+      console.error('onOpenItinerary callback was not provided.');
+      window.alert('Itinerary navigation is not configured yet.');
+    }
+  } catch (error) {
+    console.error('Unable to save itinerary selection:', error);
+    window.alert('Unable to save your selections. Please try again.');
+  }
+};
+
 
   return (
     <div className="rd-page">
@@ -984,6 +986,7 @@ export default function RouteDiscoveryPage({
             type="button"
             className="rd-quick-nav__item rd-quick-nav__item--primary"
             onClick={saveItinerarySelection}
+            
           >
             <span className="rd-quick-nav__icon">
               <Map size={23} />
@@ -993,7 +996,7 @@ export default function RouteDiscoveryPage({
               <strong>Get Your Itinerary</strong>
               <small>Build your Karnataka journey</small>
             </span>
-
+            
             <ArrowRight
               className="rd-quick-nav__arrow"
               size={19}
