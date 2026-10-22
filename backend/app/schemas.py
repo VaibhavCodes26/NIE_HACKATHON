@@ -21,24 +21,22 @@ class Interest(str, Enum):
     FESTIVALS = "Festivals & traditions"
 
 
+
 class ItineraryRequest(BaseModel):
     """Data received from the PlanJourney.jsx form."""
 
     destinations: list[str] = Field(min_length=1, max_length=8)
-    selected_attraction_ids: list[int] | None = Field(
-    default=None,
-    max_length=100,
-)
+
+    selected_attraction_ids: list[int] = Field(default_factory=list, max_length=100)
+
     start_date: date
     end_date: date
+
     traveller_count: int = Field(ge=1, le=30)
     travel_style: TravelStyle
     total_budget: int = Field(ge=1000, le=100000)
     interests: list[Interest] = Field(default_factory=list, max_length=8)
-    selected_attraction_ids: list[int] = Field(
-    default_factory=list,
-    max_length=100,
-)
+
     @model_validator(mode="after")
     def validate_trip(self):
         if self.end_date < self.start_date:
@@ -52,6 +50,11 @@ class ItineraryRequest(BaseModel):
 
         if len(set(self.interests)) != len(self.interests):
             raise ValueError("Duplicate interests are not allowed.")
+
+        if len(set(self.selected_attraction_ids)) != len(
+            self.selected_attraction_ids
+        ):
+            raise ValueError("Duplicate attraction IDs are not allowed.")
 
         return self
 

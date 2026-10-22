@@ -160,6 +160,17 @@ function getWeatherIcon(description = "") {
   return Sun;
 }
 
+
+function readSavedItinerarySelection() {
+  try {
+    const saved = sessionStorage.getItem("np_selected_itinerary");
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+
 export default function ItineraryPage({
   journeyConfig,
   selectedAttractionIds = EMPTY_ARRAY,
@@ -167,10 +178,39 @@ export default function ItineraryPage({
   onBack,
   onModifyJourney,
 }) {
-  const config = journeyConfig ?? {};
-  const destinations = useMemo(() => readDestinations(config), [config]);
-  const startDate = config.startDate ?? config.start_date ?? "";
-  const endDate = config.endDate ?? config.end_date ?? "";
+ 
+const config = journeyConfig ?? {};
+
+const [savedSelection] = useState(readSavedItinerarySelection);
+
+const destinations = useMemo(
+  () => readDestinations(config),
+  [config]
+);
+
+const requestDestinations =
+  Array.isArray(savedSelection?.destinations) &&
+  savedSelection.destinations.length
+    ? savedSelection.destinations
+    : destinations;
+
+const startDate =
+  savedSelection?.start_date ||
+  config.startDate ||
+  config.start_date ||
+  "";
+
+const endDate =
+  savedSelection?.end_date ||
+  config.endDate ||
+  config.end_date ||
+  "";
+
+const effectiveSelectedAttractionIds =
+  Array.isArray(savedSelection?.selected_attraction_ids)
+    ? savedSelection.selected_attraction_ids
+    : selectedAttractionIds;
+
   const travellerCount = Number(
     config.travellerCount ?? config.traveller_count ?? config.travelers ?? 1
   );
@@ -223,16 +263,18 @@ export default function ItineraryPage({
     setLoading(true);
     setPageError("");
 
-    const payload = {
-      destinations,
-      start_date: startDate || null,
-      end_date: endDate || null,
-      traveller_count: travellerCount || 1,
-      travel_style: travelStyle,
-      total_budget: totalBudget || null,
-      interests: Array.isArray(interests) ? interests : [],
-      selected_attraction_ids: selectedAttractionIds,
-    };
+    
+const payload = {
+  destinations: requestDestinations,
+  start_date: startDate,
+  end_date: endDate,
+  traveller_count: travellerCount || 1,
+  travel_style: travelStyle,
+  total_budget: totalBudget || 1000,
+  interests: Array.isArray(interests) ? interests : [],
+  selected_attraction_ids: effectiveSelectedAttractionIds,
+};
+
 
     try {
       const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
@@ -257,14 +299,16 @@ export default function ItineraryPage({
       setLoading(false);
     }
   }, [
-    destinations,
-    startDate,
-    endDate,
-    travellerCount,
-    travelStyle,
-    totalBudget,
-    interests,
-    selectedAttractionIds,
+    [
+  requestDestinations,
+  startDate,
+  endDate,
+  travellerCount,
+  travelStyle,
+  totalBudget,
+  interests,
+  effectiveSelectedAttractionIds,
+]
   ]);
 
   useEffect(() => {

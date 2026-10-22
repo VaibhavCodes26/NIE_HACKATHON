@@ -159,34 +159,54 @@ export default function PlanJourney({
         }
 
         setLoading(true);
-        try {
-            const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    destinations: selectedDestinations,
-                    start_date: startDate,
-                    end_date: endDate,
-                    traveller_count: Number(travellerCount),
-                    travel_style: travelStyle,
-                    total_budget: Number(totalBudget),
-                    interests,
-                }),
-            });
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                const detail = Array.isArray(payload.detail)
-                    ? payload.detail.map((item) => item.msg).join(', ')
-                    : payload.detail;
-                throw new Error(detail || 'The planner could not build this draft.');
-            }
-            setResult(payload);
-            if (onPreview) onPreview(payload);
-        } catch (err) {
-            setError(`Could not reach the NammaPrayana backend at ${API_BASE}. Start the FastAPI server and try again. ${err.message || ''}`);
-        } finally {
-            setLoading(false);
-        }
+        
+try {
+    const savedSelection = sessionStorage.getItem('np_selected_itinerary');
+    const itinerarySelection = savedSelection
+        ? JSON.parse(savedSelection)
+        : null;
+
+    const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            destinations: selectedDestinations,
+            start_date: startDate,
+            end_date: endDate,
+            traveller_count: Number(travellerCount),
+            travel_style: travelStyle,
+            total_budget: Number(totalBudget),
+            interests,
+            selected_attraction_ids:
+                itinerarySelection?.selected_attraction_ids ?? [],
+        }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        const detail = Array.isArray(payload.detail)
+            ? payload.detail.map((item) => item.msg).join(', ')
+            : payload.detail;
+
+        throw new Error(
+            detail || 'The planner could not build this draft.'
+        );
+    }
+
+    setResult(payload);
+
+    if (onPreview) onPreview(payload);
+} catch (err) {
+    setError(
+        `Could not reach the NammaPrayana backend at ${API_BASE}. ` +
+        `Start the FastAPI server and try again. ${err.message || ''}`
+    );
+} finally {
+    setLoading(false);
+}
+
+       
     };
 
     const checkWeather = async (day) => {

@@ -148,109 +148,7 @@ def preview_itinerary(
         for destination_id in request.destinations
     ]
 
-    # Fetch attractions for the selected destinations.
-    attractions = db.scalars(
-        select(Attraction)
-        .where(Attraction.destination_id.in_(request.destinations))
-        .order_by(Attraction.visit_order, Attraction.id)
-    ).all()
-
-    attractions_by_destination = {
-        destination_id: []
-        for destination_id in request.destinations
-    }
-
-    for attraction in attractions:
-        attractions_by_destination[attraction.destination_id].append(attraction)
-
-    # Match attractions to the selected interests when possible.
-    selected_interests = {
-        interest.value.lower()
-        for interest in request.interests
-    }
-
-    filtered_attractions = {}
-
-    for destination_id, destination_attractions in attractions_by_destination.items():
-        matching = [
-            attraction
-            for attraction in destination_attractions
-            if selected_interests
-            and any(
-                tag.lower() in selected_interests
-                for tag in (attraction.interest_tags or [])
-            )
-        ]
-
-        # Do not leave a destination empty merely because no tags match.
-        filtered_attractions[destination_id] = (
-            matching if matching else destination_attractions
-        )
-
-    # Allocate consecutive days to each destination.
-    destination_count = len(selected_destinations)
-    base_days = duration_days // destination_count
-    extra_days = duration_days % destination_count
-
-    days = []
-    warnings = []
-    current_date = request.start_date
-    needs_verification = False
-    empty_destinations = []
-
-    for index, destination in enumerate(selected_destinations):
-        assigned_days = base_days + (1 if index < extra_days else 0)
-        destination_attractions = filtered_attractions[destination.id]
-
-        if not destination_attractions and not selected_mode:
-            empty_destinations.append(destination.name)
-            
-    
-        for local_day in range(assigned_days):
-            day_number = len(days) + 1
-
-            # Cycle through available attractions to fill different trip days.
-            start_index = local_day * 3
-            daily_attractions = destination_attractions[
-                start_index:start_index + 3
-            ]
-
-            stops = []
-
-            for attraction in daily_attractions:
-                source_status = (
-                    "curated_reference"
-                    if attraction.source_status == "curated_reference"
-                    else "needs_verification"
-                )
-
-                if source_status == "needs_verification":
-                    needs_verification = True
-
-                stops.append(
-                    ItineraryStop(
-                        name=attraction.name,
-                        category=attraction.category,
-                        description=attraction.description,
-                        suggested_time=attraction.suggested_time,
-                        source_status=source_status,
-                    )
-                )
-
-            days.append(
-                ItineraryDay(
-                    day_number=day_number,
-                    date=current_date,
-                    destination_id=destination.id,
-                    destination_name=destination.name,
-                    stops=stops,
-                    intercity_transfer_from_previous=None,
-                    weather_status="not_requested",
-                )
-            )
-
-            current_date += timedelta(days=1)
-
+   
    
     # Fetch attractions belonging to the selected destinations.
     all_attractions = db.scalars(
@@ -263,7 +161,7 @@ def preview_itinerary(
         attraction.id: attraction for attraction in all_attractions
     }
 
-    selected_mode = request.selected_attraction_ids is not None
+    selected_mode = bool(request.selected_attraction_ids)
 
     if selected_mode:
         requested_ids = request.selected_attraction_ids
