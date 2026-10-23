@@ -54,7 +54,6 @@ const cityCoordinates = {
   chitradurga: { lat: 14.2251, lon: 76.398 },
   belur: { lat: 13.1629, lon: 75.8652 },
   hassan: { lat: 13.0068, lon: 76.0996 },
-  hubballi: { lat: 15.3647, lon: 75.124 },
 };
 
 function normaliseCity(value) {
@@ -178,7 +177,7 @@ export default function ItineraryPage({
   onBack,
   onModifyJourney,
 }) {
- 
+ console.log("ITINERARY PAGE IS RUNNING");
 const config = journeyConfig ?? {};
 
 const [savedSelection] = useState(readSavedItinerarySelection);
@@ -254,52 +253,65 @@ const effectiveSelectedAttractionIds =
     }
   }, [destinations, activeWeatherCity]);
 
-  const generatePreview = useCallback(async () => {
-    if (!destinations.length) {
-      setPageError("No destinations were carried forward. Go back and select at least one city.");
-      return;
-    }
+ 
+const generatePreview = useCallback(async (adjustmentRequest = "") => {
+  if (!requestDestinations.length) {
+    setPageError(
+      "No destinations were carried forward. Go back and select at least one city."
+    );
+    return false;
+  }
 
-    setLoading(true);
-    setPageError("");
+  setLoading(true);
+  setPageError("");
 
-    
-const payload = {
-  destinations: requestDestinations,
-  start_date: startDate,
-  end_date: endDate,
-  traveller_count: travellerCount || 1,
-  travel_style: travelStyle,
-  total_budget: totalBudget || 1000,
-  interests: Array.isArray(interests) ? interests : [],
-  selected_attraction_ids: effectiveSelectedAttractionIds,
-};
+  const payload = {
+    destinations: requestDestinations,
+    start_date: startDate,
+    end_date: endDate,
+    traveller_count: travellerCount || 1,
+    travel_style: travelStyle,
+    total_budget: totalBudget || 1000,
+    interests: Array.isArray(interests) ? interests : [],
+    selected_attraction_ids: effectiveSelectedAttractionIds,
+    adjustment_request: adjustmentRequest,
+  };
 
+  console.log("Itinerary generation payload:", payload);
 
-    try {
-      const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/itineraries/generate`,
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const details = await response.text();
-        throw new Error(details || `Request failed (${response.status})`);
       }
+    );
 
-      const result = await response.json();
-      setItinerary(result);
-      setActiveDay(0);
-    } catch (error) {
-      setPageError(
-        `We couldn't load the itinerary preview. ${error.message || "Check that the backend is running."}`
-      );
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      const details = await response.text();
+      throw new Error(details || `Request failed (${response.status})`);
     }
-  }, [
-    [
+
+    const result = await response.json();
+
+    setItinerary(result);
+    setActiveDay(0);
+
+    return true;
+  } catch (error) {
+    setPageError(
+      `We couldn't generate the itinerary. ${
+        error.message || "Check that the backend is running."
+      }`
+    );
+
+    return false;
+  } finally {
+    setLoading(false);
+  }
+}, [
   requestDestinations,
   startDate,
   endDate,
@@ -308,14 +320,15 @@ const payload = {
   totalBudget,
   interests,
   effectiveSelectedAttractionIds,
-]
-  ]);
+]);
+
 
   useEffect(() => {
-    if (!initialItinerary) {
-      generatePreview();
+    if (initialItinerary) {
+      setItinerary(initialItinerary);
+      setActiveDay(0);
     }
-  }, [initialItinerary, generatePreview]);
+  }, [initialItinerary]);
 
   const loadWeather = useCallback(async () => {
     if (!destinations.length) return;
@@ -339,8 +352,72 @@ const payload = {
       })
     );
 
-    const next = Object.fromEntries(results);
+    
+    const next = Object.fromEntries(
+      results.map(([city, value]) => {
+        if (value?._error) {
+          return [city, value];
+        }
+
+        // The forecast endpoint returns values inside daily[].
+        const daily = Array.isArray(value?.daily)
+          ? value.daily
+          : [];
+
+        const forecast =
+          daily.find((item) => item.date === startDate) ??
+          daily[0] ??
+          {};
+
+        const code = Number(forecast.weather_code);
+
+        const description =
+          ({
+            0: "Clear sky",
+            1: "Mainly clear",
+            2: "Partly cloudy",
+            3: "Overcast",
+            45: "Fog",
+            48: "Depositing rime fog",
+            51: "Light drizzle",
+            53: "Moderate drizzle",
+            55: "Dense drizzle",
+            61: "Slight rain",
+            63: "Moderate rain",
+            65: "Heavy rain",
+            80: "Rain showers",
+            81: "Moderate rain showers",
+            82: "Heavy rain showers",
+            95: "Thunderstorm",
+            96: "Thunderstorm with hail",
+            99: "Thunderstorm with heavy hail",
+          })[code] ?? "Weather forecast";
+
+        return [
+          city,
+          {
+            ...value,
+            date: forecast.date ?? startDate,
+            description,
+            temperature:
+              forecast.temperature_max_c != null &&
+              forecast.temperature_min_c != null
+                ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
+                : null,
+            rain_probability:
+              forecast.precipitation_probability_max ?? null,
+            source: value?.source ?? "Open-Meteo",
+            advice:
+              forecast.precipitation_probability_max >= 40
+                ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
+                : "Check local conditions before starting outdoor activities.",
+          },
+        ];
+      })
+    );
+
     setWeatherByCity(next);
+
 
     const failed = results.filter(([, value]) => value?._error);
     if (failed.length === results.length) {
@@ -368,8 +445,8 @@ const payload = {
           if (!response.ok) throw new Error(`Food request failed (${response.status})`);
           const result = await response.json();
           const items = Array.isArray(result)
-            ? result
-            : result?.spots ?? result?.food_spots ?? result?.items ?? [];
+           ? result
+           : result?.foods ?? result?.spots ?? result?.food_spots ?? result?.items ?? [];
           return [city, items];
         } catch {
           return [city, null];
@@ -463,518 +540,924 @@ const payload = {
     );
   };
 
-  const submitAdjustment = () => {
-    const request = [
-      `Please revise the itinerary using this preference: ${adjustment}.`,
-      travellerNeeds.length
-        ? `Traveller considerations: ${travellerNeeds.join(", ")}.`
-        : "",
-      specialNotes.trim() ? `Additional request: ${specialNotes.trim()}.` : "",
-      "Keep selected attractions and destinations where feasible. Use verified weather and database information. Explain changes and any extra costs.",
-    ]
-      .filter(Boolean)
-      .join(" ");
+const submitAdjustment = async () => {
+  const request = [
+    `Please revise the existing itinerary using this preference: ${adjustment}.`,
+    travellerNeeds.length
+      ? `Traveller considerations: ${travellerNeeds.join(", ")}.`
+      : "",
+    specialNotes.trim()
+      ? `Additional request: ${specialNotes.trim()}.`
+      : "",
+    "Keep the same destinations, dates, budget, and selected attractions wherever feasible. Modify the schedule according to these preferences. Use supplied attraction, food, and weather records. Explain changes and any extra costs.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
+  setAdjustmentMessage("Applying your preferences…");
+  setPageError("");
+
+  try {
+    await generatePreview(request);
     setAdjustmentMessage(
-      "Your preferences are ready. AI itinerary revision needs to be connected to the backend generation endpoint."
+      "Preferences applied. Your itinerary has been updated."
     );
+  } catch (error) {
+    setAdjustmentMessage(
+      `Couldn't apply preferences: ${error.message || "Please try again."}`
+    );
+  }
+};
 
-    if (onModifyJourney) {
-      onModifyJourney({
-        journeyConfig: config,
-        selectedAttractionIds,
-        adjustment,
-        travellerNeeds,
-        specialNotes,
-        request,
-      });
-    }
-  };
+return (
+  <main className="itinerary-page">
+    <div className="itinerary-page__texture" aria-hidden="true" />
 
-  return (
-    <main className="itinerary-page">
-      <div className="itinerary-page__texture" aria-hidden="true" />
+    <header className="itinerary-topbar">
+      <button
+        type="button"
+        className="itinerary-back"
+        onClick={onBack}
+      >
+        <ArrowLeft size={17} />
+        <span>Back to route discovery</span>
+      </button>
 
-      <header className="itinerary-topbar">
-        <button
-          type="button"
-          className="itinerary-back"
-          onClick={onBack}
-        >
-          <ArrowLeft size={17} />
-          <span>Back to route discovery</span>
-        </button>
-<div className="itinerary-brand">
-  <span className="itinerary-brand__text">
-    <span className="itinerary-brand__namma">NAMMA</span><span className="itinerary-brand__prayana"> PRAYANA</span>
-    <small>Your Karnataka, your way</small>
-  </span>
-</div>
-
-        <span className="itinerary-topbar__tag">
-          <Sparkles size={14} />
-          Your travel story
+      <div className="itinerary-brand">
+        <span className="itinerary-brand__text">
+          <span className="itinerary-brand__namma">NAMMA</span>
+          <span className="itinerary-brand__prayana"> PRAYANA</span>
+          <small>Your Karnataka, your way</small>
         </span>
-      </header>
+      </div>
 
-      <section className="itinerary-hero">
-        
-        <div className="itinerary-hero__content">
-          <p className="itinerary-eyebrow">
-            <span /> YOUR KARNATAKA JOURNEY <span />
-          </p>
-          <h1>
-            Every stop has
-            <br />
-            <em>a story to tell.</em>
-          </h1>
-          <p className="itinerary-hero__intro">
-            A thoughtful travel plan shaped around your places, pace, budget,
-            and the little moments that make a journey memorable.
-          </p>
-          <div className="itinerary-hero__chips">
-            <span><MapPin size={15} /> {destinations.length} destination{destinations.length === 1 ? "" : "s"}</span>
-            <span><CalendarDays size={15} /> {durationDays} day{durationDays === 1 ? "" : "s"}</span>
-            <span><Users size={15} /> {travellerCount} traveller{travellerCount === 1 ? "" : "s"}</span>
+      <span className="itinerary-topbar__tag">
+        <Sparkles size={14} />
+        Your travel story
+      </span>
+    </header>
+
+    <section className="itinerary-hero">
+      <div className="itinerary-hero__content">
+        <p className="itinerary-eyebrow">
+          <span /> YOUR KARNATAKA JOURNEY <span />
+        </p>
+
+        <h1>
+          Every stop has
+          <br />
+          <em>a story to tell.</em>
+        </h1>
+
+        <p className="itinerary-hero__intro">
+          A thoughtful travel plan shaped around your places, pace, budget,
+          and the little moments that make a journey memorable.
+        </p>
+
+        <div className="itinerary-hero__chips">
+          <span>
+            <MapPin size={15} /> {destinations.length} destination
+            {destinations.length === 1 ? "" : "s"}
+          </span>
+          <span>
+            <CalendarDays size={15} /> {durationDays} day
+            {durationDays === 1 ? "" : "s"}
+          </span>
+          <span>
+            <Users size={15} /> {travellerCount} traveller
+            {travellerCount === 1 ? "" : "s"}
+          </span>
+        </div>
+      </div>
+
+      <div className="itinerary-hero__sun" aria-hidden="true" />
+    </section>
+
+    <div className="itinerary-main">
+      <section className="itinerary-trip-summary">
+        <div className="itinerary-trip-summary__place">
+          <span className="itinerary-trip-summary__icon">
+            <Compass size={20} />
+          </span>
+          <div>
+            <span className="itinerary-label">YOUR ROUTE</span>
+            <strong>
+              {destinations.map(cityLabel).join("  →  ") ||
+                "Choose your destinations"}
+            </strong>
           </div>
         </div>
-        
-        <div className="itinerary-hero__sun" aria-hidden="true" />
+
+        <div className="itinerary-trip-summary__divider" />
+
+        <div className="itinerary-trip-summary__item">
+          <CalendarDays size={19} />
+          <div>
+            <span className="itinerary-label">TRAVEL DATES</span>
+            <strong>
+              {formatDate(startDate)} – {formatDate(endDate)}
+            </strong>
+          </div>
+        </div>
+
+        <div className="itinerary-trip-summary__divider" />
+
+        <div className="itinerary-trip-summary__item">
+          <Wallet size={19} />
+          <div>
+            <span className="itinerary-label">TOTAL GROUP BUDGET</span>
+            <strong>
+              {totalBudget ? formatCurrency(totalBudget) : "Not specified"}
+            </strong>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="itinerary-edit-link"
+          onClick={onBack}
+        >
+          Edit <ArrowRight size={15} />
+        </button>
       </section>
 
-      <div className="itinerary-main">
-        <section className="itinerary-trip-summary">
-          <div className="itinerary-trip-summary__place">
-            <span className="itinerary-trip-summary__icon"><Compass size={20} /></span>
-            <div>
-              <span className="itinerary-label">YOUR ROUTE</span>
-              <strong>{destinations.map(cityLabel).join("  →  ") || "Choose your destinations"}</strong>
-            </div>
-          </div>
-          <div className="itinerary-trip-summary__divider" />
-          <div className="itinerary-trip-summary__item">
-            <CalendarDays size={19} />
-            <div>
-              <span className="itinerary-label">TRAVEL DATES</span>
-              <strong>{formatDate(startDate)} – {formatDate(endDate)}</strong>
-            </div>
-          </div>
-          <div className="itinerary-trip-summary__divider" />
-          <div className="itinerary-trip-summary__item">
-            <Wallet size={19} />
-            <div>
-              <span className="itinerary-label">TOTAL GROUP BUDGET</span>
-              <strong>{totalBudget ? formatCurrency(totalBudget) : "Not specified"}</strong>
-            </div>
-          </div>
-          <button type="button" className="itinerary-edit-link" onClick={onBack}>
-            Edit <ArrowRight size={15} />
-          </button>
-        </section>
+      {/* Preferences and generation actions */}
+      <section className="itinerary-adjust-section">
+        <div className="itinerary-adjust-section__header">
+          <div className="itinerary-adjust-section__intro">
+            <span className="itinerary-adjust-section__symbol">
+              <Heart size={22} />
+            </span>
 
-        <section className="itinerary-weather-section">
-          <div className="itinerary-section-heading">
             <div>
-              <p className="itinerary-eyebrow itinerary-eyebrow--left">PLAN WITH THE SKY</p>
-              <h2>Weather explorer</h2>
-              <p>Check the forecast for each city before you set out.</p>
+              <p className="itinerary-eyebrow itinerary-eyebrow--left">
+                TRAVEL THAT FITS YOUR GROUP
+              </p>
+              <h2>Make it feel right for everyone.</h2>
+              <p>
+                Choose your travel preferences before generating your
+                personalised Karnataka itinerary.
+              </p>
             </div>
+          </div>
+
+          <div className="itinerary-adjust-actions">
             <button
               type="button"
-              className="itinerary-icon-button"
-              onClick={loadWeather}
-              disabled={weatherLoading}
-              aria-label="Refresh weather"
+              className="itinerary-expand-button"
+              onClick={() =>
+                setShowTravellerNeeds((current) => !current)
+              }
+              aria-expanded={showTravellerNeeds}
             >
-              <RefreshCw size={17} className={weatherLoading ? "itinerary-spin" : ""} />
+              {showTravellerNeeds
+                ? "Close preferences"
+                : "Apply My Preferences"}
+              <ChevronDown
+                size={17}
+                className={showTravellerNeeds ? "is-rotated" : ""}
+              />
             </button>
-          </div>
 
-          <div className="itinerary-weather-tabs" role="tablist" aria-label="Choose a city">
-            {destinations.map((city) => (
-              <button
-                key={city}
-                type="button"
-                role="tab"
-                aria-selected={activeWeatherCity === city}
-                className={activeWeatherCity === city ? "is-active" : ""}
-                onClick={() => setActiveWeatherCity(city)}
-              >
-                <MapPin size={14} /> {cityLabel(city)}
-              </button>
-            ))}
-          </div>
-
-          {weatherLoading && !weather ? (
-            <div className="itinerary-inline-state"><RefreshCw size={17} className="itinerary-spin" /> Fetching weather details…</div>
-          ) : weather?._error ? (
-            <div className="itinerary-inline-state itinerary-inline-state--error">
-              Weather is unavailable for {cityLabel(activeWeatherCity)} right now.
-            </div>
-          ) : weather ? (
-            <div className="itinerary-weather-card">
-              <div className="itinerary-weather-card__main">
-                <span className="itinerary-weather-card__icon"><WeatherIcon size={30} /></span>
-                <div>
-                  <span className="itinerary-label">{cityLabel(activeWeatherCity)} · TRIP FORECAST</span>
-                  <strong className="itinerary-weather-card__condition">
-                    {weatherDescription || "Forecast received"}
-                  </strong>
-                  <p>{weather?.advice ?? "Use the forecast to plan outdoor activities."}</p>
-                </div>
-              </div>
-              <div className="itinerary-weather-card__stats">
-                <div><span>Temperature</span><strong>{weather?.temperature ?? weather?.temperature_c ?? weather?.temp_c ?? "—"}{weather?.temperature != null || weather?.temperature_c != null || weather?.temp_c != null ? "°C" : ""}</strong></div>
-                <div><span>Rain chance</span><strong>{weather?.rain_probability ?? weather?.rain_chance ?? weather?.precipitation_probability ?? "—"}{weather?.rain_probability != null || weather?.rain_chance != null || weather?.precipitation_probability != null ? "%" : ""}</strong></div>
-                <div><span>Forecast date</span><strong>{formatDate(weather?.date ?? startDate)}</strong></div>
-              </div>
-              {weather?.source && <p className="itinerary-source">Source: {weather.source}</p>}
-            </div>
-          ) : (
-            <div className="itinerary-inline-state">
-              Weather information will appear when the forecast endpoint returns data.
-            </div>
-          )}
-
-          {weatherError && <p className="itinerary-muted-error">{weatherError}</p>}
-          <p className="itinerary-footnote">
-            Forecast availability depends on the selected travel date and the weather service's forecast horizon.
-          </p>
-        </section>
-
-        <section className="itinerary-plan-section">
-          <div className="itinerary-section-heading">
-            <div>
-              <p className="itinerary-eyebrow itinerary-eyebrow--left">YOUR DAYS, BEAUTIFULLY PLANNED</p>
-              <h2>The journey, day by day</h2>
-              <p>Explore the schedule and keep enough room for rest and discovery.</p>
-            </div>
             <button
               type="button"
-              className="itinerary-secondary-button"
-              onClick={generatePreview}
+              className="itinerary-primary-button itinerary-generate-button"
+              onClick={async () => {
+                const request = [
+                  `Revise the itinerary according to this travel pace: ${adjustment}.`,
+                  travellerNeeds.length
+                    ? `Traveller considerations: ${travellerNeeds.join(", ")}.`
+                    : "",
+                  specialNotes.trim()
+                    ? `Additional requests: ${specialNotes.trim()}.`
+                    : "",
+                  "Preserve the selected destinations, dates, budget, and selected attractions wherever feasible. Use supplied database and weather records. Do not invent information.",
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+
+                const success = await generatePreview(request);
+
+                setAdjustmentMessage(
+                  success
+                    ? "Your personalised itinerary has been generated."
+                    : "Itinerary generation failed. Check the error below and try again."
+                );
+              }}
               disabled={loading}
             >
-              <RefreshCw size={16} className={loading ? "itinerary-spin" : ""} />
-              {loading ? "Loading plan…" : "Refresh preview"}
+              <Sparkles
+                size={17}
+                className={loading ? "itinerary-spin" : ""}
+              />
+              {loading ? "Generating Your Itinerary..." : "Get Your Itinerary"}
+              {!loading && <ArrowRight size={16} />}
             </button>
           </div>
+        </div>
 
-          {pageError && (
-            <div className="itinerary-error-panel">
-              <AlertTriangle size={20} />
-              <div>
-                <strong>We couldn't load your plan yet.</strong>
-                <p>{pageError}</p>
-                <button type="button" onClick={generatePreview}>Try again</button>
-              </div>
-            </div>
-          )}
+        {showTravellerNeeds && (
+          <div className="itinerary-adjust-form">
+            <label className="itinerary-form-label">
+              What kind of pace works best?
+            </label>
 
-          {loading && !itinerary ? (
-            <div className="itinerary-loading-panel">
-              <span className="itinerary-loading-panel__icon"><Sparkles size={25} /></span>
-              <strong>Gathering your journey details…</strong>
-              <p>Preparing your route preview and day structure.</p>
-            </div>
-          ) : days.length > 0 ? (
-            <div className="itinerary-day-layout">
-              <nav className="itinerary-day-nav" aria-label="Itinerary days">
-                {days.map((day, index) => (
-                  <button
-                    type="button"
-                    key={day?.day_number ?? day?.day ?? index}
-                    className={activeDay === index ? "is-active" : ""}
-                    onClick={() => setActiveDay(index)}
-                  >
-                    <span className="itinerary-day-nav__number">{String(index + 1).padStart(2, "0")}</span>
-                    <span className="itinerary-day-nav__text">
-                      <strong>{day?.title ?? day?.destination ?? `Day ${index + 1}`}</strong>
-                      <small>{day?.date ? formatDate(day.date) : `Day ${index + 1} of ${days.length}`}</small>
-                    </span>
-                    <ArrowRight size={15} />
-                  </button>
-                ))}
-              </nav>
-
-              <div className="itinerary-day-detail">
-                <div className="itinerary-day-detail__header">
-                  <div>
-                    <span className="itinerary-label">DAY {String(activeDay + 1).padStart(2, "0")}</span>
-                    <h3>{selectedDay?.title ?? selectedDay?.destination ?? `Day ${activeDay + 1}`}</h3>
-                    <p>{selectedDay?.date ? formatDate(selectedDay.date) : "Discover Karnataka at your own pace"}</p>
-                  </div>
-                  <span className="itinerary-day-detail__stamp"><Mountain size={19} /> Namma Nadu</span>
-                </div>
-
-                {selectedDay?.summary && <p className="itinerary-day-summary">{selectedDay.summary}</p>}
-
-                {selectedDayItems.length > 0 ? (
-                  <div className="itinerary-timeline">
-                    {selectedDayItems.map((stop, index) => {
-                      const cost = getStopCost(stop);
-                      return (
-                        <article className="itinerary-stop" key={stop?.attraction_id ?? stop?.id ?? `${activeDay}-${index}`}>
-                          <div className="itinerary-stop__rail">
-                            <span className="itinerary-stop__dot">{index + 1}</span>
-                            {index < selectedDayItems.length - 1 && <span className="itinerary-stop__line" />}
-                          </div>
-                          <div className="itinerary-stop__content">
-                            <div className="itinerary-stop__meta">
-                              {getStopTime(stop) && <span><Clock3 size={13} /> {getStopTime(stop)}</span>}
-                              {stop?.duration && <span><Clock3 size={13} /> {stop.duration}</span>}
-                              {stop?.category && <span className="itinerary-stop__category">{stop.category}</span>}
-                            </div>
-                            <h4>{getStopName(stop)}</h4>
-                            {getStopDescription(stop) && <p>{getStopDescription(stop)}</p>}
-                            {cost != null && <span className="itinerary-stop__cost">Estimated {formatCurrency(cost)}</span>}
-                            {stop?.is_must_visit && <span className="itinerary-must-visit"><Check size={12} /> Must visit</span>}
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="itinerary-empty-day">
-                    <Compass size={24} />
-                    <strong>No scheduled stops were returned for this day.</strong>
-                    <p>Refresh the preview or adjust your selected attractions.</p>
-                  </div>
-                )}
-
-                {Array.isArray(selectedDay?.warnings) && selectedDay.warnings.length > 0 && (
-                  <div className="itinerary-day-warning">
-                    <AlertTriangle size={17} />
-                    <div>{selectedDay.warnings.map((warning, index) => <p key={index}>{String(warning)}</p>)}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : !pageError && (
-            <div className="itinerary-loading-panel itinerary-loading-panel--empty">
-              <Compass size={27} />
-              <strong>Your detailed schedule will appear here.</strong>
-              <p>Once the itinerary endpoint returns its day-by-day data, it will be displayed in this section.</p>
-            </div>
-          )}
-
-          {Array.isArray(itinerary?.warnings) && itinerary.warnings.length > 0 && (
-            <div className="itinerary-general-warnings">
-              <strong><AlertTriangle size={17} /> A few things to keep in mind</strong>
-              {itinerary.warnings.map((warning, index) => (
-                <p key={index}>{typeof warning === "string" ? warning : warning?.message ?? JSON.stringify(warning)}</p>
+            <div className="itinerary-choice-grid">
+              {[
+                ["balanced", "Balanced", "A mix of exploring and relaxing"],
+                ["less-walking", "Less walking", "Shorter walks and more breaks"],
+                ["rain-friendly", "Rain-friendly", "Prefer indoor alternatives if needed"],
+                ["easy-pace", "Easy pace", "Fewer stops and more rest time"],
+              ].map(([value, title, description]) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={`itinerary-choice ${
+                    adjustment === value ? "is-selected" : ""
+                  }`}
+                  onClick={() => setAdjustment(value)}
+                >
+                  <span className="itinerary-choice__check">
+                    {adjustment === value && <Check size={13} />}
+                  </span>
+                  <strong>{title}</strong>
+                  <small>{description}</small>
+                </button>
               ))}
             </div>
-          )}
-        </section>
 
-        <section className="itinerary-discover-grid">
-          <article className="itinerary-feature-card itinerary-feature-card--food">
-            <div className="itinerary-feature-card__top">
-              <span className="itinerary-feature-card__icon"><Utensils size={20} /></span>
-              <span className="itinerary-feature-card__kicker">A TASTE OF KARNATAKA</span>
+            <label className="itinerary-form-label">
+              Anything the plan should consider?
+            </label>
+
+            <div className="itinerary-needs-options">
+              {[
+                "Senior citizen travelling",
+                "Child travelling",
+                "Pregnant traveller",
+                "Mobility or accessibility needs",
+                "Avoid strenuous treks",
+                "Prefer cooler / less exposed activities",
+              ].map((need) => (
+                <button
+                  type="button"
+                  key={need}
+                  className={`itinerary-need-chip ${
+                    travellerNeeds.includes(need) ? "is-selected" : ""
+                  }`}
+                  onClick={() => toggleNeed(need)}
+                >
+                  {travellerNeeds.includes(need) && <Check size={13} />}
+                  {need}
+                </button>
+              ))}
             </div>
-            <h3>Local food worth the stop</h3>
-            <p>Explore food spots from your selected cities, using the existing food database.</p>
-            <button
-              type="button"
-              className="itinerary-text-button"
-              onClick={() => setOpenSection(openSection === "food" ? "" : "food")}
+
+            <label
+              className="itinerary-form-label"
+              htmlFor="itinerary-special-notes"
             >
-              {openSection === "food" ? "Hide food picks" : "Explore food picks"}
-              <ChevronDown size={16} className={openSection === "food" ? "is-rotated" : ""} />
-            </button>
-            {openSection === "food" && (
-              <div className="itinerary-feature-expanded">
-                <div className="itinerary-city-mini-tabs">
-                  {destinations.map((city) => (
-                    <button key={city} type="button" className={activeWeatherCity === city ? "is-active" : ""} onClick={() => setActiveWeatherCity(city)}>
-                      {cityLabel(city)}
-                    </button>
-                  ))}
-                </div>
-                {foodLoading ? (
-                  <p className="itinerary-feature-state"><RefreshCw size={14} className="itinerary-spin" /> Loading food spots…</p>
-                ) : foodItems.length ? (
-                  foodItems.slice(0, 5).map((food, index) => (
-                    <div className="itinerary-recommendation" key={food.id ?? food.name ?? index}>
-                      <span className="itinerary-recommendation__icon"><Coffee size={16} /></span>
-                      <div>
-                        <strong>{food.name ?? food.spot_name ?? food.restaurant_name ?? "Local food stop"}</strong>
-                        <p>{food.dish ?? food.famous_dish ?? food.description ?? food.category ?? "Local speciality"}</p>
-                        {food.rating != null && <small>★ {food.rating}</small>}
-                        {food.maps_link && <a href={food.maps_link} target="_blank" rel="noreferrer">Open map ↗</a>}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="itinerary-feature-state">
-                    {foodError || `No food records were returned for ${cityLabel(activeWeatherCity)}.`}
-                  </p>
-                )}
-              </div>
-            )}
-          </article>
+              Other requests <span>(optional)</span>
+            </label>
 
-          <article className="itinerary-feature-card itinerary-feature-card--stay">
-            <div className="itinerary-feature-card__top">
-              <span className="itinerary-feature-card__icon"><Hotel size={20} /></span>
-              <span className="itinerary-feature-card__kicker">REST WELL, TRAVEL WELL</span>
-            </div>
-            <h3>A stay that fits your journey</h3>
-            <p>Ask the stays service for recommendations matching your group, dates, style, and budget.</p>
-            <button
-              type="button"
-              className="itinerary-text-button"
-              onClick={() => setOpenSection(openSection === "stays" ? "" : "stays")}
-            >
-              {openSection === "stays" ? "Hide stays" : "Explore stays"}
-              <ChevronDown size={16} className={openSection === "stays" ? "is-rotated" : ""} />
-            </button>
-            {openSection === "stays" && (
-              <div className="itinerary-feature-expanded">
-                {staysLoading ? (
-                  <p className="itinerary-feature-state"><RefreshCw size={14} className="itinerary-spin" /> Finding suitable stays…</p>
-                ) : stays.length ? (
-                  stays.slice(0, 5).map((stay, index) => (
-                    <div className="itinerary-recommendation" key={stay.id ?? stay.name ?? index}>
-                      <span className="itinerary-recommendation__icon"><Hotel size={16} /></span>
-                      <div>
-                        <strong>{stay.name ?? stay.hotel_name ?? "Recommended stay"}</strong>
-                        <p>{stay.location ?? stay.city ?? stay.description ?? "Location details not provided"}</p>
-                        {(stay.price ?? stay.price_per_night ?? stay.estimated_price) != null && (
-                          <small>{formatCurrency(stay.price ?? stay.price_per_night ?? stay.estimated_price)}{stay.price_per_night != null ? " / night" : ""}</small>
-                        )}
-                        {stay.rating != null && <small> · ★ {stay.rating}</small>}
-                        {(stay.booking_url ?? stay.booking_link ?? stay.url) && (
-                          <a href={stay.booking_url ?? stay.booking_link ?? stay.url} target="_blank" rel="noreferrer">View stay ↗</a>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="itinerary-feature-state">
-                    <p>{staysError || "No stay recommendations have been returned yet."}</p>
-                    <button type="button" onClick={loadStays}>Try again</button>
-                  </div>
-                )}
-                <p className="itinerary-disclaimer">Prices and availability should be confirmed with the property or booking provider.</p>
-              </div>
-            )}
-          </article>
+            <textarea
+              id="itinerary-special-notes"
+              value={specialNotes}
+              onChange={(event) => setSpecialNotes(event.target.value)}
+              placeholder="For example: avoid steep climbs, include a longer lunch break, or keep evenings free…"
+              rows={3}
+            />
 
-          <article className="itinerary-feature-card itinerary-feature-card--budget">
-            <div className="itinerary-feature-card__top">
-              <span className="itinerary-feature-card__icon"><Wallet size={20} /></span>
-              <span className="itinerary-feature-card__kicker">MONEY, WITHOUT THE MYSTERY</span>
-            </div>
-            <h3>Your budget at a glance</h3>
-            <p>Keep the group budget visible while you plan each day.</p>
-            <div className="itinerary-budget-summary">
-              <div><span>Group budget</span><strong>{totalBudget ? formatCurrency(totalBudget) : "Not set"}</strong></div>
-              <div><span>Per traveller</span><strong>{totalBudget && travellerCount ? formatCurrency(totalBudget / travellerCount) : "—"}</strong></div>
-              <div><span>Current estimate</span><strong>{estimatedBudget ? formatCurrency(estimatedBudget) : "Not available"}</strong></div>
-            </div>
-            {totalBudget > 0 && Number(estimatedBudget) > totalBudget && (
-              <p className="itinerary-budget-warning"><AlertTriangle size={15} /> Current estimate is above your budget.</p>
+            {adjustmentMessage && (
+              <p className="itinerary-adjust-message">
+                {adjustmentMessage}
+              </p>
             )}
-            <p className="itinerary-disclaimer">Estimates are not confirmed quotes. Transport, meals, and stays may change the final cost.</p>
-          </article>
-        </section>
 
-        <section className="itinerary-adjust-section">
-          <div className="itinerary-adjust-section__intro">
-            <span className="itinerary-adjust-section__symbol"><Heart size={22} /></span>
-            <div>
-              <p className="itinerary-eyebrow itinerary-eyebrow--left">TRAVEL THAT FITS YOUR GROUP</p>
-              <h2>Make it feel right for everyone.</h2>
-              <p>Share any special considerations so the itinerary can be adjusted thoughtfully.</p>
-            </div>
+            <p className="itinerary-disclaimer">
+              These are travel preferences, not medical assessments.
+              Confirm accessibility and health-related requirements
+              with the relevant providers.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* Weather explorer */}
+      <section className="itinerary-weather-section">
+        <div className="itinerary-section-heading">
+          <div>
+            <p className="itinerary-eyebrow itinerary-eyebrow--left">
+              PLAN WITH THE SKY
+            </p>
+            <h2>Weather explorer</h2>
+            <p>Check the forecast for each city before you set out.</p>
           </div>
 
           <button
             type="button"
-            className="itinerary-expand-button"
-            onClick={() => setShowTravellerNeeds((current) => !current)}
-            aria-expanded={showTravellerNeeds}
+            className="itinerary-icon-button"
+            onClick={loadWeather}
+            disabled={weatherLoading}
+            aria-label="Refresh weather"
           >
-            {showTravellerNeeds ? "Close adjustments" : "Personalise my itinerary"}
-            <ChevronDown size={17} className={showTravellerNeeds ? "is-rotated" : ""} />
+            <RefreshCw
+              size={17}
+              className={weatherLoading ? "itinerary-spin" : ""}
+            />
+          </button>
+        </div>
+
+        <div
+          className="itinerary-weather-tabs"
+          role="tablist"
+          aria-label="Choose a city"
+        >
+          {destinations.map((city) => (
+            <button
+              key={city}
+              type="button"
+              role="tab"
+              aria-selected={activeWeatherCity === city}
+              className={activeWeatherCity === city ? "is-active" : ""}
+              onClick={() => setActiveWeatherCity(city)}
+            >
+              <MapPin size={14} /> {cityLabel(city)}
+            </button>
+          ))}
+        </div>
+
+        {weatherLoading && !weather ? (
+          <div className="itinerary-inline-state">
+            <RefreshCw size={17} className="itinerary-spin" />
+            Fetching weather details…
+          </div>
+        ) : weather?._error ? (
+          <div className="itinerary-inline-state itinerary-inline-state--error">
+            Weather is unavailable for {cityLabel(activeWeatherCity)} right now.
+          </div>
+        ) : weather ? (
+          <div className="itinerary-weather-card">
+            <div className="itinerary-weather-card__main">
+              <span className="itinerary-weather-card__icon">
+                <WeatherIcon size={30} />
+              </span>
+              <div>
+                <span className="itinerary-label">
+                  {cityLabel(activeWeatherCity)} · TRIP FORECAST
+                </span>
+                <strong className="itinerary-weather-card__condition">
+                  {weatherDescription || "Forecast received"}
+                </strong>
+                <p>
+                  {weather?.advice ??
+                    "Use the forecast to plan outdoor activities."}
+                </p>
+              </div>
+            </div>
+
+            <div className="itinerary-weather-card__stats">
+              <div>
+                <span>Temperature</span>
+                <strong>
+                  {weather?.temperature ??
+                    weather?.temperature_c ??
+                    weather?.temp_c ??
+                    "—"}
+                  {weather?.temperature != null ||
+                  weather?.temperature_c != null ||
+                  weather?.temp_c != null
+                    ? "°C"
+                    : ""}
+                </strong>
+              </div>
+              <div>
+                <span>Rain chance</span>
+                <strong>
+                  {weather?.rain_probability ??
+                    weather?.rain_chance ??
+                    weather?.precipitation_probability ??
+                    "—"}
+                  {weather?.rain_probability != null ||
+                  weather?.rain_chance != null ||
+                  weather?.precipitation_probability != null
+                    ? "%"
+                    : ""}
+                </strong>
+              </div>
+              <div>
+                <span>Forecast date</span>
+                <strong>{formatDate(weather?.date ?? startDate)}</strong>
+              </div>
+            </div>
+
+            {weather?.source && (
+              <p className="itinerary-source">Source: {weather.source}</p>
+            )}
+          </div>
+        ) : (
+          <div className="itinerary-inline-state">
+            Weather information will appear when the forecast endpoint returns data.
+          </div>
+        )}
+
+        {weatherError && (
+          <p className="itinerary-muted-error">{weatherError}</p>
+        )}
+
+        <p className="itinerary-footnote">
+          Forecast availability depends on the selected travel date and the
+          weather service&apos;s forecast horizon.
+        </p>
+      </section>
+
+      {/* Day-by-day itinerary */}
+      <section className="itinerary-plan-section">
+        <div className="itinerary-section-heading">
+          <div>
+            <p className="itinerary-eyebrow itinerary-eyebrow--left">
+              YOUR DAYS, BEAUTIFULLY PLANNED
+            </p>
+            <h2>The journey, day by day</h2>
+            <p>
+              Explore the schedule and keep enough room for rest and discovery.
+            </p>
+          </div>
+
+          {itinerary && (
+            <button
+              type="button"
+              className="itinerary-secondary-button"
+              onClick={() => generatePreview()}
+              disabled={loading}
+            >
+              <RefreshCw
+                size={16}
+                className={loading ? "itinerary-spin" : ""}
+              />
+              {loading ? "Regenerating…" : "Regenerate Itinerary"}
+            </button>
+          )}
+        </div>
+
+        {pageError && (
+          <div className="itinerary-error-panel">
+            <AlertTriangle size={20} />
+            <div>
+              <strong>We couldn&apos;t load your plan yet.</strong>
+              <p>{pageError}</p>
+              <button
+                type="button"
+                onClick={() => generatePreview()}
+                disabled={loading}
+              >
+                Try again
+              </button>
+            </div>
+          </div>
+        )}
+
+        {loading && !itinerary ? (
+          <div className="itinerary-loading-panel">
+            <span className="itinerary-loading-panel__icon">
+              <Sparkles size={25} />
+            </span>
+            <strong>Creating your personalised journey…</strong>
+            <p>
+              Your itinerary is being generated. This may take a little while.
+            </p>
+          </div>
+        ) : days.length > 0 ? (
+          <div className="itinerary-day-layout">
+            <nav className="itinerary-day-nav" aria-label="Itinerary days">
+              {days.map((day, index) => (
+                <button
+                  type="button"
+                  key={day?.day_number ?? day?.day ?? index}
+                  className={activeDay === index ? "is-active" : ""}
+                  onClick={() => setActiveDay(index)}
+                >
+                  <span className="itinerary-day-nav__number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="itinerary-day-nav__text">
+                    <strong>
+                      {day?.title ?? day?.destination ?? `Day ${index + 1}`}
+                    </strong>
+                    <small>
+                      {day?.date
+                        ? formatDate(day.date)
+                        : `Day ${index + 1} of ${days.length}`}
+                    </small>
+                  </span>
+                  <ArrowRight size={15} />
+                </button>
+              ))}
+            </nav>
+
+            <div className="itinerary-day-detail">
+              <div className="itinerary-day-detail__header">
+                <div>
+                  <span className="itinerary-label">
+                    DAY {String(activeDay + 1).padStart(2, "0")}
+                  </span>
+                  <h3>
+                    {selectedDay?.title ??
+                      selectedDay?.destination ??
+                      `Day ${activeDay + 1}`}
+                  </h3>
+                  <p>
+                    {selectedDay?.date
+                      ? formatDate(selectedDay.date)
+                      : "Discover Karnataka at your own pace"}
+                  </p>
+                </div>
+                <span className="itinerary-day-detail__stamp">
+                  <Mountain size={19} /> Namma Nadu
+                </span>
+              </div>
+
+              {selectedDay?.summary && (
+                <p className="itinerary-day-summary">
+                  {selectedDay.summary}
+                </p>
+              )}
+
+              {selectedDayItems.length > 0 ? (
+                <div className="itinerary-timeline">
+                  {selectedDayItems.map((stop, index) => {
+                    const cost = getStopCost(stop);
+
+                    return (
+                      <article
+                        className="itinerary-stop"
+                        key={
+                          stop?.attraction_id ??
+                          stop?.id ??
+                          `${activeDay}-${index}`
+                        }
+                      >
+                        <div className="itinerary-stop__rail">
+                          <span className="itinerary-stop__dot">
+                            {index + 1}
+                          </span>
+                          {index < selectedDayItems.length - 1 && (
+                            <span className="itinerary-stop__line" />
+                          )}
+                        </div>
+
+                        <div className="itinerary-stop__content">
+                          <div className="itinerary-stop__meta">
+                            {getStopTime(stop) && (
+                              <span>
+                                <Clock3 size={13} /> {getStopTime(stop)}
+                              </span>
+                            )}
+                            {stop?.duration && (
+                              <span>
+                                <Clock3 size={13} /> {stop.duration}
+                              </span>
+                            )}
+                            {stop?.category && (
+                              <span className="itinerary-stop__category">
+                                {stop.category}
+                              </span>
+                            )}
+                          </div>
+
+                          <h4>{getStopName(stop)}</h4>
+
+                          {getStopDescription(stop) && (
+                            <p>{getStopDescription(stop)}</p>
+                          )}
+
+                          {cost != null && (
+                            <span className="itinerary-stop__cost">
+                              Estimated {formatCurrency(cost)}
+                            </span>
+                          )}
+
+                          {stop?.is_must_visit && (
+                            <span className="itinerary-must-visit">
+                              <Check size={12} /> Must visit
+                            </span>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="itinerary-empty-day">
+                  <Compass size={24} />
+                  <strong>No scheduled stops were returned for this day.</strong>
+                  <p>
+                    Refresh the itinerary or adjust your selected attractions.
+                  </p>
+                </div>
+              )}
+
+              {Array.isArray(selectedDay?.warnings) &&
+                selectedDay.warnings.length > 0 && (
+                  <div className="itinerary-day-warning">
+                    <AlertTriangle size={17} />
+                    <div>
+                      {selectedDay.warnings.map((warning, index) => (
+                        <p key={index}>{String(warning)}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+            </div>
+          </div>
+        ) : !pageError ? (
+          <div className="itinerary-loading-panel itinerary-loading-panel--empty">
+            <Compass size={27} />
+            <strong>Your itinerary will appear here.</strong>
+            <p>
+              Choose your preferences and click Get Your Itinerary to generate
+              your day-by-day plan.
+            </p>
+          </div>
+        ) : null}
+
+        {Array.isArray(itinerary?.warnings) &&
+          itinerary.warnings.length > 0 && (
+            <div className="itinerary-general-warnings">
+              <strong>
+                <AlertTriangle size={17} /> A few things to keep in mind
+              </strong>
+              {itinerary.warnings.map((warning, index) => (
+                <p key={index}>
+                  {typeof warning === "string"
+                    ? warning
+                    : warning?.message ?? JSON.stringify(warning)}
+                </p>
+              ))}
+            </div>
+          )}
+      </section>
+
+      {/* Food, stays and budget */}
+      <section className="itinerary-discover-grid">
+        <article className="itinerary-feature-card itinerary-feature-card--food">
+          <div className="itinerary-feature-card__top">
+            <span className="itinerary-feature-card__icon">
+              <Utensils size={20} />
+            </span>
+            <span className="itinerary-feature-card__kicker">
+              A TASTE OF KARNATAKA
+            </span>
+          </div>
+
+          <h3>Local food worth the stop</h3>
+          <p>
+            Explore food spots from your selected cities, using the existing
+            food database.
+          </p>
+
+          <button
+            type="button"
+            className="itinerary-text-button"
+            onClick={() =>
+              setOpenSection(openSection === "food" ? "" : "food")
+            }
+          >
+            {openSection === "food" ? "Hide food picks" : "Explore food picks"}
+            <ChevronDown
+              size={16}
+              className={openSection === "food" ? "is-rotated" : ""}
+            />
           </button>
 
-          {showTravellerNeeds && (
-            <div className="itinerary-adjust-form">
-              <label className="itinerary-form-label">What kind of pace works best?</label>
-              <div className="itinerary-choice-grid">
-                {[
-                  ["balanced", "Balanced", "A mix of exploring and relaxing"],
-                  ["less-walking", "Less walking", "Shorter walks and more breaks"],
-                  ["rain-friendly", "Rain-friendly", "Prefer indoor alternatives if needed"],
-                  ["easy-pace", "Easy pace", "Fewer stops and more rest time"],
-                ].map(([value, title, description]) => (
+          {openSection === "food" && (
+            <div className="itinerary-feature-expanded">
+              <div className="itinerary-city-mini-tabs">
+                {destinations.map((city) => (
                   <button
+                    key={city}
                     type="button"
-                    key={value}
-                    className={`itinerary-choice ${adjustment === value ? "is-selected" : ""}`}
-                    onClick={() => setAdjustment(value)}
+                    className={activeWeatherCity === city ? "is-active" : ""}
+                    onClick={() => setActiveWeatherCity(city)}
                   >
-                    <span className="itinerary-choice__check">{adjustment === value && <Check size={13} />}</span>
-                    <strong>{title}</strong>
-                    <small>{description}</small>
+                    {cityLabel(city)}
                   </button>
                 ))}
               </div>
 
-              <label className="itinerary-form-label">Anything the plan should consider?</label>
-              <div className="itinerary-needs-options">
-                {[
-                  "Senior citizen travelling",
-                  "Child travelling",
-                  "Pregnant traveller",
-                  "Mobility or accessibility needs",
-                  "Avoid strenuous treks",
-                  "Prefer cooler / less exposed activities",
-                ].map((need) => (
-                  <button
-                    type="button"
-                    key={need}
-                    className={`itinerary-need-chip ${travellerNeeds.includes(need) ? "is-selected" : ""}`}
-                    onClick={() => toggleNeed(need)}
+              {foodLoading ? (
+                <p className="itinerary-feature-state">
+                  <RefreshCw size={14} className="itinerary-spin" />
+                  Loading food spots…
+                </p>
+              ) : foodItems.length ? (
+                foodItems.slice(0, 5).map((food, index) => (
+                  <div
+                    className="itinerary-recommendation"
+                    key={food.id ?? food.name ?? index}
                   >
-                    {travellerNeeds.includes(need) && <Check size={13} />}
-                    {need}
+                    <span className="itinerary-recommendation__icon">
+                      <Coffee size={16} />
+                    </span>
+                    <div>
+                      <strong>
+                        {food.name ??
+                          food.spot_name ??
+                          food.restaurant_name ??
+                          "Local food stop"}
+                      </strong>
+                      <p>
+                        {food.dish ??
+                          food.famous_dish ??
+                          food.description ??
+                          food.category ??
+                          "Local speciality"}
+                      </p>
+                      {food.rating != null && <small>★ {food.rating}</small>}
+                      {food.maps_link && (
+                        <a
+                          href={food.maps_link}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open map ↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="itinerary-feature-state">
+                  {foodError ||
+                    `No food records were returned for ${cityLabel(
+                      activeWeatherCity
+                    )}.`}
+                </p>
+              )}
+            </div>
+          )}
+        </article>
+
+        <article className="itinerary-feature-card itinerary-feature-card--stay">
+          <div className="itinerary-feature-card__top">
+            <span className="itinerary-feature-card__icon">
+              <Hotel size={20} />
+            </span>
+            <span className="itinerary-feature-card__kicker">
+              REST WELL, TRAVEL WELL
+            </span>
+          </div>
+
+          <h3>A stay that fits your journey</h3>
+          <p>
+            Ask the stays service for recommendations matching your group,
+            dates, style, and budget.
+          </p>
+
+          <button
+            type="button"
+            className="itinerary-text-button"
+            onClick={() =>
+              setOpenSection(openSection === "stays" ? "" : "stays")
+            }
+          >
+            {openSection === "stays" ? "Hide stays" : "Explore stays"}
+            <ChevronDown
+              size={16}
+              className={openSection === "stays" ? "is-rotated" : ""}
+            />
+          </button>
+
+          {openSection === "stays" && (
+            <div className="itinerary-feature-expanded">
+              {staysLoading ? (
+                <p className="itinerary-feature-state">
+                  <RefreshCw size={14} className="itinerary-spin" />
+                  Finding suitable stays…
+                </p>
+              ) : stays.length ? (
+                stays.slice(0, 5).map((stay, index) => (
+                  <div
+                    className="itinerary-recommendation"
+                    key={stay.id ?? stay.name ?? index}
+                  >
+                    <span className="itinerary-recommendation__icon">
+                      <Hotel size={16} />
+                    </span>
+                    <div>
+                      <strong>
+                        {stay.name ?? stay.hotel_name ?? "Recommended stay"}
+                      </strong>
+                      <p>
+                        {stay.location ??
+                          stay.city ??
+                          stay.description ??
+                          "Location details not provided"}
+                      </p>
+                      {(stay.price ??
+                        stay.price_per_night ??
+                        stay.estimated_price) != null && (
+                        <small>
+                          {formatCurrency(
+                            stay.price ??
+                              stay.price_per_night ??
+                              stay.estimated_price
+                          )}
+                          {stay.price_per_night != null ? " / night" : ""}
+                        </small>
+                      )}
+                      {stay.rating != null && <small> · ★ {stay.rating}</small>}
+                      {(stay.booking_url ?? stay.booking_link ?? stay.url) && (
+                        <a
+                          href={
+                            stay.booking_url ?? stay.booking_link ?? stay.url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View stay ↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="itinerary-feature-state">
+                  <p>
+                    {staysError ||
+                      "No stay recommendations have been returned yet."}
+                  </p>
+                  <button type="button" onClick={loadStays}>
+                    Try again
                   </button>
-                ))}
-              </div>
+                </div>
+              )}
 
-              <label className="itinerary-form-label" htmlFor="itinerary-special-notes">
-                Other requests <span>(optional)</span>
-              </label>
-              <textarea
-                id="itinerary-special-notes"
-                value={specialNotes}
-                onChange={(event) => setSpecialNotes(event.target.value)}
-                placeholder="For example: avoid steep climbs, include a longer lunch break, or keep evenings free…"
-                rows={3}
-              />
-
-              <button type="button" className="itinerary-primary-button" onClick={submitAdjustment}>
-                <Sparkles size={17} /> Apply my preferences <ArrowRight size={16} />
-              </button>
-              {adjustmentMessage && <p className="itinerary-adjust-message">{adjustmentMessage}</p>}
               <p className="itinerary-disclaimer">
-                These choices are preferences, not medical assessments. The connected AI service must use them to revise the schedule before changes are shown.
+                Prices and availability should be confirmed with the property
+                or booking provider.
               </p>
             </div>
           )}
-        </section>
+        </article>
 
-        <footer className="itinerary-footer">
-          <span className="itinerary-footer__emblem">✳</span>
-          <p>Made for the roads, stories, flavours, and soul of Karnataka.</p>
-          <span className="itinerary-footer__kan">ನಮ್ಮ ನಾಡು · ನಮ್ಮ ಪ್ರಯಾಣ</span>
-        </footer>
-      </div>
-    </main>
-  );
+        <article className="itinerary-feature-card itinerary-feature-card--budget">
+          <div className="itinerary-feature-card__top">
+            <span className="itinerary-feature-card__icon">
+              <Wallet size={20} />
+            </span>
+            <span className="itinerary-feature-card__kicker">
+              MONEY, WITHOUT THE MYSTERY
+            </span>
+          </div>
+
+          <h3>Your budget at a glance</h3>
+          <p>Keep the group budget visible while you plan each day.</p>
+
+          <div className="itinerary-budget-summary">
+            <div>
+              <span>Group budget</span>
+              <strong>
+                {totalBudget ? formatCurrency(totalBudget) : "Not set"}
+              </strong>
+            </div>
+            <div>
+              <span>Per traveller</span>
+              <strong>
+                {totalBudget && travellerCount
+                  ? formatCurrency(totalBudget / travellerCount)
+                  : "—"}
+              </strong>
+            </div>
+            <div>
+              <span>Current estimate</span>
+              <strong>
+                {estimatedBudget ? formatCurrency(estimatedBudget) : "Not available"}
+              </strong>
+            </div>
+          </div>
+
+          {totalBudget > 0 && Number(estimatedBudget) > totalBudget && (
+            <p className="itinerary-budget-warning">
+              <AlertTriangle size={15} /> Current estimate is above your budget.
+            </p>
+          )}
+
+          <p className="itinerary-disclaimer">
+            Estimates are not confirmed quotes. Transport, meals, and stays may
+            change the final cost.
+          </p>
+        </article>
+      </section>
+
+      <footer className="itinerary-footer">
+        <span className="itinerary-footer__emblem">✳</span>
+        <p>Made for the roads, stories, flavours, and soul of Karnataka.</p>
+        <span className="itinerary-footer__kan">
+          ನಮ್ಮ ನಾಡು · ನಮ್ಮ ಪ್ರಯಾಣ
+        </span>
+      </footer>
+    </div>
+  </main>
+)
 }

@@ -3633,3 +3633,56 @@
   }
 
 }
+/* latest changes */
+
+.itinerary-adjust-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.itinerary-adjust-section__intro {
+  flex: 1;
+  min-width: 0;
+}
+
+.itinerary-adjust-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.itinerary-generate-button {
+  white-space: nowrap;
+  background: linear-gradient(135deg, #a92525, #c7472c);
+  color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 22px rgba(169, 37, 37, 0.18);
+}
+
+.itinerary-generate-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 760px) {
+  .itinerary-adjust-section__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .itinerary-adjust-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .itinerary-adjust-actions > button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+

@@ -3,13 +3,14 @@
 import httpx 
 from collections import Counter
 from datetime import date, timedelta
-
-from fastapi import Depends, FastAPI, HTTPException
+from app.services.weather_service import get_weather_forecast
+from fastapi import Depends, FastAPI, HTTPException,Query
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 import json
+from app.services.gemini_service import generate_itinerary
 from app.database import create_tables, get_db
 from app.models import Attraction, Destination, FoodSpot
 from app.schemas import (
@@ -51,6 +52,95 @@ def home():
         "message": "Welcome to NammaPrayana API",
         "status": "running",
     }
+
+WEATHER_COORDINATES = {
+    "badami": (15.9149, 75.6768),
+    "hampi": (15.3350, 76.4600),
+    "mysuru": (12.2958, 76.6394),
+    "bengaluru": (12.9716, 77.5946),
+    "coorg": (12.4244, 75.7382),
+    "chikkamagaluru": (13.3161, 75.7720),
+    "mangaluru": (12.9141, 74.8560),
+    "udupi": (13.3409, 74.7421),
+    "gokarna": (14.5479, 74.3188),
+    "dandeli": (15.2470, 74.6290),
+    "shivamogga": (13.9299, 75.5681),
+    "belur-halebidu": (13.1650, 75.8650),
+    "vijayapura": (16.8302, 75.7100),
+    "bidar": (17.9149, 77.5046),
+    "chitradurga": (14.2251, 76.3980),
+    "belagavi": (15.8497, 74.4977),
+    "hubballi": (15.3647, 75.1240),
+    "hassan": (13.0068, 76.0996),
+}
+@app.get("/api/weather/forecast")
+def weather_forecast(
+    latitude: float | None = None,
+    longitude: float | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    destination: str | None = None,
+    date_param: date | None = Query(default=None, alias="date"),
+):
+    # Support the existing frontend: destination + date.
+    if latitude is None or longitude is None:
+        if not destination:
+            raise HTTPException(
+                status_code=422,
+                detail="Provide a destination or latitude and longitude.",
+            )
+
+        key = destination.strip().lower()
+        coordinates = WEATHER_COORDINATES.get(key)
+
+        if coordinates is None:
+            # Also match destination display names from the database.
+            with next(get_db()) as db:
+                destinations = db.scalars(
+                    select(Destination).where(Destination.is_active.is_(True))
+                ).all()
+
+            match = next(
+                (
+                    item for item in destinations
+                    if item.name.strip().lower() == key
+                ),
+                None,
+            )
+
+            if match is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Weather coordinates unavailable for destination: {destination}",
+                )
+
+            coordinates = WEATHER_COORDINATES.get(match.id)
+
+        if coordinates is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Weather coordinates unavailable for destination: {destination}",
+            )
+
+        latitude, longitude = coordinates
+
+    start_date = start_date or date_param or date.today()
+    end_date = end_date or start_date
+
+    try:
+        return get_weather_forecast(
+            latitude=latitude,
+            longitude=longitude,
+            start_date=start_date,
+            end_date=end_date,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Weather forecast is temporarily unavailable.",
+        ) from exc
 
 
 @app.get("/api/destinations")
@@ -101,6 +191,200 @@ def get_attractions(
         }
         for attraction in attractions
     ]
+
+#ai generated itinerary 
+@app.post("/api/itineraries/generate")
+def generate_ai_itinerary(
+    request: ItineraryRequest,
+    db: Session = Depends(get_db),
+):
+    duration_days = (request.end_date - request.start_date).days + 1
+
+   
+    # Preserve the destination order selected by the user.
+    destination_map = {
+        item.id: item
+        for item in db.scalars(
+            select(Destination).where(
+                Destination.id.in_(request.destinations),
+                Destination.is_active.is_(True),
+            )
+        ).all()
+    }
+
+    missing_destinations = [
+        item for item in request.destinations
+        if item not in destination_map
+    ]
+
+    if missing_destinations:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown destinations: {missing_destinations}",
+        )
+
+    selected_destinations = [
+        destination_map[item] for item in request.destinations
+    ]
+
+    # Load attractions only from the selected destinations.
+    all_attractions = db.scalars(
+        select(Attraction)
+        .where(Attraction.destination_id.in_(request.destinations))
+        .order_by(Attraction.destination_id, Attraction.visit_order, Attraction.id)
+    ).all()
+
+    attraction_map = {item.id: item for item in all_attractions}
+
+    if request.selected_attraction_ids:
+        missing_ids = [
+            item for item in request.selected_attraction_ids
+            if item not in attraction_map
+        ]
+
+        if missing_ids:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid selected attraction IDs: {missing_ids}",
+            )
+
+        attractions = [
+            attraction_map[item]
+            for item in request.selected_attraction_ids
+        ]
+    else:
+        interests = {item.value.lower() for item in request.interests}
+
+        matching = [
+            item for item in all_attractions
+            if any(
+                tag.lower() in interests
+                for tag in (item.interest_tags or [])
+            )
+        ]
+
+        # Keep the prompt compact if the user did not select specific spots.
+        attractions = (matching or all_attractions)[:40]
+
+    attraction_records = [
+        {
+            "id": item.id,
+            "name": item.name,
+            "destination_id": item.destination_id,
+            "category": item.category,
+            "description": item.description,
+            "suggested_time": item.suggested_time,
+            "estimated_duration_minutes": item.estimated_duration_minutes,
+            "source_status": item.source_status,
+        }
+        for item in attractions
+    ]
+
+    # Fetch food records from the database for selected destinations.
+    food_rows = db.scalars(
+        select(FoodSpot).order_by(FoodSpot.city, FoodSpot.spot_id)
+    ).all()
+
+    destination_keys = {
+        item.id.replace("-", " ").lower() for item in selected_destinations
+    } | {
+        item.name.replace("&", " ").replace("-", " ").lower()
+        for item in selected_destinations
+    }
+
+    food_records = []
+    for spot in food_rows:
+        city_key = spot.city.replace("&", " ").replace("-", " ").lower()
+
+        if any(
+            city_key in key or key in city_key
+            for key in destination_keys
+            if city_key and key
+        ):
+            food_records.append({
+                "id": spot.id,
+                "city": spot.city,
+                "name": spot.famous_food_spot,
+               "category": "Local food",
+                "description": spot.description,
+                "speciality_dish": spot.speciality_dish,
+            })
+
+    # Assign consecutive dates to destinations, matching the existing preview.
+    weather_records = []
+    weather_warnings = []
+
+    base_days = duration_days // len(selected_destinations)
+    extra_days = duration_days % len(selected_destinations)
+    day_offset = 0
+
+    for index, destination in enumerate(selected_destinations):
+        assigned_days = base_days + (1 if index < extra_days else 0)
+        first_date = request.start_date + timedelta(days=day_offset)
+        last_date = first_date + timedelta(days=assigned_days - 1)
+        day_offset += assigned_days
+
+        coordinates = WEATHER_COORDINATES.get(destination.id)
+
+        if not coordinates:
+            weather_warnings.append(
+                f"Weather coordinates are unavailable for {destination.name}."
+            )
+            continue
+
+        try:
+            forecast = get_weather_forecast(
+                latitude=coordinates[0],
+                longitude=coordinates[1],
+                start_date=first_date,
+                end_date=last_date,
+            )
+
+            for item in forecast.get("daily", []):
+                weather_records.append({
+                    "destination": destination.name,
+                    **item,
+                })
+
+        except (ValueError, RuntimeError):
+            weather_warnings.append(
+                f"Weather could not be checked for {destination.name} "
+                f"({first_date} to {last_date})."
+            )
+
+    try:
+        result = generate_itinerary(
+            destinations=[item.name for item in selected_destinations],
+            start_date=request.start_date.isoformat(),
+            end_date=request.end_date.isoformat(),
+            traveller_count=request.traveller_count,
+            travel_style=request.travel_style.value,
+            total_budget=request.total_budget,
+            interests=[item.value for item in request.interests],
+            attractions=attraction_records,
+            food_spots=food_records,
+            weather_data=weather_records,
+            adjustment_request=request.adjustment_request,
+        )
+    except (RuntimeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"AI itinerary generation failed: {exc}",
+        ) from exc
+    except Exception as exc:
+        print(f"[ITINERARY AI ERROR] {type(exc).__name__}: {exc}")
+        raise HTTPException(
+            status_code=502,
+            detail="The AI itinerary service is temporarily unavailable.",
+        ) from exc
+
+    # Make missing weather visible instead of implying every date was checked.
+    result["weather_warnings"] = weather_warnings
+    result["weather_source"] = "Open-Meteo"
+    result["generation_status"] = "ai_generated"
+
+    return result
+
 
 
 @app.post(
@@ -526,14 +810,37 @@ def get_food_cities(db: Session = Depends(get_db)):
     }
 
 
+
 @app.get("/api/food/spots")
 def get_food_spots(city: str, db: Session = Depends(get_db)):
-    """Return all food spots for the requested city."""
-    spots = db.scalars(
-        select(FoodSpot)
-        .where(FoodSpot.city == city)
-        .order_by(FoodSpot.spot_id)
+    """Return food spots for a city, supporting frontend destination IDs."""
+
+    def normalize_city(value: str) -> str:
+        value = value.strip().lower()
+        aliases = {
+            "mysore": "mysuru",
+            "hubli": "hubballi",
+            "belgaum": "belagavi",
+            "shimoga": "shivamogga",
+            "kodagu": "coorg",
+            "bijapur": "vijayapura",
+        }
+
+        # Remove alternate names in parentheses for matching.
+        primary_name = value.split("(")[0].strip()
+        return aliases.get(primary_name, primary_name)
+
+    requested_city = normalize_city(city)
+
+    all_spots = db.scalars(
+        select(FoodSpot).order_by(FoodSpot.city, FoodSpot.spot_id)
     ).all()
+
+    spots = [
+        spot
+        for spot in all_spots
+        if normalize_city(spot.city) == requested_city
+    ]
 
     if not spots:
         raise HTTPException(
@@ -541,26 +848,32 @@ def get_food_spots(city: str, db: Session = Depends(get_db)):
             detail=f"No food spots found for city '{city}'.",
         )
 
-    return {
-        "foods": [
-            {
-                "id": spot.id,
-                "spot_id": spot.spot_id,
-                "city": spot.city,
-                "name": spot.famous_food_spot,
-                "category": spot.tourist_attraction,
-                "description": spot.description,
-                "speciality_dish": spot.speciality_dish,
-                "restaurant_name": spot.famous_food_spot,
-                "rating": spot.rating_as_per_google,
-                "map_url": spot.google_maps_link,
-                "is_must_try": spot.rating_as_per_google is not None
-                    and float(spot.rating_as_per_google.split("/")[0].strip()) >= 4.4,
-            }
-            for spot in spots
-        ]
-    }
-    
+    foods = []
+    for spot in spots:
+        try:
+            rating_value = float(
+                spot.rating_as_per_google.split("/")[0].strip()
+            ) if spot.rating_as_per_google else None
+        except (ValueError, AttributeError):
+            rating_value = None
+
+        foods.append({
+            "id": spot.id,
+            "spot_id": spot.spot_id,
+            "city": spot.city,
+            "name": spot.famous_food_spot,
+            "category": "Local food",
+            "description": spot.description,
+            "speciality_dish": spot.speciality_dish,
+            "restaurant_name": spot.famous_food_spot,
+            "rating": spot.rating_as_per_google,
+            "map_url": spot.google_maps_link,
+            "is_must_try": rating_value is not None
+                and rating_value >= 4.4,
+        })
+
+    return {"foods": foods}
+
 class StaysRequest(BaseModel):
     destinations: list[str] = Field(min_length=1, max_length=8)
     start_date: date

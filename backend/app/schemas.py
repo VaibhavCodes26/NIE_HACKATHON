@@ -36,7 +36,7 @@ class ItineraryRequest(BaseModel):
     travel_style: TravelStyle
     total_budget: int = Field(ge=1000, le=100000)
     interests: list[Interest] = Field(default_factory=list, max_length=8)
-
+    adjustment_request: str = Field(default="", max_length=2000)
     @model_validator(mode="after")
     def validate_trip(self):
         if self.end_date < self.start_date:

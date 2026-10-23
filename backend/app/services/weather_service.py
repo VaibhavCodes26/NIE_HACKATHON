@@ -1,0 +1,80 @@
+
+"""Compact daily weather forecasts from Open-Meteo."""
+
+from datetime import date, timedelta
+
+import httpx
+
+
+OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+
+
+def get_weather_forecast(
+    latitude: float,
+    longitude: float,
+    start_date: date,
+    end_date: date,
+) -> dict:
+    """Return daily forecast data without inventing unavailable weather."""
+
+    if end_date < start_date:
+        raise ValueError("End date must be on or after start date.")
+
+    # Open-Meteo's standard forecast supports a limited future horizon.
+    today = date.today()
+    if start_date < today:
+        raise ValueError("Weather forecasts are not available for past dates.")
+
+    if end_date > today + timedelta(days=15):
+        raise ValueError("Requested dates exceed the supported forecast window.")
+
+    params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "daily": (
+            "weather_code,"
+            "temperature_2m_max,"
+            "temperature_2m_min,"
+            "precipitation_probability_max"
+        ),
+        "timezone": "auto",
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
+    }
+
+    try:
+        with httpx.Client(timeout=12.0) as client:
+            response = client.get(OPEN_METEO_URL, params=params)
+            response.raise_for_status()
+            payload = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise RuntimeError("Weather provider is temporarily unavailable.") from exc
+
+    daily = payload.get("daily") or {}
+    dates = daily.get("time") or []
+
+    if not dates:
+        raise RuntimeError("Weather provider returned no forecast data.")
+
+    forecasts = []
+    for index, forecast_date in enumerate(dates):
+        forecasts.append({
+            "date": forecast_date,
+            "weather_code": (daily.get("weather_code") or [None] * len(dates))[index],
+            "temperature_max_c": (
+                daily.get("temperature_2m_max") or [None] * len(dates)
+            )[index],
+            "temperature_min_c": (
+                daily.get("temperature_2m_min") or [None] * len(dates)
+            )[index],
+            "precipitation_probability_max": (
+                daily.get("precipitation_probability_max") or [None] * len(dates)
+            )[index],
+        })
+
+    return {
+        "latitude": latitude,
+        "longitude": longitude,
+        "source": "Open-Meteo",
+        "daily": forecasts,
+    }

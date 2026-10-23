@@ -140,10 +140,10 @@ export default function PlanJourney({
             setError('The end date must be on or after the start date.');
             return;
         }
-        if (durationDays < selectedDestinations.length) {
-            setError('Choose at least one calendar day per destination, or remove a destination to fit your dates.');
-            return;
-        }
+        //if (durationDays < selectedDestinations.length) {
+           // setError('Choose at least one calendar day per destination, or remove a destination to fit your dates.');
+            //return;
+        //}
 
         if (onDiveIntoJourney) {
             onDiveIntoJourney({
