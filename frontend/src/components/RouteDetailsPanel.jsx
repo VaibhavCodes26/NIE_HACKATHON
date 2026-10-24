@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Clock,
+  ExternalLink,
   IndianRupee,
   Info,
   Route as RouteIcon,
@@ -11,6 +12,37 @@ import {
 import { formatDuration } from '../services/routeService';
 import { MODES } from './TransportOptions';
 import RouteMap from './RouteMap';
+
+/**
+ * Build a safe Uber mobile deep-link from origin/destination coordinates.
+ * https://developer.uber.com/docs/riders/ride-requests/tutorials/deep-links/introduction
+ */
+function buildUberUrl(from, to) {
+  const params = new URLSearchParams({
+    action: 'setPickup',
+    'pickup[latitude]': String(from.lat),
+    'pickup[longitude]': String(from.lng),
+    'pickup[nickname]': from.name,
+    'dropoff[latitude]': String(to.lat),
+    'dropoff[longitude]': String(to.lng),
+    'dropoff[nickname]': to.name,
+  });
+  return `https://m.uber.com/ul/?${params.toString()}`;
+}
+
+/**
+ * Build a RedBus route search URL for the given origin/destination city names.
+ * RedBus canonical slug format: /bus-tickets/{from-city}-to-{to-city}
+ * Names are lower-cased and spaces replaced with hyphens.
+ */
+function buildRedBusUrl(from, to) {
+  const slug = (name) =>
+    name.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const fromSlug = slug(from.name);
+  const toSlug = slug(to.name);
+  return `https://www.redbus.in/bus-tickets/${fromSlug}-to-${toSlug}`;
+}
+
 export default function RouteDetailsPanel({
   modeId,
   routes,
@@ -150,6 +182,7 @@ export default function RouteDetailsPanel({
                 from={from}
                 to={to}
                 modeId={modeId}
+                polyline={m.polyline}
               />
 
               {m.notes?.length > 0 && (
@@ -170,24 +203,57 @@ export default function RouteDetailsPanel({
               may not be verified.
             </p>
 
-            {onContinue && m.available && (
-              <button
-                type="button"
-                className="rd-cta rd-cta--sm"
-                onClick={() =>
-                  onContinue({
-                    from,
-                    to,
-                    mode: modeId,
-                    route: m,
-                  })
-                }
-              >
-                Continue Planning
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
-            )}
+            <div className="rd-details__actions">
+              {/* Uber deep-link for Taxi */}
+              {modeId === 'taxi' && m.available && (
+                <a
+                  href={buildUberUrl(from, to)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rd-cta rd-cta--sm rd-book-link"
+                  id="rd-book-uber"
+                  aria-label={`Book taxi from ${from.name} to ${to.name} via Uber`}
+                >
+                  Book Taxi
+                  <ExternalLink size={15} aria-hidden="true" />
+                </a>
+              )}
+
+              {/* RedBus search link for Bus */}
+              {modeId === 'bus' && m.available && (
+                <a
+                  href={buildRedBusUrl(from, to)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rd-cta rd-cta--sm rd-book-link"
+                  id="rd-book-redbus"
+                  aria-label={`Find bus tickets from ${from.name} to ${to.name} via RedBus`}
+                >
+                  Find Bus Tickets
+                  <ExternalLink size={15} aria-hidden="true" />
+                </a>
+              )}
+
+              {onContinue && m.available && (
+                <button
+                  type="button"
+                  className="rd-cta rd-cta--sm"
+                  onClick={() =>
+                    onContinue({
+                      from,
+                      to,
+                      mode: modeId,
+                      route: m,
+                    })
+                  }
+                >
+                  Continue Planning
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </footer>
+
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 
 """FastAPI application for NammaPrayana."""
 
+import asyncio
 import json
 import os
 from datetime import date, timedelta
@@ -25,6 +26,7 @@ from app.schemas import (
     ItineraryWarning,
 )
 from app.services.gemini_service import generate_itinerary
+from app.services.railradar_service import railradar_get
 from app.services.stays_service import recommend_stays
 from app.services.weather_service import get_weather_forecast
 
@@ -738,6 +740,87 @@ class RouteRequest(BaseModel):
     travelDate: date = Field(default_factory=date.today)
 
 
+ROUTES_API_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
+ROUTES_FIELD_MASK = (
+    "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline,"
+    "routes.description,routes.travelAdvisory.transitFare,"
+    "routes.legs.steps.navigationInstruction.instructions,"
+    "routes.legs.steps.distanceMeters,routes.legs.steps.staticDuration,"
+    "routes.legs.steps.transitDetails"
+)
+
+def unavailable_mode(message: str, source_url: str):
+    return {
+        "available": False,
+        "sourceUrl": source_url,
+        "distanceKm": 0,
+        "durationMin": 0,
+        "fare": "Unavailable",
+        "fareNote": "No verified direct route available.",
+        "summary": message,
+        "steps": ["No direct route available for this mode."],
+        "notes": [f"Official source: {source_url}"],
+        "extra": [],
+    }
+
+
+async def _fetch_google_route(
+    client: httpx.AsyncClient,
+    routes_api_key: str | None,
+    origin: RouteLocation,
+    destination: RouteLocation,
+    travel_mode: str,
+    routing_preference: str | None = None,
+    transit_preferences: dict | None = None,
+) -> dict | None:
+    if not routes_api_key:
+        return None
+
+    payload = {
+        "origin": {
+            "location": {
+                "latLng": {
+                    "latitude": origin.lat,
+                    "longitude": origin.lng,
+                }
+            }
+        },
+        "destination": {
+            "location": {
+                "latLng": {
+                    "latitude": destination.lat,
+                    "longitude": destination.lng,
+                }
+            }
+        },
+        "travelMode": travel_mode,
+        "languageCode": "en",
+    }
+    if routing_preference:
+        payload["routingPreference"] = routing_preference
+    if transit_preferences:
+        payload["transitPreferences"] = transit_preferences
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": routes_api_key,
+        "X-Goog-FieldMask": ROUTES_FIELD_MASK,
+    }
+
+    try:
+        response = await client.post(
+            ROUTES_API_URL,
+            json=payload,
+            headers=headers,
+        )
+        if response.status_code == 200:
+            return response.json()
+        print(f"Google Routes API {travel_mode} returned status {response.status_code}")
+    except Exception as exc:
+        print(f"Google Routes API {travel_mode} failed: {type(exc).__name__}: {exc}")
+    return None
+
+
 @app.post("/api/routes")
 async def get_transport_routes(request: RouteRequest):
     if request.travelDate < date.today():
@@ -748,227 +831,324 @@ async def get_transport_routes(request: RouteRequest):
 
     origin = request.origin
     destination = request.destination
+    routes_api_key = os.getenv("ROUTES_API_KEY")
 
-    # Taxi route: OSRM provides road distance and duration.
-    # The displayed fare is an estimate, not a live provider quote.
-    taxi = {
-        "available": False,
-        "distanceKm": 0,
-        "durationMin": 0,
-        "fare": "Unavailable",
-        "fareNote": "Road routing provider did not return a verified route.",
-        "summary": "Road route could not be calculated right now.",
-        "steps": ["Please retry when the routing service is available."],
-        "notes": [
-            "No estimated distance or duration is being substituted.",
-            "The routing service may be temporarily unavailable.",
-        ],
-        "extra": [],
-    }
-
-    try:
-        url = (
-            "https://router.project-osrm.org/route/v1/driving/"
-            f"{origin.lng},{origin.lat};{destination.lng},{destination.lat}"
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        taxi_task = _fetch_google_route(
+            client, routes_api_key, origin, destination,
+            travel_mode="DRIVE",
+            routing_preference="TRAFFIC_AWARE",
+        )
+        walking_task = _fetch_google_route(
+            client, routes_api_key, origin, destination,
+            travel_mode="WALK",
+        )
+        bus_task = _fetch_google_route(
+            client, routes_api_key, origin, destination,
+            travel_mode="TRANSIT",
+            transit_preferences={"allowedTravelModes": ["BUS"]},
+        )
+        metro_task = _fetch_google_route(
+            client, routes_api_key, origin, destination,
+            travel_mode="TRANSIT",
+            transit_preferences={"allowedTravelModes": ["SUBWAY"]},
         )
 
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.get(
-                url,
-                params={"overview": "false", "steps": "true"},
-            )
-            response.raise_for_status()
-            data = response.json()
+        taxi_data, walking_data, bus_data, metro_data = await asyncio.gather(
+            taxi_task, walking_task, bus_task, metro_task
+        )
 
-        if data.get("code") != "Ok" or not data.get("routes"):
-            raise ValueError("No road route returned by provider.")
+    train = unavailable_mode(
+        f"Train schedules for {origin.name} to {destination.name} "
+        f"on {request.travelDate.isoformat()} have not been verified.",
+        "https://www.irctc.co.in/nget/train-search",
+    )
 
-        road_route = data["routes"][0]
-        distance_km = road_route["distance"] / 1000
-        duration_min = road_route["duration"] / 60
+    # 1. Taxi / Driving (Google Routes API with TRAFFIC_AWARE)
+    taxi = unavailable_mode(
+        f"Driving route from {origin.name} to {destination.name} could not be calculated.",
+        "https://maps.google.com",
+    )
+    if taxi_data and taxi_data.get("routes"):
+        r = taxi_data["routes"][0]
+        distance_km = r.get("distanceMeters", 0) / 1000.0
+        duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
+        duration_min = round(duration_sec / 60.0)
+        polyline = r.get("polyline", {}).get("encodedPolyline", "")
 
         fare_min = round((80 + distance_km * 18) * 0.8 / 10) * 10
         fare_max = round((80 + distance_km * 18) * 1.2 / 10) * 10
 
+        steps = [
+            step["navigationInstruction"]["instructions"]
+            for leg in r.get("legs", [])
+            for step in leg.get("steps", [])
+            if step.get("navigationInstruction", {}).get("instructions")
+        ]
+        if not steps:
+            steps = [
+                f"Start at {origin.name}.",
+                f"Follow the road route for approximately {distance_km:.1f} km with live traffic awareness.",
+                f"Arrive at {destination.name}.",
+            ]
+
         taxi = {
             "available": True,
             "distanceKm": round(distance_km, 2),
-            "durationMin": round(duration_min),
-            "fare": f"₹{fare_min}–₹{fare_max}",
+            "durationMin": duration_min,
+            "polyline": polyline,
+            "fare": f"₹{fare_min:,}–₹{fare_max:,}",
             "fareNote": "Indicative estimate only; not a live taxi quote.",
             "summary": (
                 f"Road route from {origin.name} to {destination.name}, "
-                "calculated using OSRM routing."
+                "calculated using Google Routes API with live traffic."
             ),
-            "steps": [
-                f"Start at {origin.name}.",
-                f"Follow the calculated road route for approximately "
-                f"{distance_km:.1f} km.",
-                f"Arrive at {destination.name}.",
-            ],
+            "steps": steps,
             "notes": [
-                "Road distance and duration are provider estimates, not live traffic predictions.",
+                "Route duration accounts for live traffic conditions.",
                 "Taxi fare is an indicative estimate, not an Ola/Uber quote.",
-                "Actual fares may vary with traffic, tolls, waiting and surge pricing.",
+                "Actual fares may vary with traffic, waiting time, and tolls.",
             ],
             "extra": [
-                {"label": "Routing source", "value": "OSRM / OpenStreetMap"},
+                {"label": "Routing source", "value": "Google Routes API (Traffic Aware)"},
                 {"label": "Fare status", "value": "Indicative estimate"},
             ],
         }
 
-    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError) as exc:
-        print(f"OSRM taxi route failed: {type(exc).__name__}: {exc}")
+    # 2. Walking (Google Routes API)
+    walking = unavailable_mode(
+        f"Walking route from {origin.name} to {destination.name} could not be calculated.",
+        "https://maps.google.com",
+    )
+    if walking_data and walking_data.get("routes"):
+        r = walking_data["routes"][0]
+        distance_km = r.get("distanceMeters", 0) / 1000.0
+        duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
+        duration_min = round(duration_sec / 60.0)
+        polyline = r.get("polyline", {}).get("encodedPolyline", "")
 
-    # Walking route: Google Routes API.
-    # Never fabricate walking distance, duration or navigation steps.
-    walking = {
-        "available": False,
-        "distanceKm": 0,
-        "durationMin": 0,
-        "fare": "Free",
-        "summary": "Walking directions are unavailable right now.",
-        "steps": ["Please try again later."],
-        "notes": ["No estimated distance or duration is being substituted."],
-        "extra": [],
-    }
+        steps = [
+            step["navigationInstruction"]["instructions"]
+            for leg in r.get("legs", [])
+            for step in leg.get("steps", [])
+            if step.get("navigationInstruction", {}).get("instructions")
+        ]
+        if not steps:
+            steps = [
+                f"Follow pedestrian paths from {origin.name} to {destination.name}."
+            ]
 
-    routes_api_key = os.getenv("ROUTES_API_KEY")
+        warning = "Long distance: walking is not recommended for this journey." if distance_km > 25 else None
 
-    if routes_api_key:
-        try:
-            payload = {
-                "origin": {
-                    "location": {
-                        "latLng": {
-                            "latitude": origin.lat,
-                            "longitude": origin.lng,
-                        }
-                    }
-                },
-                "destination": {
-                    "location": {
-                        "latLng": {
-                            "latitude": destination.lat,
-                            "longitude": destination.lng,
-                        }
-                    }
-                },
-                "travelMode": "WALK",
-                "languageCode": "en",
-            }
-
-            headers = {
-                "Content-Type": "application/json",
-                "X-Goog-Api-Key": routes_api_key,
-                "X-Goog-FieldMask": (
-                    "routes.distanceMeters,routes.duration,"
-                    "routes.legs.steps.distanceMeters,"
-                    "routes.legs.steps.navigationInstruction.instructions"
-                ),
-            }
-
-            async with httpx.AsyncClient(timeout=20.0) as client:
-                response = await client.post(
-                    "https://routes.googleapis.com/directions/v2:computeRoutes",
-                    json=payload,
-                    headers=headers,
-                )
-                response.raise_for_status()
-                data = response.json()
-
-            if data.get("routes"):
-                route = data["routes"][0]
-                distance_km = route["distanceMeters"] / 1000
-                duration_min = float(
-                    route["duration"].removesuffix("s")
-                ) / 60
-
-                steps = [
-                    step["navigationInstruction"]["instructions"]
-                    for leg in route.get("legs", [])
-                    for step in leg.get("steps", [])
-                    if step.get("navigationInstruction", {}).get("instructions")
-                ]
-
-                walking = {
-                    "available": True,
-                    "distanceKm": round(distance_km, 2),
-                    "durationMin": round(duration_min),
-                    "fare": "Free",
-                    "summary": (
-                        f"Walking route from {origin.name} to {destination.name}, "
-                        "calculated using Google Routes API."
-                    ),
-                    "steps": steps or [
-                        "Follow the walking route shown by Google Maps."
-                    ],
-                    "notes": [
-                        "Distance and duration are Google route estimates."
-                    ],
-                    "extra": [
-                        {
-                            "label": "Routing source",
-                            "value": "Google Routes API",
-                        }
-                    ],
-                }
-            else:
-                print("Google walking route returned no routes.")
-
-        except (
-            httpx.HTTPError,
-            ValueError,
-            KeyError,
-            TypeError,
-        ) as exc:
-            # Do not print the API key or request headers.
-            print(f"Google walking route failed: {type(exc).__name__}: {exc}")
-    else:
-        print("ROUTES_API_KEY is missing; Google walking routes are disabled.")
-
-    def unavailable_mode(message, source_url):
-        return {
-            "available": False,
-            "sourceUrl": source_url,
-            "distanceKm": 0,
-            "durationMin": 0,
-            "fare": "Not verified",
-            "fareNote": "No verified fare available.",
-            "summary": message,
-            "steps": ["Check the official operator source for this journey."],
+        walking = {
+            "available": True,
+            "distanceKm": round(distance_km, 2),
+            "durationMin": duration_min,
+            "polyline": polyline,
+            "fare": "Free",
+            "fareNote": "Pedestrian walking route.",
+            "warning": warning,
+            "summary": (
+                f"Walking route from {origin.name} to {destination.name}, "
+                "calculated using Google Routes API."
+            ),
+            "steps": steps,
             "notes": [
-                f"Official source: {source_url}",
-                "Schedules, availability and fares have not been verified by this endpoint.",
+                "Distance and duration are Google Routes API estimates.",
             ],
-            "extra": [],
+            "extra": [
+                {"label": "Routing source", "value": "Google Routes API"},
+            ],
         }
+
+    # 3. Bus (Google Routes API TRANSIT with allowedTravelModes: [BUS])
+    bus = unavailable_mode(
+        f"No direct transit bus routes found between {origin.name} and {destination.name}.",
+        "https://mybmtc.karnataka.gov.in/",
+    )
+    # Vehicle types Google Routes API uses for bus-type services
+    _BUS_VEHICLE_TYPES = {"BUS", "INTERCITY_BUS", "TROLLEYBUS", "SHARE_TAXI"}
+    # Vehicle types considered true metro/subway
+    _SUBWAY_VEHICLE_TYPES = {"SUBWAY", "METRO_RAIL", "MONORAIL", "TRAM"}
+
+    if bus_data and bus_data.get("routes"):
+        r = bus_data["routes"][0]
+        # Only mark available if there is an actual transit step with a bus-type vehicle
+        transit_steps = [
+            step for leg in r.get("legs", [])
+            for step in leg.get("steps", [])
+            if "transitDetails" in step
+            and step["transitDetails"].get("transitLine", {}).get("vehicle", {}).get("type")
+            in _BUS_VEHICLE_TYPES
+        ]
+        if transit_steps:
+            distance_km = r.get("distanceMeters", 0) / 1000.0
+            duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
+            duration_min = round(duration_sec / 60.0)
+            polyline = r.get("polyline", {}).get("encodedPolyline", "")
+
+            first_td = transit_steps[0].get("transitDetails", {})
+            t_line = first_td.get("transitLine", {})
+            bus_line = t_line.get("nameShort") or t_line.get("name") or "Bus"
+            dep_stop = first_td.get("stopDetails", {}).get("departureStop", {}).get("name")
+            arr_stop = first_td.get("stopDetails", {}).get("arrivalStop", {}).get("name")
+            stop_count = first_td.get("stopCount")
+            agencies = t_line.get("agencies", [])
+            agency_name = agencies[0].get("name") if agencies else "Transit Agency"
+
+            fare_obj = r.get("travelAdvisory", {}).get("transitFare")
+            if fare_obj and fare_obj.get("units"):
+                curr = "₹" if fare_obj.get("currencyCode") == "INR" else f"{fare_obj.get('currencyCode')} "
+                fare_str = f"{curr}{fare_obj['units']}"
+                fare_note = "Official transit fare reported by provider."
+            else:
+                fare_str = "Not published"
+                fare_note = "Fare not published by transit agency."
+
+            steps = []
+            for leg in r.get("legs", []):
+                for step in leg.get("steps", []):
+                    if "transitDetails" in step:
+                        td = step["transitDetails"]
+                        tl = td.get("transitLine", {})
+                        l_name = tl.get("nameShort") or tl.get("name") or "Bus"
+                        ds = td.get("stopDetails", {}).get("departureStop", {}).get("name") or "stop"
+                        as_ = td.get("stopDetails", {}).get("arrivalStop", {}).get("name") or "destination stop"
+                        sc = td.get("stopCount")
+                        sc_text = f" ({sc} stops)" if sc else ""
+                        steps.append(f"Board {l_name} at {ds} towards {td.get('headsign', 'destination')}{sc_text}.")
+                        steps.append(f"Alight at {as_}.")
+                    elif step.get("navigationInstruction", {}).get("instructions"):
+                        steps.append(step["navigationInstruction"]["instructions"])
+
+            if not steps:
+                steps = [f"Take bus route {bus_line} from {dep_stop or origin.name} to {arr_stop or destination.name}."]
+
+            extra = [{"label": "Bus route", "value": bus_line}]
+            if dep_stop:
+                extra.append({"label": "Boarding", "value": dep_stop})
+            if arr_stop:
+                extra.append({"label": "Alighting", "value": arr_stop})
+            if stop_count:
+                extra.append({"label": "Stops", "value": f"{stop_count} stops"})
+
+            bus = {
+                "available": True,
+                "distanceKm": round(distance_km, 2),
+                "durationMin": duration_min,
+                "polyline": polyline,
+                "fare": fare_str,
+                "fareNote": fare_note,
+                "summary": (
+                    f"Bus connection via {bus_line} from {dep_stop or origin.name} "
+                    f"to {arr_stop or destination.name}."
+                ),
+                "steps": steps,
+                "notes": [
+                    "Transit route calculated using Google Routes API.",
+                    f"Operated by {agency_name}.",
+                ],
+                "extra": extra,
+            }
+
+    # 4. Metro (Google Routes API TRANSIT with allowedTravelModes: [SUBWAY])
+    metro = unavailable_mode(
+        f"No direct metro route found between {origin.name} and {destination.name}.",
+        "https://english.bmrc.co.in/",
+    )
+    if metro_data and metro_data.get("routes"):
+        r = metro_data["routes"][0]
+        # Only mark available if the API actually returned subway/metro-type steps.
+        # The API sometimes returns BUS steps even when SUBWAY is requested for
+        # intercity journeys; those must be rejected here.
+        transit_steps = [
+            step for leg in r.get("legs", [])
+            for step in leg.get("steps", [])
+            if "transitDetails" in step
+            and step["transitDetails"].get("transitLine", {}).get("vehicle", {}).get("type")
+            in _SUBWAY_VEHICLE_TYPES
+        ]
+        if transit_steps:
+            distance_km = r.get("distanceMeters", 0) / 1000.0
+            duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
+            duration_min = round(duration_sec / 60.0)
+            polyline = r.get("polyline", {}).get("encodedPolyline", "")
+
+            first_td = transit_steps[0].get("transitDetails", {})
+            t_line = first_td.get("transitLine", {})
+            metro_line = t_line.get("nameShort") or t_line.get("name") or "Metro"
+            dep_station = first_td.get("stopDetails", {}).get("departureStop", {}).get("name")
+            arr_station = first_td.get("stopDetails", {}).get("arrivalStop", {}).get("name")
+            stop_count = first_td.get("stopCount")
+            agencies = t_line.get("agencies", [])
+            agency_name = agencies[0].get("name") if agencies else "BMRCL"
+
+            fare_obj = r.get("travelAdvisory", {}).get("transitFare")
+            if fare_obj and fare_obj.get("units"):
+                curr = "₹" if fare_obj.get("currencyCode") == "INR" else f"{fare_obj.get('currencyCode')} "
+                fare_str = f"{curr}{fare_obj['units']}"
+                fare_note = "Official metro fare reported by provider."
+            else:
+                fare_str = "Not published"
+                fare_note = "Fare not published by transit agency."
+
+            steps = []
+            for leg in r.get("legs", []):
+                for step in leg.get("steps", []):
+                    if "transitDetails" in step:
+                        td = step["transitDetails"]
+                        tl = td.get("transitLine", {})
+                        l_name = tl.get("nameShort") or tl.get("name") or "Metro"
+                        ds = td.get("stopDetails", {}).get("departureStop", {}).get("name") or "station"
+                        as_ = td.get("stopDetails", {}).get("arrivalStop", {}).get("name") or "destination station"
+                        sc = td.get("stopCount")
+                        sc_text = f" ({sc} stations)" if sc else ""
+                        steps.append(f"Board {l_name} at {ds} towards {td.get('headsign', 'terminal')}{sc_text}.")
+                        steps.append(f"Alight at {as_}.")
+                    elif step.get("navigationInstruction", {}).get("instructions"):
+                        steps.append(step["navigationInstruction"]["instructions"])
+
+            if not steps:
+                steps = [f"Take metro line {metro_line} from {dep_station or origin.name} to {arr_station or destination.name}."]
+
+            extra = [{"label": "Metro line", "value": metro_line}]
+            if dep_station:
+                extra.append({"label": "Boarding", "value": dep_station})
+            if arr_station:
+                extra.append({"label": "Alighting", "value": arr_station})
+            if stop_count:
+                extra.append({"label": "Stations", "value": f"{stop_count} stations"})
+
+            metro = {
+                "available": True,
+                "distanceKm": round(distance_km, 2),
+                "durationMin": duration_min,
+                "polyline": polyline,
+                "fare": fare_str,
+                "fareNote": fare_note,
+                "summary": (
+                    f"Metro transit via {metro_line} from {dep_station or origin.name} "
+                    f"to {arr_station or destination.name}."
+                ),
+                "steps": steps,
+                "notes": [
+                    "Metro route calculated using Google Routes API.",
+                    f"Operated by {agency_name}.",
+                ],
+                "extra": extra,
+            }
 
     modes = {
         "taxi": taxi,
         "walking": walking,
-        "train": unavailable_mode(
-            f"Train schedules for {origin.name} to {destination.name} "
-            f"on {request.travelDate.isoformat()} have not been verified.",
-            "https://www.indianrail.gov.in/enquiry/TBIS/TrainBetweenImportantStations.jsp",
-        ),
-        "bus": unavailable_mode(
-            f"Bus schedules for {origin.name} to {destination.name} "
-            f"on {request.travelDate.isoformat()} have not been verified.",
-            "https://www.ksrtc.in/",
-        ),
-        "metro": unavailable_mode(
-            "Metro availability depends on the selected origin and destination. "
-            "A verified metro route is not available from this endpoint.",
-            "https://english.bmrc.co.in/",
-        ),
+        "train": train,
+        "bus": bus,
+        "metro": metro,
     }
 
-    # Keep the response structure consistent for the frontend.
-    primary_distance = (
-        taxi["distanceKm"]
-        if taxi["available"]
-        else walking["distanceKm"]
+    primary_distance = next(
+        (m["distanceKm"] for m in [taxi, train, bus, metro, walking] if m.get("available")),
+        0,
     )
 
     return {

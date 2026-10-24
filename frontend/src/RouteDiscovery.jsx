@@ -488,16 +488,16 @@ tourismDestinations,
   }, [from, to]);
 
   const selectMode = (id) => {
-  // Clicking the currently open route closes it.
-  if (selected === id) {
-    setSelected(null);
-    return;
-  }
+    // Clicking the currently open route closes it.
+    if (selected === id) {
+      setSelected(null);
+      return;
+    }
 
-  // Open the newly selected route.
-  setSelected(id);
-  scrollTo(detailsRef);
-};
+    // Open the newly selected route.
+    setSelected(id);
+    scrollTo(detailsRef);
+  };
   // Keep the active destination tab valid.
   useEffect(() => {
     if (
@@ -767,7 +767,7 @@ const saveItinerarySelection = () => {
           </div>
 
 {selected === 'train' && (
-  <div className="rd-reveal">
+  <div ref={detailsRef} className="rd-reveal">
     <TrainSearchPanel />
   </div>
 )}
