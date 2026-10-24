@@ -20,12 +20,14 @@ from app.schemas import (
     ItineraryStop,
     ItineraryWarning,
 )
+from app.routes.trains import router as trains_router
 from app.services.stays_service import recommend_stays
 app = FastAPI(
     title="NammaPrayana API",
     description="Karnataka travel itinerary planning API",
     version="1.0.0",
 )
+app.include_router(trains_router)
 
 app.add_middleware(
     CORSMiddleware,

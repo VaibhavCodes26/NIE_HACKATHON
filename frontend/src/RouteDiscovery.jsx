@@ -14,7 +14,7 @@ import {
   Check,
   MapPinned,
 } from 'lucide-react';
-
+import TrainSearchPanel from './components/TrainSearchPanel';
 import HeroSection from './components/HeroSection';
 import RoutePlanner from './components/RoutePlanner';
 import TransportOptions from './components/TransportOptions';
@@ -488,10 +488,16 @@ tourismDestinations,
   }, [from, to]);
 
   const selectMode = (id) => {
-    setSelected(id);
-    scrollTo(detailsRef);
-  };
+  // Clicking the currently open route closes it.
+  if (selected === id) {
+    setSelected(null);
+    return;
+  }
 
+  // Open the newly selected route.
+  setSelected(id);
+  scrollTo(detailsRef);
+};
   // Keep the active destination tab valid.
   useEffect(() => {
     if (
@@ -760,17 +766,23 @@ const saveItinerarySelection = () => {
             />
           </div>
 
-          {selected && (
-            <div ref={detailsRef} className="rd-reveal">
-              <RouteDetailsPanel
-                modeId={selected}
-                routes={routes}
-                from={from}
-                to={to}
-                onContinue={onContinue}
-              />
-            </div>
-          )}
+{selected === 'train' && (
+  <div className="rd-reveal">
+    <TrainSearchPanel />
+  </div>
+)}
+
+{selected && selected !== 'train' && (
+  <div ref={detailsRef} className="rd-reveal">
+    <RouteDetailsPanel
+      modeId={selected}
+      routes={routes}
+      from={from}
+      to={to}
+      onContinue={onContinue}
+    />
+  </div>
+)}
         </>
       )}
 

@@ -98,31 +98,37 @@ const finishIntro = useCallback(() => {
     });
   };
 
-  const onNav = (id) => {
-    setActive(id);
+  
+const onNav = (id) => {
+  setActive(id);
 
-    if (id === 'plan') {
-      navigate('/plan-journey');
-      return;
+  if (id === 'plan') {
+    navigate('/plan-journey');
+    return;
+  }
+
+  if (id === 'food') {
+    navigate('/food-spots');
+    return;
+  }
+
+  if (id === 'help') {
+    setPanel({ type: id });
+    return;
+  }
+
+  if (currentPage !== '/') {
+    navigate('/');
+
+    if (id !== 'home') {
+      requestAnimationFrame(() => scrollTo(id));
     }
 
-    if (id === 'help') {
-      setPanel({ type: id });
-      return;
-    }
+    return;
+  }
 
-    if (currentPage !== '/') {
-      navigate('/');
-
-      if (id !== 'home') {
-        requestAnimationFrame(() => scrollTo(id));
-      }
-
-      return;
-    }
-
-    scrollTo(id);
-  };
+  scrollTo(id);
+};
 
   // Open the dedicated Food Spots page.
   const openFood = () => {

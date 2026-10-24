@@ -27,6 +27,7 @@ import {
   Mountain,
 } from "lucide-react";
 import "./ItineraryPage.css";
+import { KaMark, Wordmark } from "./components/Logo.jsx";
 
 const API_BASE = "http://127.0.0.1:8000";
 const EMPTY_ARRAY = [];
@@ -584,17 +585,14 @@ return (
       </button>
 
       <div className="itinerary-brand">
-        <span className="itinerary-brand__text">
-          <span className="itinerary-brand__namma">NAMMA</span>
-          <span className="itinerary-brand__prayana"> PRAYANA</span>
-          <small>Your Karnataka, your way</small>
-        </span>
-      </div>
+  <KaMark size={38} />
+  <span className="brand-text">
+    <Wordmark />
+    <small>    Explore. Taste. Travel.</small>
+  </span>
+</div>
 
-      <span className="itinerary-topbar__tag">
-        <Sparkles size={14} />
-        Your travel story
-      </span>
+      
     </header>
 
     <section className="itinerary-hero">

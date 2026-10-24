@@ -1,5 +1,17 @@
-import { AlertTriangle, ArrowRight, Bus, Car, Check, Footprints, TrainFront, TramFront } from 'lucide-react';
+
 import { formatDuration } from '../services/routeService';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bus,
+  Car,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Footprints,
+  TrainFront,
+  TramFront,
+} from 'lucide-react';
 
 export const MODES = [
   { id: 'taxi', title: 'Taxi', blurb: 'A comfortable, direct ride.', Icon: Car },
@@ -32,9 +44,8 @@ export default function TransportOptions({ routes, selected, onSelect, from, to 
             return (
               <li key={id}>
                 <article
-                  className={`rd-mode rd-mode--${id} ${isSel ? 'is-selected' : ''} ${
-                    m.available ? '' : 'is-unavailable'
-                  }`}
+                  className={`rd-mode rd-mode--${id} ${isSel ? 'is-selected' : ''} ${m.available ? '' : 'is-unavailable'
+                    }`}
                 >
                   {isSel && (
                     <span className="rd-mode__check" aria-hidden="true">
@@ -76,16 +87,22 @@ export default function TransportOptions({ routes, selected, onSelect, from, to 
                     </p>
                   )}
                   {!m.available && <p className="rd-mode__na">Not available on this route</p>}
-
                   <button
                     type="button"
                     className="rd-mode__btn"
                     role="radio"
                     aria-checked={isSel}
+                    aria-expanded={isSel}
                     onClick={() => onSelect(id)}
                   >
-                    {isSel ? 'Viewing' : 'View Route'} <ArrowRight size={16} aria-hidden="true" />
+                    {isSel ? 'Hide Route' : 'View Route'}
+                    {isSel ? (
+                      <ChevronUp size={16} aria-hidden="true" />
+                    ) : (
+                      <ChevronDown size={16} aria-hidden="true" />
+                    )}
                   </button>
+
                 </article>
               </li>
             );

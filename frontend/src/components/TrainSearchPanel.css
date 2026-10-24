@@ -1,0 +1,205 @@
+.rd-train-api__form {
+  align-items: start;
+}
+
+.rd-train-api__station-field {
+  position: relative;
+  min-width: 0;
+}
+
+.rd-train-api__station-field > input,
+.rd-train-search__field select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #dec9b5;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #3f2d27;
+  background: #fffdf8;
+  font: inherit;
+  outline: none;
+}
+
+.rd-train-api__station-field > input:focus,
+.rd-train-search__field select:focus {
+  border-color: #9b3228;
+  box-shadow: 0 0 0 3px rgb(155 50 40 / 10%);
+}
+
+.rd-train-api__input-spinner {
+  position: absolute;
+  right: 12px;
+  bottom: 13px;
+  color: #91372c;
+  animation: rd-train-api-spin 1s linear infinite;
+}
+
+.rd-train-api__suggestions {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% - 1px);
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow: auto;
+  border: 1px solid #dec9b5;
+  border-radius: 0 0 10px 10px;
+  background: #fffdf8;
+  box-shadow: 0 12px 28px rgb(60 34 20 / 14%);
+}
+
+.rd-train-api__suggestion {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid #f0e5d8;
+  padding: 10px 11px;
+  background: transparent;
+  color: #432e26;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rd-train-api__suggestion:hover,
+.rd-train-api__suggestion:focus-visible {
+  background: #fff1dc;
+  outline: none;
+}
+
+.rd-train-api__station-code {
+  min-width: 50px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: #f7e4c6;
+  color: #8b3027;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rd-train-api__station-name,
+.rd-train-api__station-name strong,
+.rd-train-api__station-name small {
+  display: block;
+}
+
+.rd-train-api__station-name strong { font-size: 12px; }
+.rd-train-api__station-name small { margin-top: 2px; color: #857267; font-size: 11px; }
+.rd-train-api__hint { display: block; margin-top: 5px; color: #867568; font-size: 11px; line-height: 1.45; }
+.rd-train-api__field-error { color: #a32922 !important; font-size: 12px; line-height: 1.45; }
+
+.rd-train-api__results,
+.rd-train-api__details {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #ead5b8;
+  border-radius: 13px;
+  background: #fffaf0;
+}
+
+.rd-train-api__results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rd-train-api__results-heading h4 {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin: 6px 0 4px;
+  color: #77251f;
+  font-size: 19px;
+}
+
+.rd-train-api__results-heading p,
+.rd-train-api__provider-caption { margin: 0; color: #837064; font-size: 12px; }
+
+.rd-train-api__text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 1px solid #e1cbb2;
+  border-radius: 8px;
+  background: transparent;
+  color: #743127;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-train-api__train-list { display: grid; gap: 11px; }
+.rd-train-api__train-card { padding: 13px; border: 1px solid #ead8c1; border-radius: 11px; background: #fffdf8; }
+.rd-train-api__train-topline { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.rd-train-api__train-number { color: #96352a; font-size: 11px; font-weight: 800; letter-spacing: .06em; }
+.rd-train-api__train-title h4 { margin: 3px 0 5px; color: #402d27; font-size: 15px; line-height: 1.35; }
+.rd-train-api__train-type { display: inline-block; padding: 3px 6px; border-radius: 5px; background: #f6ead7; color: #765747; font-size: 10px; }
+
+.rd-train-api__outline-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #96352a;
+  border-radius: 8px;
+  background: #fff7ea;
+  color: #8b2b24;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-train-api__outline-button:hover:not(:disabled) { background: #f8e5cf; }
+.rd-train-api__outline-button:disabled { cursor: not-allowed; opacity: .6; }
+
+.rd-train-api__route-line { display: grid; grid-template-columns: minmax(55px, 1fr) minmax(100px, 1.8fr) minmax(55px, 1fr); align-items: center; gap: 8px; margin-top: 15px; }
+.rd-train-api__route-line > div:not(.rd-train-api__route-duration) strong,
+.rd-train-api__route-line > div:not(.rd-train-api__route-duration) small { display: block; }
+.rd-train-api__route-line strong { color: #4a2b25; font-size: 17px; }
+.rd-train-api__route-line small { margin-top: 3px; color: #927f72; font-size: 10px; }
+.rd-train-api__route-line > div:last-child { text-align: right; }
+.rd-train-api__route-duration { display: flex; align-items: center; gap: 5px; color: #857165; font-size: 10px; text-align: center; white-space: nowrap; }
+.rd-train-api__route-duration span { flex: 1; height: 1px; background: #d8b99c; }
+.rd-train-api__meta-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.rd-train-api__meta-row span { padding: 4px 7px; border-radius: 5px; background: #faf0e0; color: #75594a; font-size: 10px; }
+
+.rd-train-api__empty { display: grid; justify-items: center; gap: 7px; padding: 25px 15px; color: #8c342a; text-align: center; }
+.rd-train-api__empty strong { color: #4a3027; font-size: 14px; }
+.rd-train-api__empty p { margin: 0; color: #89766a; font-size: 12px; }
+
+.rd-train-api__details h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 12px; color: #7d2a22; font-size: 17px; }
+.rd-train-api__detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rd-train-api__detail-panel { min-width: 0; padding: 12px; border: 1px solid #ecdcc6; border-radius: 10px; background: #fffdf8; }
+.rd-train-api__detail-panel h5 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; color: #4e352b; font-size: 13px; }
+.rd-train-api__provider-caption { margin-bottom: 10px; }
+.rd-train-api__availability-list,
+.rd-train-api__fare-list { display: grid; gap: 7px; }
+.rd-train-api__availability-row,
+.rd-train-api__fare-list > div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-bottom: 7px; border-bottom: 1px solid #f0e6d8; color: #745c4e; font-size: 11px; }
+.rd-train-api__availability-row strong,
+.rd-train-api__fare-list strong { color: #4b3229; text-align: right; }
+.rd-train-api__availability-row small { color: #8c7768; font-size: 10px; }
+.rd-train-api__fare-list .rd-train-api__fare-total { padding-top: 7px; border-top: 1px solid #d7bca0; border-bottom: 0; color: #802c24; font-weight: 800; }
+.rd-train-api__fare-list .rd-train-api__fare-total strong { color: #802c24; font-size: 15px; }
+.rd-train-api__detail-panel p { color: #867366; font-size: 12px; line-height: 1.5; }
+.rd-train-api__source-note { margin: 12px 0 0; color: #867366; font-size: 11px; line-height: 1.5; }
+.rd-train-api__loading-panel { display: flex; align-items: center; gap: 9px; margin-top: 14px; padding: 13px; border: 1px solid #e4cfb5; border-radius: 9px; color: #7e3027; background: #fff7e8; font-size: 12px; }
+.rd-train-api__notice { margin-top: 16px; }
+.rd-train-api__spin { animation: rd-train-api-spin 1s linear infinite; }
+
+@keyframes rd-train-api-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .rd-train-api__detail-grid { grid-template-columns: 1fr; }
+  .rd-train-api__results-heading { flex-direction: column; }
+  .rd-train-api__train-topline { flex-direction: column; }
+  .rd-train-api__outline-button { width: 100%; }
+}
