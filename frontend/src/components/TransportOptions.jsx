@@ -110,8 +110,10 @@ export default function TransportOptions({ routes, selected, onSelect, from, to 
         </ul>
 
         <p className="rd-disclaimer">
-          Prototype data: durations, fares and timings shown are illustrative estimates, not real-time information.
-        </p>
+  Road distances and durations are estimates. Taxi fares are indicative,
+  not live quotes. Train and bus schedules and fares must be verified
+  with the relevant operators.
+</p>
       </div>
     </section>
   );

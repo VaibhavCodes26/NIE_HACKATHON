@@ -1,18 +1,22 @@
 
-"""FastAPI application for NammaPrayana itinerary previews."""
-import httpx 
-from collections import Counter
+"""FastAPI application for NammaPrayana."""
+
+import json
+import os
 from datetime import date, timedelta
-from app.services.weather_service import get_weather_forecast
-from fastapi import Depends, FastAPI, HTTPException,Query
-from pydantic import BaseModel, Field
+from pathlib import Path
+
+import httpx
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-import json
-from app.services.gemini_service import generate_itinerary
+
 from app.database import create_tables, get_db
 from app.models import Attraction, Destination, FoodSpot
+from app.routes.trains import router as trains_router
 from app.schemas import (
     ItineraryDay,
     ItineraryPreviewResponse,
@@ -20,13 +24,21 @@ from app.schemas import (
     ItineraryStop,
     ItineraryWarning,
 )
-from app.routes.trains import router as trains_router
+from app.services.gemini_service import generate_itinerary
 from app.services.stays_service import recommend_stays
+from app.services.weather_service import get_weather_forecast
+
+
+# Load E:\NIE_HACKATHON\backend\.env regardless of the terminal's working directory.
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BACKEND_DIR / ".env")
+
 app = FastAPI(
     title="NammaPrayana API",
     description="Karnataka travel itinerary planning API",
     version="1.0.0",
 )
+
 app.include_router(trains_router)
 
 app.add_middleware(
@@ -55,6 +67,11 @@ def home():
         "status": "running",
     }
 
+
+# ---------------------------------------------------------------------------
+# Weather
+# ---------------------------------------------------------------------------
+
 WEATHER_COORDINATES = {
     "badami": (15.9149, 75.6768),
     "hampi": (15.3350, 76.4600),
@@ -75,6 +92,8 @@ WEATHER_COORDINATES = {
     "hubballi": (15.3647, 75.1240),
     "hassan": (13.0068, 76.0996),
 }
+
+
 @app.get("/api/weather/forecast")
 def weather_forecast(
     latitude: float | None = None,
@@ -83,8 +102,8 @@ def weather_forecast(
     end_date: date | None = None,
     destination: str | None = None,
     date_param: date | None = Query(default=None, alias="date"),
+    db: Session = Depends(get_db),
 ):
-    # Support the existing frontend: destination + date.
     if latitude is None or longitude is None:
         if not destination:
             raise HTTPException(
@@ -96,27 +115,21 @@ def weather_forecast(
         coordinates = WEATHER_COORDINATES.get(key)
 
         if coordinates is None:
-            # Also match destination display names from the database.
-            with next(get_db()) as db:
-                destinations = db.scalars(
-                    select(Destination).where(Destination.is_active.is_(True))
-                ).all()
+            destinations = db.scalars(
+                select(Destination).where(Destination.is_active.is_(True))
+            ).all()
 
             match = next(
                 (
-                    item for item in destinations
+                    item
+                    for item in destinations
                     if item.name.strip().lower() == key
                 ),
                 None,
             )
 
-            if match is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Weather coordinates unavailable for destination: {destination}",
-                )
-
-            coordinates = WEATHER_COORDINATES.get(match.id)
+            if match is not None:
+                coordinates = WEATHER_COORDINATES.get(match.id)
 
         if coordinates is None:
             raise HTTPException(
@@ -128,6 +141,12 @@ def weather_forecast(
 
     start_date = start_date or date_param or date.today()
     end_date = end_date or start_date
+
+    if end_date < start_date:
+        raise HTTPException(
+            status_code=422,
+            detail="End date must be on or after start date.",
+        )
 
     try:
         return get_weather_forecast(
@@ -144,6 +163,10 @@ def weather_forecast(
             detail="Weather forecast is temporarily unavailable.",
         ) from exc
 
+
+# ---------------------------------------------------------------------------
+# Destinations and attractions
+# ---------------------------------------------------------------------------
 
 @app.get("/api/destinations")
 def get_destinations(db: Session = Depends(get_db)):
@@ -194,7 +217,11 @@ def get_attractions(
         for attraction in attractions
     ]
 
-#ai generated itinerary 
+
+# ---------------------------------------------------------------------------
+# AI-generated itinerary
+# ---------------------------------------------------------------------------
+
 @app.post("/api/itineraries/generate")
 def generate_ai_itinerary(
     request: ItineraryRequest,
@@ -202,8 +229,18 @@ def generate_ai_itinerary(
 ):
     duration_days = (request.end_date - request.start_date).days + 1
 
-   
-    # Preserve the destination order selected by the user.
+    if duration_days < 1:
+        raise HTTPException(
+            status_code=422,
+            detail="End date must be on or after start date.",
+        )
+
+    if not request.destinations:
+        raise HTTPException(
+            status_code=422,
+            detail="Select at least one destination.",
+        )
+
     destination_map = {
         item.id: item
         for item in db.scalars(
@@ -215,8 +252,7 @@ def generate_ai_itinerary(
     }
 
     missing_destinations = [
-        item for item in request.destinations
-        if item not in destination_map
+        item for item in request.destinations if item not in destination_map
     ]
 
     if missing_destinations:
@@ -229,18 +265,22 @@ def generate_ai_itinerary(
         destination_map[item] for item in request.destinations
     ]
 
-    # Load attractions only from the selected destinations.
     all_attractions = db.scalars(
         select(Attraction)
         .where(Attraction.destination_id.in_(request.destinations))
-        .order_by(Attraction.destination_id, Attraction.visit_order, Attraction.id)
+        .order_by(
+            Attraction.destination_id,
+            Attraction.visit_order,
+            Attraction.id,
+        )
     ).all()
 
     attraction_map = {item.id: item for item in all_attractions}
 
     if request.selected_attraction_ids:
         missing_ids = [
-            item for item in request.selected_attraction_ids
+            item
+            for item in request.selected_attraction_ids
             if item not in attraction_map
         ]
 
@@ -258,14 +298,14 @@ def generate_ai_itinerary(
         interests = {item.value.lower() for item in request.interests}
 
         matching = [
-            item for item in all_attractions
+            item
+            for item in all_attractions
             if any(
                 tag.lower() in interests
                 for tag in (item.interest_tags or [])
             )
         ]
 
-        # Keep the prompt compact if the user did not select specific spots.
         attractions = (matching or all_attractions)[:40]
 
     attraction_records = [
@@ -282,19 +322,20 @@ def generate_ai_itinerary(
         for item in attractions
     ]
 
-    # Fetch food records from the database for selected destinations.
     food_rows = db.scalars(
         select(FoodSpot).order_by(FoodSpot.city, FoodSpot.spot_id)
     ).all()
 
     destination_keys = {
-        item.id.replace("-", " ").lower() for item in selected_destinations
+        item.id.replace("-", " ").lower()
+        for item in selected_destinations
     } | {
         item.name.replace("&", " ").replace("-", " ").lower()
         for item in selected_destinations
     }
 
     food_records = []
+
     for spot in food_rows:
         city_key = spot.city.replace("&", " ").replace("-", " ").lower()
 
@@ -303,16 +344,17 @@ def generate_ai_itinerary(
             for key in destination_keys
             if city_key and key
         ):
-            food_records.append({
-                "id": spot.id,
-                "city": spot.city,
-                "name": spot.famous_food_spot,
-               "category": "Local food",
-                "description": spot.description,
-                "speciality_dish": spot.speciality_dish,
-            })
+            food_records.append(
+                {
+                    "id": spot.id,
+                    "city": spot.city,
+                    "name": spot.famous_food_spot,
+                    "category": "Local food",
+                    "description": spot.description,
+                    "speciality_dish": spot.speciality_dish,
+                }
+            )
 
-    # Assign consecutive dates to destinations, matching the existing preview.
     weather_records = []
     weather_warnings = []
 
@@ -343,10 +385,12 @@ def generate_ai_itinerary(
             )
 
             for item in forecast.get("daily", []):
-                weather_records.append({
-                    "destination": destination.name,
-                    **item,
-                })
+                weather_records.append(
+                    {
+                        "destination": destination.name,
+                        **item,
+                    }
+                )
 
         except (ValueError, RuntimeError):
             weather_warnings.append(
@@ -380,7 +424,6 @@ def generate_ai_itinerary(
             detail="The AI itinerary service is temporarily unavailable.",
         ) from exc
 
-    # Make missing weather visible instead of implying every date was checked.
     result["weather_warnings"] = weather_warnings
     result["weather_source"] = "Open-Meteo"
     result["generation_status"] = "ai_generated"
@@ -388,6 +431,9 @@ def generate_ai_itinerary(
     return result
 
 
+# ---------------------------------------------------------------------------
+# Itinerary preview
+# ---------------------------------------------------------------------------
 
 @app.post(
     "/api/itineraries/preview",
@@ -397,8 +443,19 @@ def preview_itinerary(
     request: ItineraryRequest,
     db: Session = Depends(get_db),
 ):
-    # Calculate inclusive trip duration.
     duration_days = (request.end_date - request.start_date).days + 1
+
+    if duration_days < 1:
+        raise HTTPException(
+            status_code=422,
+            detail="End date must be on or after start date.",
+        )
+
+    if not request.destinations:
+        raise HTTPException(
+            status_code=422,
+            detail="Select at least one destination.",
+        )
 
     if len(request.destinations) > duration_days:
         raise HTTPException(
@@ -406,7 +463,6 @@ def preview_itinerary(
             detail="Choose at least one travel day for every selected destination.",
         )
 
-    # Retrieve destinations in the exact order selected by the user.
     destination_map = {
         destination.id: destination
         for destination in db.scalars(
@@ -434,13 +490,14 @@ def preview_itinerary(
         for destination_id in request.destinations
     ]
 
-   
-   
-    # Fetch attractions belonging to the selected destinations.
     all_attractions = db.scalars(
         select(Attraction)
         .where(Attraction.destination_id.in_(request.destinations))
-        .order_by(Attraction.destination_id, Attraction.visit_order, Attraction.id)
+        .order_by(
+            Attraction.destination_id,
+            Attraction.visit_order,
+            Attraction.id,
+        )
     ).all()
 
     all_attractions_by_id = {
@@ -473,30 +530,22 @@ def preview_itinerary(
                 ),
             )
 
-        # Preserve the order in which the frontend submits selected IDs.
         attractions = [
             all_attractions_by_id[attraction_id]
             for attraction_id in requested_ids
         ]
     else:
-        # Backward-compatible automatic selection for older clients.
         attractions = all_attractions
 
     attractions_by_destination = {
-        destination_id: []
-        for destination_id in request.destinations
+        destination_id: [] for destination_id in request.destinations
     }
 
     for attraction in attractions:
-        attractions_by_destination[attraction.destination_id].append(
-            attraction
-        )
+        attractions_by_destination[attraction.destination_id].append(attraction)
 
-    # Apply interest matching only to automatic recommendations.
-    # Explicitly selected attractions must never be filtered out.
     selected_interests = {
-        interest.value.lower()
-        for interest in request.interests
+        interest.value.lower() for interest in request.interests
     }
 
     if not selected_mode and selected_interests:
@@ -528,24 +577,17 @@ def preview_itinerary(
 
     for index, destination in enumerate(selected_destinations):
         assigned_days = base_days + (1 if index < extra_days else 0)
-        destination_attractions = attractions_by_destination[
-            destination.id
-        ]
+        destination_attractions = attractions_by_destination[destination.id]
 
         if not destination_attractions and not selected_mode:
             empty_destinations.append(destination.name)
 
-        # Spread every selected attraction across this destination's days.
-        # Unlike the previous slice(start_index:start_index + 3) logic,
-        # this does not silently drop selected attractions.
         daily_attraction_groups = [
             destination_attractions[local_day::assigned_days]
             for local_day in range(assigned_days)
         ]
 
-        for local_day, daily_attractions in enumerate(
-            daily_attraction_groups
-        ):
+        for daily_attractions in daily_attraction_groups:
             day_number = len(days) + 1
 
             if len(daily_attractions) > 3:
@@ -601,6 +643,19 @@ def preview_itinerary(
             )
         )
 
+    if empty_destinations:
+        warnings.append(
+            ItineraryWarning(
+                code="NO_ATTRACTIONS",
+                message=(
+                    "No attractions are currently available in the database for: "
+                    + ", ".join(empty_destinations)
+                    + ". Add curated attraction data before relying on this itinerary."
+                ),
+                severity="warning",
+            )
+        )
+
     if overloaded_days:
         warnings.append(
             ItineraryWarning(
@@ -613,7 +668,6 @@ def preview_itinerary(
                 severity="warning",
             )
         )
-
 
     if needs_verification:
         warnings.append(
@@ -639,7 +693,9 @@ def preview_itinerary(
         )
     )
 
-    destination_names = [destination.name for destination in selected_destinations]
+    destination_names = [
+        destination.name for destination in selected_destinations
+    ]
 
     return ItineraryPreviewResponse(
         status="preview",
@@ -663,6 +719,12 @@ def preview_itinerary(
             "live weather, bookings, transport schedules or current prices."
         ),
     )
+
+
+# ---------------------------------------------------------------------------
+# Route directions
+# ---------------------------------------------------------------------------
+
 class RouteLocation(BaseModel):
     id: str
     name: str
@@ -676,10 +738,8 @@ class RouteRequest(BaseModel):
     travelDate: date = Field(default_factory=date.today)
 
 
-
 @app.post("/api/routes")
 async def get_transport_routes(request: RouteRequest):
-    
     if request.travelDate < date.today():
         raise HTTPException(
             status_code=422,
@@ -689,12 +749,27 @@ async def get_transport_routes(request: RouteRequest):
     origin = request.origin
     destination = request.destination
 
-    # Never return invented road distances if routing fails.
+    # Taxi route: OSRM provides road distance and duration.
+    # The displayed fare is an estimate, not a live provider quote.
+    taxi = {
+        "available": False,
+        "distanceKm": 0,
+        "durationMin": 0,
+        "fare": "Unavailable",
+        "fareNote": "Road routing provider did not return a verified route.",
+        "summary": "Road route could not be calculated right now.",
+        "steps": ["Please retry when the routing service is available."],
+        "notes": [
+            "No estimated distance or duration is being substituted.",
+            "The routing service may be temporarily unavailable.",
+        ],
+        "extra": [],
+    }
+
     try:
         url = (
             "https://router.project-osrm.org/route/v1/driving/"
-            f"{origin.lng},{origin.lat};"
-            f"{destination.lng},{destination.lat}"
+            f"{origin.lng},{origin.lat};{destination.lng},{destination.lat}"
         )
 
         async with httpx.AsyncClient(timeout=15.0) as client:
@@ -717,13 +792,13 @@ async def get_transport_routes(request: RouteRequest):
 
         taxi = {
             "available": True,
-            "distanceKm": distance_km,
-            "durationMin": duration_min,
+            "distanceKm": round(distance_km, 2),
+            "durationMin": round(duration_min),
             "fare": f"₹{fare_min}–₹{fare_max}",
             "fareNote": "Indicative estimate only; not a live taxi quote.",
             "summary": (
                 f"Road route from {origin.name} to {destination.name}, "
-                "calculated using OpenStreetMap-based OSRM routing."
+                "calculated using OSRM routing."
             ),
             "steps": [
                 f"Start at {origin.name}.",
@@ -742,21 +817,115 @@ async def get_transport_routes(request: RouteRequest):
             ],
         }
 
-    except (httpx.HTTPError, ValueError, KeyError, IndexError):
-        taxi = {
-            "available": False,
-            "distanceKm": 0,
-            "durationMin": 0,
-            "fare": "Unavailable",
-            "fareNote": "Road routing provider did not return a verified route.",
-            "summary": "Road route could not be calculated right now.",
-            "steps": ["Please retry when the routing service is available."],
-            "notes": [
-                "No estimated distance or duration is being substituted.",
-                "The routing service may be temporarily unavailable.",
-            ],
-            "extra": [],
-        }
+    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError) as exc:
+        print(f"OSRM taxi route failed: {type(exc).__name__}: {exc}")
+
+    # Walking route: Google Routes API.
+    # Never fabricate walking distance, duration or navigation steps.
+    walking = {
+        "available": False,
+        "distanceKm": 0,
+        "durationMin": 0,
+        "fare": "Free",
+        "summary": "Walking directions are unavailable right now.",
+        "steps": ["Please try again later."],
+        "notes": ["No estimated distance or duration is being substituted."],
+        "extra": [],
+    }
+
+    routes_api_key = os.getenv("ROUTES_API_KEY")
+
+    if routes_api_key:
+        try:
+            payload = {
+                "origin": {
+                    "location": {
+                        "latLng": {
+                            "latitude": origin.lat,
+                            "longitude": origin.lng,
+                        }
+                    }
+                },
+                "destination": {
+                    "location": {
+                        "latLng": {
+                            "latitude": destination.lat,
+                            "longitude": destination.lng,
+                        }
+                    }
+                },
+                "travelMode": "WALK",
+                "languageCode": "en",
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "X-Goog-Api-Key": routes_api_key,
+                "X-Goog-FieldMask": (
+                    "routes.distanceMeters,routes.duration,"
+                    "routes.legs.steps.distanceMeters,"
+                    "routes.legs.steps.navigationInstruction.instructions"
+                ),
+            }
+
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                response = await client.post(
+                    "https://routes.googleapis.com/directions/v2:computeRoutes",
+                    json=payload,
+                    headers=headers,
+                )
+                response.raise_for_status()
+                data = response.json()
+
+            if data.get("routes"):
+                route = data["routes"][0]
+                distance_km = route["distanceMeters"] / 1000
+                duration_min = float(
+                    route["duration"].removesuffix("s")
+                ) / 60
+
+                steps = [
+                    step["navigationInstruction"]["instructions"]
+                    for leg in route.get("legs", [])
+                    for step in leg.get("steps", [])
+                    if step.get("navigationInstruction", {}).get("instructions")
+                ]
+
+                walking = {
+                    "available": True,
+                    "distanceKm": round(distance_km, 2),
+                    "durationMin": round(duration_min),
+                    "fare": "Free",
+                    "summary": (
+                        f"Walking route from {origin.name} to {destination.name}, "
+                        "calculated using Google Routes API."
+                    ),
+                    "steps": steps or [
+                        "Follow the walking route shown by Google Maps."
+                    ],
+                    "notes": [
+                        "Distance and duration are Google route estimates."
+                    ],
+                    "extra": [
+                        {
+                            "label": "Routing source",
+                            "value": "Google Routes API",
+                        }
+                    ],
+                }
+            else:
+                print("Google walking route returned no routes.")
+
+        except (
+            httpx.HTTPError,
+            ValueError,
+            KeyError,
+            TypeError,
+        ) as exc:
+            # Do not print the API key or request headers.
+            print(f"Google walking route failed: {type(exc).__name__}: {exc}")
+    else:
+        print("ROUTES_API_KEY is missing; Google walking routes are disabled.")
 
     def unavailable_mode(message, source_url):
         return {
@@ -767,9 +936,7 @@ async def get_transport_routes(request: RouteRequest):
             "fare": "Not verified",
             "fareNote": "No verified fare available.",
             "summary": message,
-            "steps": [
-                "Check the official operator source for this journey."
-            ],
+            "steps": ["Check the official operator source for this journey."],
             "notes": [
                 f"Official source: {source_url}",
                 "Schedules, availability and fares have not been verified by this endpoint.",
@@ -777,32 +944,47 @@ async def get_transport_routes(request: RouteRequest):
             "extra": [],
         }
 
-    return {
-        
-            "walking": unavailable_mode(
-                "Walking directions are not available from the current routing provider.",
-                "https://www.openstreetmap.org/directions",
-            ),
-            "train": unavailable_mode(
-                f"Train schedules for {origin.name} to {destination.name} "
-                f"on {request.travelDate.isoformat()} have not been verified.",
-                "https://www.indianrail.gov.in/enquiry/TBIS/TrainBetweenImportantStations.jsp",
-            ),
-            "bus": unavailable_mode(
-                f"Bus schedules for {origin.name} to {destination.name} "
-                f"on {request.travelDate.isoformat()} have not been verified.",
-                "https://www.ksrtc.in/",
-            ),
-            "metro": unavailable_mode(
-                "Metro availability depends on the selected origin and destination. "
-                "A verified metro route is not available from this endpoint.",
-                "https://english.bmrc.co.in/",
-            ),
+    modes = {
+        "taxi": taxi,
+        "walking": walking,
+        "train": unavailable_mode(
+            f"Train schedules for {origin.name} to {destination.name} "
+            f"on {request.travelDate.isoformat()} have not been verified.",
+            "https://www.indianrail.gov.in/enquiry/TBIS/TrainBetweenImportantStations.jsp",
+        ),
+        "bus": unavailable_mode(
+            f"Bus schedules for {origin.name} to {destination.name} "
+            f"on {request.travelDate.isoformat()} have not been verified.",
+            "https://www.ksrtc.in/",
+        ),
+        "metro": unavailable_mode(
+            "Metro availability depends on the selected origin and destination. "
+            "A verified metro route is not available from this endpoint.",
+            "https://english.bmrc.co.in/",
+        ),
+    }
 
-        }
+    # Keep the response structure consistent for the frontend.
+    primary_distance = (
+        taxi["distanceKm"]
+        if taxi["available"]
+        else walking["distanceKm"]
+    )
+
+    return {
+        "distanceKm": primary_distance,
+        "isIllustrative": False,
+        "modes": modes,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Food spots
+# ---------------------------------------------------------------------------
+
 @app.get("/api/food/cities")
 def get_food_cities(db: Session = Depends(get_db)):
-    """Return the distinct city names that have food spots in the database."""
+    """Return distinct city names that have food spots in the database."""
     rows = db.execute(
         select(FoodSpot.city).distinct().order_by(FoodSpot.city)
     ).scalars().all()
@@ -812,13 +994,13 @@ def get_food_cities(db: Session = Depends(get_db)):
     }
 
 
-
 @app.get("/api/food/spots")
 def get_food_spots(city: str, db: Session = Depends(get_db)):
     """Return food spots for a city, supporting frontend destination IDs."""
 
     def normalize_city(value: str) -> str:
         value = value.strip().lower()
+
         aliases = {
             "mysore": "mysuru",
             "hubli": "hubballi",
@@ -828,7 +1010,6 @@ def get_food_spots(city: str, db: Session = Depends(get_db)):
             "bijapur": "vijayapura",
         }
 
-        # Remove alternate names in parentheses for matching.
         primary_name = value.split("(")[0].strip()
         return aliases.get(primary_name, primary_name)
 
@@ -851,30 +1032,41 @@ def get_food_spots(city: str, db: Session = Depends(get_db)):
         )
 
     foods = []
+
     for spot in spots:
         try:
-            rating_value = float(
-                spot.rating_as_per_google.split("/")[0].strip()
-            ) if spot.rating_as_per_google else None
+            rating_value = (
+                float(spot.rating_as_per_google.split("/")[0].strip())
+                if spot.rating_as_per_google
+                else None
+            )
         except (ValueError, AttributeError):
             rating_value = None
 
-        foods.append({
-            "id": spot.id,
-            "spot_id": spot.spot_id,
-            "city": spot.city,
-            "name": spot.famous_food_spot,
-            "category": "Local food",
-            "description": spot.description,
-            "speciality_dish": spot.speciality_dish,
-            "restaurant_name": spot.famous_food_spot,
-            "rating": spot.rating_as_per_google,
-            "map_url": spot.google_maps_link,
-            "is_must_try": rating_value is not None
-                and rating_value >= 4.4,
-        })
+        foods.append(
+            {
+                "id": spot.id,
+                "spot_id": spot.spot_id,
+                "city": spot.city,
+                "name": spot.famous_food_spot,
+                "category": "Local food",
+                "description": spot.description,
+                "speciality_dish": spot.speciality_dish,
+                "restaurant_name": spot.famous_food_spot,
+                "rating": spot.rating_as_per_google,
+                "map_url": spot.google_maps_link,
+                "is_must_try": (
+                    rating_value is not None and rating_value >= 4.4
+                ),
+            }
+        )
 
     return {"foods": foods}
+
+
+# ---------------------------------------------------------------------------
+# Stays
+# ---------------------------------------------------------------------------
 
 class StaysRequest(BaseModel):
     destinations: list[str] = Field(min_length=1, max_length=8)
@@ -917,11 +1109,7 @@ def get_stay_recommendations(request: StaysRequest):
         ) from exc
     except Exception as exc:
         print(f"[STAYS ERROR] {type(exc).__name__}: {exc}")
-        # Log exc in production; don't expose secrets or provider errors.
         raise HTTPException(
             status_code=502,
-            detail=(
-                f"Stay recommendations failed: "
-                f"{type(exc).__name__}: {exc}"
-            ),
+            detail="Stay recommendations failed. Check the backend logs.",
         ) from exc
