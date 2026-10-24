@@ -74,15 +74,51 @@ export default function PlanJourney({
         date.setDate(date.getDate() + 2);
         return dateString(date);
     }, []);
-// initial values kept in the page
-    const [selectedDestinations, setSelectedDestinations] = useState([]);
+    const savedConfig = useMemo(() => {
+        try {
+            const raw = sessionStorage.getItem('np_journey_config');
+            if (raw) return JSON.parse(raw);
+            const rawItin = sessionStorage.getItem('np_selected_itinerary');
+            if (rawItin) {
+                const parsed = JSON.parse(rawItin);
+                return {
+                    destinations: parsed.destinations ?? [],
+                    startDate: parsed.start_date,
+                    endDate: parsed.end_date,
+                    travellerCount: parsed.traveller_count,
+                    travelStyle: parsed.travel_style,
+                    totalBudget: parsed.total_budget,
+                    interests: parsed.interests,
+                };
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    }, []);
+
+    const [selectedDestinations, setSelectedDestinations] = useState(
+        () => savedConfig?.destinations ?? []
+    );
     const [destinationToAdd, setDestinationToAdd] = useState('mysuru');
-    const [startDate, setStartDate] = useState(today);
-    const [endDate, setEndDate] = useState(defaultEnd);
-    const [travellerCount, setTravellerCount] = useState(3);
-    const [travelStyle, setTravelStyle] = useState('premium');
-    const [totalBudget, setTotalBudget] = useState(10000);
-    const [interests, setInterests] = useState(['Heritage & culture', 'Local food']);
+    const [startDate, setStartDate] = useState(
+        () => savedConfig?.startDate ?? today
+    );
+    const [endDate, setEndDate] = useState(
+        () => savedConfig?.endDate ?? defaultEnd
+    );
+    const [travellerCount, setTravellerCount] = useState(
+        () => savedConfig?.travellerCount ?? 3
+    );
+    const [travelStyle, setTravelStyle] = useState(
+        () => savedConfig?.travelStyle ?? 'premium'
+    );
+    const [totalBudget, setTotalBudget] = useState(
+        () => savedConfig?.totalBudget ?? 10000
+    );
+    const [interests, setInterests] = useState(
+        () => savedConfig?.interests ?? ['Heritage & culture', 'Local food']
+    );
     const [result, setResult] = useState(initialResult);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -140,21 +176,38 @@ export default function PlanJourney({
             setError('The end date must be on or after the start date.');
             return;
         }
-        //if (durationDays < selectedDestinations.length) {
-           // setError('Choose at least one calendar day per destination, or remove a destination to fit your dates.');
-            //return;
-        //}
+
+        const preferences = {
+            destinations: selectedDestinations,
+            startDate,
+            endDate,
+            travellerCount: Number(travellerCount),
+            travelStyle,
+            totalBudget: Number(totalBudget),
+            interests,
+        };
+
+        try {
+            sessionStorage.setItem('np_journey_config', JSON.stringify(preferences));
+            const existingSaved = sessionStorage.getItem('np_selected_itinerary');
+            const parsed = existingSaved ? JSON.parse(existingSaved) : {};
+            sessionStorage.setItem('np_selected_itinerary', JSON.stringify({
+                ...parsed,
+                destinations: selectedDestinations,
+                start_date: startDate,
+                end_date: endDate,
+                traveller_count: Number(travellerCount),
+                travel_style: travelStyle,
+                total_budget: Number(totalBudget),
+                interests,
+                selected_attraction_ids: parsed.selected_attraction_ids ?? [],
+            }));
+        } catch (storageError) {
+            console.error('Unable to store journey preferences:', storageError);
+        }
 
         if (onDiveIntoJourney) {
-            onDiveIntoJourney({
-                destinations: selectedDestinations,
-                startDate,
-                endDate,
-                travellerCount: Number(travellerCount),
-                travelStyle,
-                totalBudget: Number(totalBudget),
-                interests,
-            });
+            onDiveIntoJourney(preferences);
             return;
         }
 

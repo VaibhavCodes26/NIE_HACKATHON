@@ -32,7 +32,28 @@ const isLandingPageReload = () => {
 
 
 export default function App() {
-  const [journeyConfig, setJourneyConfig] = useState(null);
+  const [journeyConfig, setJourneyConfig] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('np_journey_config');
+      if (saved) return JSON.parse(saved);
+      const savedItin = sessionStorage.getItem('np_selected_itinerary');
+      if (savedItin) {
+        const parsed = JSON.parse(savedItin);
+        return {
+          destinations: parsed.destinations ?? [],
+          startDate: parsed.start_date,
+          endDate: parsed.end_date,
+          travellerCount: parsed.traveller_count,
+          travelStyle: parsed.travel_style,
+          totalBudget: parsed.total_budget,
+          interests: parsed.interests,
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  });
 
 
 const [intro, setIntro] = useState(
@@ -163,6 +184,7 @@ const onNav = (id) => {
   if (currentPage === '/route-discovery') {
     return (
       <RouteDiscoveryPage
+        journeyConfig={journeyConfig}
         initialDestinations={journeyConfig?.destinations ?? []}
         initialStartDate={journeyConfig?.startDate}
         initialEndDate={journeyConfig?.endDate}

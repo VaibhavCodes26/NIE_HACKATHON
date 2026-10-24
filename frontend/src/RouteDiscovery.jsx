@@ -229,6 +229,7 @@ function getWeatherDescription(code) {
 }
 
 export default function RouteDiscoveryPage({
+  journeyConfig = null,
   onContinue,
   onOpenStays,
   initialDestinations = EMPTY_DESTINATIONS,
@@ -239,6 +240,16 @@ export default function RouteDiscoveryPage({
   onOpenItinerary,
 
 }) {
+  const effectiveConfig = useMemo(() => {
+    if (journeyConfig) return journeyConfig;
+    try {
+      const saved = sessionStorage.getItem('np_journey_config');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  }, [journeyConfig]);
+
   const [from, setFrom] = useState( () => getSavedRouteDiscoveryState().from ?? initialFrom);
   const [to, setTo] = useState( () => getSavedRouteDiscoveryState().to ?? initialTo);
   const [errors, setErrors] = useState({});
@@ -702,10 +713,29 @@ const saveItinerarySelection = () => {
     destinations: tourismDestinations.map(
       (destination) => destination.id
     ),
-    selected_attraction_ids: selectedAttractionIds,
+    selected_attraction_ids: Array.from(new Set(selectedAttractionIds.map(Number))),
     start_date: startDate,
     end_date: endDate,
     trip_days: tripDays,
+    traveller_count: Number(
+      effectiveConfig?.travellerCount ??
+      effectiveConfig?.traveller_count ??
+      3
+    ),
+    travel_style:
+      effectiveConfig?.travelStyle ??
+      effectiveConfig?.travel_style ??
+      'premium',
+    total_budget: Number(
+      effectiveConfig?.totalBudget ??
+      effectiveConfig?.total_budget ??
+      10000
+    ),
+    interests:
+      effectiveConfig?.interests ?? [
+        'Heritage & culture',
+        'Local food',
+      ],
     selected_places: selectedAttractions.map((place) => ({
       id: Number(place.id),
       destination_id: place.destination_id,
@@ -717,6 +747,19 @@ const saveItinerarySelection = () => {
     sessionStorage.setItem(
       'np_selected_itinerary',
       JSON.stringify(payload)
+    );
+    sessionStorage.setItem(
+      'np_journey_config',
+      JSON.stringify({
+        ...effectiveConfig,
+        destinations: payload.destinations,
+        startDate: payload.start_date,
+        endDate: payload.end_date,
+        travellerCount: payload.traveller_count,
+        travelStyle: payload.travel_style,
+        totalBudget: payload.total_budget,
+        interests: payload.interests,
+      })
     );
 
     if (typeof onOpenItinerary === 'function') {

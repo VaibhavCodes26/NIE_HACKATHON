@@ -96,6 +96,57 @@ WEATHER_COORDINATES = {
 }
 
 
+def _resolve_coordinates(destination: str, db: Session) -> tuple[float, float] | None:
+    """Resolve coordinates for destination using key, aliases or DB lookup."""
+    key = destination.strip().lower()
+    if key in WEATHER_COORDINATES:
+        return WEATHER_COORDINATES[key]
+
+    aliases = {
+        "bangalore": "bengaluru",
+        "mysore": "mysuru",
+        "badami & aihole": "badami",
+        "badami and aihole": "badami",
+        "chikmagalur": "chikkamagaluru",
+        "chikmagaluru": "chikkamagaluru",
+        "shimoga": "shivamogga",
+        "bijapur": "vijayapura",
+        "hubli": "hubballi",
+        "belgaum": "belagavi",
+        "kodagu": "coorg",
+        "madikeri": "coorg",
+        "belur": "belur-halebidu",
+        "halebidu": "belur-halebidu",
+        "belur and halebidu": "belur-halebidu",
+        "belur & halebidu": "belur-halebidu",
+    }
+    if key in aliases and aliases[key] in WEATHER_COORDINATES:
+        return WEATHER_COORDINATES[aliases[key]]
+
+    for alias_key, target in aliases.items():
+        if alias_key in key or key in alias_key:
+            if target in WEATHER_COORDINATES:
+                return WEATHER_COORDINATES[target]
+
+    destinations = db.scalars(
+        select(Destination).where(Destination.is_active.is_(True))
+    ).all()
+
+    for item in destinations:
+        clean_name = item.name.split("(")[0].strip().lower()
+        if key == item.id.lower() or key == item.name.strip().lower() or key == clean_name:
+            if item.id in WEATHER_COORDINATES:
+                return WEATHER_COORDINATES[item.id]
+
+    # Partial match on destinations
+    for item in destinations:
+        if item.id in key or key in item.id or item.name.lower() in key or key in item.name.lower():
+            if item.id in WEATHER_COORDINATES:
+                return WEATHER_COORDINATES[item.id]
+
+    return None
+
+
 @app.get("/api/weather/forecast")
 def weather_forecast(
     latitude: float | None = None,
@@ -113,25 +164,7 @@ def weather_forecast(
                 detail="Provide a destination or latitude and longitude.",
             )
 
-        key = destination.strip().lower()
-        coordinates = WEATHER_COORDINATES.get(key)
-
-        if coordinates is None:
-            destinations = db.scalars(
-                select(Destination).where(Destination.is_active.is_(True))
-            ).all()
-
-            match = next(
-                (
-                    item
-                    for item in destinations
-                    if item.name.strip().lower() == key
-                ),
-                None,
-            )
-
-            if match is not None:
-                coordinates = WEATHER_COORDINATES.get(match.id)
+        coordinates = _resolve_coordinates(destination, db)
 
         if coordinates is None:
             raise HTTPException(
@@ -243,19 +276,34 @@ def generate_ai_itinerary(
             detail="Select at least one destination.",
         )
 
-    destination_map = {
-        item.id: item
-        for item in db.scalars(
-            select(Destination).where(
-                Destination.id.in_(request.destinations),
-                Destination.is_active.is_(True),
-            )
-        ).all()
-    }
+    active_destinations = db.scalars(
+        select(Destination).where(Destination.is_active.is_(True))
+    ).all()
 
-    missing_destinations = [
-        item for item in request.destinations if item not in destination_map
-    ]
+    dest_by_key: dict[str, Destination] = {}
+    for dest in active_destinations:
+        dest_by_key[dest.id.lower()] = dest
+        dest_by_key[dest.name.lower()] = dest
+        clean_name = dest.name.split("(")[0].strip().lower()
+        dest_by_key[clean_name] = dest
+        dest_by_key[dest.id.replace("-", " ").lower()] = dest
+        dest_by_key[dest.name.replace("&", "and").lower()] = dest
+
+    selected_destinations = []
+    missing_destinations = []
+    for raw_dest in request.destinations:
+        key = str(raw_dest).strip().lower()
+        matched = dest_by_key.get(key)
+        if matched is None:
+            for k, d in dest_by_key.items():
+                if k in key or key in k:
+                    matched = d
+                    break
+        if matched:
+            if matched not in selected_destinations:
+                selected_destinations.append(matched)
+        else:
+            missing_destinations.append(raw_dest)
 
     if missing_destinations:
         raise HTTPException(
@@ -263,13 +311,11 @@ def generate_ai_itinerary(
             detail=f"Unknown destinations: {missing_destinations}",
         )
 
-    selected_destinations = [
-        destination_map[item] for item in request.destinations
-    ]
+    selected_dest_ids = [item.id for item in selected_destinations]
 
     all_attractions = db.scalars(
         select(Attraction)
-        .where(Attraction.destination_id.in_(request.destinations))
+        .where(Attraction.destination_id.in_(selected_dest_ids))
         .order_by(
             Attraction.destination_id,
             Attraction.visit_order,
@@ -280,22 +326,13 @@ def generate_ai_itinerary(
     attraction_map = {item.id: item for item in all_attractions}
 
     if request.selected_attraction_ids:
-        missing_ids = [
-            item
-            for item in request.selected_attraction_ids
-            if item not in attraction_map
-        ]
-
-        if missing_ids:
-            raise HTTPException(
-                status_code=422,
-                detail=f"Invalid selected attraction IDs: {missing_ids}",
-            )
-
         attractions = [
             attraction_map[item]
             for item in request.selected_attraction_ids
+            if item in attraction_map
         ]
+        if not attractions:
+            attractions = all_attractions[:40]
     else:
         interests = {item.value.lower() for item in request.interests}
 
@@ -370,7 +407,7 @@ def generate_ai_itinerary(
         last_date = first_date + timedelta(days=assigned_days - 1)
         day_offset += assigned_days
 
-        coordinates = WEATHER_COORDINATES.get(destination.id)
+        coordinates = _resolve_coordinates(destination.id, db) or _resolve_coordinates(destination.name, db)
 
         if not coordinates:
             weather_warnings.append(
@@ -394,10 +431,10 @@ def generate_ai_itinerary(
                     }
                 )
 
-        except (ValueError, RuntimeError):
+        except (ValueError, RuntimeError) as exc:
             weather_warnings.append(
-                f"Weather could not be checked for {destination.name} "
-                f"({first_date} to {last_date})."
+                f"Weather forecast unavailable for {destination.name} "
+                f"({first_date} to {last_date}): {exc}."
             )
 
     try:
@@ -465,21 +502,34 @@ def preview_itinerary(
             detail="Choose at least one travel day for every selected destination.",
         )
 
-    destination_map = {
-        destination.id: destination
-        for destination in db.scalars(
-            select(Destination).where(
-                Destination.id.in_(request.destinations),
-                Destination.is_active.is_(True),
-            )
-        ).all()
-    }
+    active_destinations = db.scalars(
+        select(Destination).where(Destination.is_active.is_(True))
+    ).all()
 
-    missing = [
-        destination_id
-        for destination_id in request.destinations
-        if destination_id not in destination_map
-    ]
+    dest_by_key: dict[str, Destination] = {}
+    for dest in active_destinations:
+        dest_by_key[dest.id.lower()] = dest
+        dest_by_key[dest.name.lower()] = dest
+        clean_name = dest.name.split("(")[0].strip().lower()
+        dest_by_key[clean_name] = dest
+        dest_by_key[dest.id.replace("-", " ").lower()] = dest
+        dest_by_key[dest.name.replace("&", "and").lower()] = dest
+
+    selected_destinations = []
+    missing = []
+    for raw_dest in request.destinations:
+        key = str(raw_dest).strip().lower()
+        matched = dest_by_key.get(key)
+        if matched is None:
+            for k, d in dest_by_key.items():
+                if k in key or key in k:
+                    matched = d
+                    break
+        if matched:
+            if matched not in selected_destinations:
+                selected_destinations.append(matched)
+        else:
+            missing.append(raw_dest)
 
     if missing:
         raise HTTPException(
@@ -487,14 +537,11 @@ def preview_itinerary(
             detail=f"Unknown or inactive destination IDs: {', '.join(missing)}",
         )
 
-    selected_destinations = [
-        destination_map[destination_id]
-        for destination_id in request.destinations
-    ]
+    selected_dest_ids = [item.id for item in selected_destinations]
 
     all_attractions = db.scalars(
         select(Attraction)
-        .where(Attraction.destination_id.in_(request.destinations))
+        .where(Attraction.destination_id.in_(selected_dest_ids))
         .order_by(
             Attraction.destination_id,
             Attraction.visit_order,
@@ -772,27 +819,40 @@ async def _fetch_google_route(
     travel_mode: str,
     routing_preference: str | None = None,
     transit_preferences: dict | None = None,
+    origin_address: str | None = None,
+    destination_address: str | None = None,
 ) -> dict | None:
     if not routes_api_key:
         return None
 
-    payload = {
-        "origin": {
+    # Use address if provided, otherwise fall back to lat/lng
+    if origin_address:
+        origin_payload = {"address": origin_address}
+    else:
+        origin_payload = {
             "location": {
                 "latLng": {
                     "latitude": origin.lat,
                     "longitude": origin.lng,
                 }
             }
-        },
-        "destination": {
+        }
+
+    if destination_address:
+        destination_payload = {"address": destination_address}
+    else:
+        destination_payload = {
             "location": {
                 "latLng": {
                     "latitude": destination.lat,
                     "longitude": destination.lng,
                 }
             }
-        },
+        }
+
+    payload = {
+        "origin": origin_payload,
+        "destination": destination_payload,
         "travelMode": travel_mode,
         "languageCode": "en",
     }
@@ -815,7 +875,7 @@ async def _fetch_google_route(
         )
         if response.status_code == 200:
             return response.json()
-        print(f"Google Routes API {travel_mode} returned status {response.status_code}")
+        print(f"Google Routes API {travel_mode} returned status {response.status_code}: {response.text[:200]}")
     except Exception as exc:
         print(f"Google Routes API {travel_mode} failed: {type(exc).__name__}: {exc}")
     return None
@@ -843,10 +903,15 @@ async def get_transport_routes(request: RouteRequest):
             client, routes_api_key, origin, destination,
             travel_mode="WALK",
         )
+        # Bus: use DRIVING mode between KSRTC bus terminal addresses for accurate intercity routing
+        bus_origin_address = f"KSRTC Bus Terminal, {origin.name}, Karnataka, India"
+        bus_destination_address = f"KSRTC Bus Terminal, {destination.name}, Karnataka, India"
         bus_task = _fetch_google_route(
             client, routes_api_key, origin, destination,
-            travel_mode="TRANSIT",
-            transit_preferences={"allowedTravelModes": ["BUS"]},
+            travel_mode="DRIVE",
+            routing_preference="TRAFFIC_AWARE",
+            origin_address=bus_origin_address,
+            destination_address=bus_destination_address,
         )
         metro_task = _fetch_google_route(
             client, routes_api_key, origin, destination,
@@ -961,95 +1026,67 @@ async def get_transport_routes(request: RouteRequest):
             ],
         }
 
-    # 3. Bus (Google Routes API TRANSIT with allowedTravelModes: [BUS])
+    # 3. Bus (DRIVE mode between KSRTC bus terminals for accurate intercity routing)
     bus = unavailable_mode(
-        f"No direct transit bus routes found between {origin.name} and {destination.name}.",
-        "https://mybmtc.karnataka.gov.in/",
+        f"No direct KSRTC bus route found between {origin.name} and {destination.name}.",
+        "https://www.ksrtc.in/",
     )
-    # Vehicle types Google Routes API uses for bus-type services
-    _BUS_VEHICLE_TYPES = {"BUS", "INTERCITY_BUS", "TROLLEYBUS", "SHARE_TAXI"}
-    # Vehicle types considered true metro/subway
+    # Vehicle types considered true metro/subway (still needed for metro section below)
     _SUBWAY_VEHICLE_TYPES = {"SUBWAY", "METRO_RAIL", "MONORAIL", "TRAM"}
 
     if bus_data and bus_data.get("routes"):
         r = bus_data["routes"][0]
-        # Only mark available if there is an actual transit step with a bus-type vehicle
-        transit_steps = [
-            step for leg in r.get("legs", [])
-            for step in leg.get("steps", [])
-            if "transitDetails" in step
-            and step["transitDetails"].get("transitLine", {}).get("vehicle", {}).get("type")
-            in _BUS_VEHICLE_TYPES
+        distance_km = r.get("distanceMeters", 0) / 1000.0
+        duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
+        duration_min = round(duration_sec / 60.0)
+        polyline = r.get("polyline", {}).get("encodedPolyline", "")
+
+        # Boarding and alighting at KSRTC terminals
+        dep_terminal = f"KSRTC Bus Terminal, {origin.name}"
+        arr_terminal = f"KSRTC Bus Terminal, {destination.name}"
+
+        # Fare estimate for KSRTC (approx ₹1.5 per km for ordinary, ₹2.2 for express)
+        fare_min = round(distance_km * 1.5 / 10) * 10
+        fare_max = round(distance_km * 2.2 / 10) * 10
+
+        steps = [
+            f"Proceed to {dep_terminal}.",
+            f"Board KSRTC intercity bus towards {destination.name}.",
         ]
-        if transit_steps:
-            distance_km = r.get("distanceMeters", 0) / 1000.0
-            duration_sec = float(r.get("duration", "0s").removesuffix("s") or 0)
-            duration_min = round(duration_sec / 60.0)
-            polyline = r.get("polyline", {}).get("encodedPolyline", "")
+        nav_steps = [
+            step["navigationInstruction"]["instructions"]
+            for leg in r.get("legs", [])
+            for step in leg.get("steps", [])
+            if step.get("navigationInstruction", {}).get("instructions")
+        ]
+        if nav_steps:
+            steps.extend(nav_steps)
+        steps.append(f"Arrive at {arr_terminal}.")
 
-            first_td = transit_steps[0].get("transitDetails", {})
-            t_line = first_td.get("transitLine", {})
-            bus_line = t_line.get("nameShort") or t_line.get("name") or "Bus"
-            dep_stop = first_td.get("stopDetails", {}).get("departureStop", {}).get("name")
-            arr_stop = first_td.get("stopDetails", {}).get("arrivalStop", {}).get("name")
-            stop_count = first_td.get("stopCount")
-            agencies = t_line.get("agencies", [])
-            agency_name = agencies[0].get("name") if agencies else "Transit Agency"
-
-            fare_obj = r.get("travelAdvisory", {}).get("transitFare")
-            if fare_obj and fare_obj.get("units"):
-                curr = "₹" if fare_obj.get("currencyCode") == "INR" else f"{fare_obj.get('currencyCode')} "
-                fare_str = f"{curr}{fare_obj['units']}"
-                fare_note = "Official transit fare reported by provider."
-            else:
-                fare_str = "Not published"
-                fare_note = "Fare not published by transit agency."
-
-            steps = []
-            for leg in r.get("legs", []):
-                for step in leg.get("steps", []):
-                    if "transitDetails" in step:
-                        td = step["transitDetails"]
-                        tl = td.get("transitLine", {})
-                        l_name = tl.get("nameShort") or tl.get("name") or "Bus"
-                        ds = td.get("stopDetails", {}).get("departureStop", {}).get("name") or "stop"
-                        as_ = td.get("stopDetails", {}).get("arrivalStop", {}).get("name") or "destination stop"
-                        sc = td.get("stopCount")
-                        sc_text = f" ({sc} stops)" if sc else ""
-                        steps.append(f"Board {l_name} at {ds} towards {td.get('headsign', 'destination')}{sc_text}.")
-                        steps.append(f"Alight at {as_}.")
-                    elif step.get("navigationInstruction", {}).get("instructions"):
-                        steps.append(step["navigationInstruction"]["instructions"])
-
-            if not steps:
-                steps = [f"Take bus route {bus_line} from {dep_stop or origin.name} to {arr_stop or destination.name}."]
-
-            extra = [{"label": "Bus route", "value": bus_line}]
-            if dep_stop:
-                extra.append({"label": "Boarding", "value": dep_stop})
-            if arr_stop:
-                extra.append({"label": "Alighting", "value": arr_stop})
-            if stop_count:
-                extra.append({"label": "Stops", "value": f"{stop_count} stops"})
-
-            bus = {
-                "available": True,
-                "distanceKm": round(distance_km, 2),
-                "durationMin": duration_min,
-                "polyline": polyline,
-                "fare": fare_str,
-                "fareNote": fare_note,
-                "summary": (
-                    f"Bus connection via {bus_line} from {dep_stop or origin.name} "
-                    f"to {arr_stop or destination.name}."
-                ),
-                "steps": steps,
-                "notes": [
-                    "Transit route calculated using Google Routes API.",
-                    f"Operated by {agency_name}.",
-                ],
-                "extra": extra,
-            }
+        bus = {
+            "available": True,
+            "distanceKm": round(distance_km, 2),
+            "durationMin": duration_min,
+            "polyline": polyline,
+            "fare": f"₹{fare_min:,}–₹{fare_max:,}",
+            "fareNote": "Indicative KSRTC fare estimate (ordinary to express). Check ksrtc.in for exact fares.",
+            "summary": (
+                f"KSRTC intercity bus from {dep_terminal} to {arr_terminal}. "
+                f"Route calculated via Google Routes API (DRIVE between bus terminals)."
+            ),
+            "steps": steps,
+            "notes": [
+                "Board at KSRTC Bus Terminal. Verify schedule at ksrtc.in or redbus.in.",
+                "Fare is an estimate based on per-km rates; actual fares vary by service class.",
+                "Route duration is driving time between terminals; bus journey may differ.",
+            ],
+            "extra": [
+                {"label": "Boarding terminal", "value": dep_terminal},
+                {"label": "Alighting terminal", "value": arr_terminal},
+                {"label": "Operator", "value": "KSRTC Karnataka"},
+                {"label": "Routing source", "value": "Google Routes API (DRIVE, bus terminals)"},
+            ],
+        }
 
     # 4. Metro (Google Routes API TRANSIT with allowedTravelModes: [SUBWAY])
     metro = unavailable_mode(

@@ -20,13 +20,20 @@ def get_weather_forecast(
     if end_date < start_date:
         raise ValueError("End date must be on or after start date.")
 
-    # Open-Meteo's standard forecast supports a limited future horizon.
     today = date.today()
-    if start_date < today:
+    max_forecast_date = today + timedelta(days=15)
+
+    if end_date < today:
         raise ValueError("Weather forecasts are not available for past dates.")
 
-    if end_date > today + timedelta(days=15):
-        raise ValueError("Requested dates exceed the supported forecast window.")
+    effective_start = max(start_date, today)
+    if effective_start > max_forecast_date:
+        raise ValueError(
+            f"Weather forecasts are only available up to {max_forecast_date.isoformat()} (16-day forecast horizon). "
+            f"Requested start date {start_date.isoformat()} is beyond this window."
+        )
+
+    effective_end = min(end_date, max_forecast_date)
 
     params = {
         "latitude": latitude,
@@ -38,8 +45,8 @@ def get_weather_forecast(
             "precipitation_probability_max"
         ),
         "timezone": "auto",
-        "start_date": start_date.isoformat(),
-        "end_date": end_date.isoformat(),
+        "start_date": effective_start.isoformat(),
+        "end_date": effective_end.isoformat(),
     }
 
     try:

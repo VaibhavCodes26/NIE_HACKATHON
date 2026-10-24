@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,7 +29,9 @@ import {
 import "./ItineraryPage.css";
 import { KaMark, Wordmark } from "./components/Logo.jsx";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
+).replace(/\/$/, "");
 const EMPTY_ARRAY = [];
 
 const cityCoordinates = {
@@ -183,16 +185,23 @@ const config = journeyConfig ?? {};
 
 const [savedSelection] = useState(readSavedItinerarySelection);
 
-const destinations = useMemo(
-  () => readDestinations(config),
-  [config]
-);
+const destinations = useMemo(() => {
+  const fromSaved =
+    Array.isArray(savedSelection?.destinations) &&
+    savedSelection.destinations.length > 0
+      ? savedSelection.destinations
+      : null;
+  const fromConfig = readDestinations(config);
+  const rawList = fromSaved || fromConfig;
+  return rawList
+    .map((item) => {
+      if (typeof item === "string") return item;
+      return item?.id ?? item?.slug ?? item?.name ?? "";
+    })
+    .filter(Boolean);
+}, [config, savedSelection]);
 
-const requestDestinations =
-  Array.isArray(savedSelection?.destinations) &&
-  savedSelection.destinations.length
-    ? savedSelection.destinations
-    : destinations;
+const requestDestinations = destinations;
 
 const startDate =
   savedSelection?.start_date ||
@@ -206,230 +215,313 @@ const endDate =
   config.end_date ||
   "";
 
-const effectiveSelectedAttractionIds =
-  Array.isArray(savedSelection?.selected_attraction_ids)
-    ? savedSelection.selected_attraction_ids
-    : selectedAttractionIds;
+const effectiveSelectedAttractionIds = useMemo(() => {
+  const ids =
+    Array.isArray(savedSelection?.selected_attraction_ids) &&
+    savedSelection.selected_attraction_ids.length > 0
+      ? savedSelection.selected_attraction_ids
+      : selectedAttractionIds;
+  return Array.from(new Set(ids.map(Number))).filter(Number.isFinite);
+}, [savedSelection, selectedAttractionIds]);
 
-  const travellerCount = Number(
-    config.travellerCount ?? config.traveller_count ?? config.travelers ?? 1
-  );
-  const travelStyle = config.travelStyle ?? config.travel_style ?? "comfortable";
-  const totalBudget = Number(config.totalBudget ?? config.total_budget ?? 0);
-  const interests = config.interests ?? EMPTY_ARRAY;
+const travellerCount = Math.max(
+  1,
+  Math.min(
+    30,
+    Number(
+      savedSelection?.traveller_count ??
+        config.travellerCount ??
+        config.traveller_count ??
+        config.travelers ??
+        3
+    )
+  )
+);
 
-  const [itinerary, setItinerary] = useState(initialItinerary);
-  const [loading, setLoading] = useState(false);
-  const [pageError, setPageError] = useState("");
-  const [activeDay, setActiveDay] = useState(0);
-  const [activeWeatherCity, setActiveWeatherCity] = useState(destinations[0] ?? "");
-  const [weatherByCity, setWeatherByCity] = useState({});
-  const [weatherLoading, setWeatherLoading] = useState(false);
-  const [weatherError, setWeatherError] = useState("");
-  const [foodByCity, setFoodByCity] = useState({});
-  const [foodLoading, setFoodLoading] = useState(false);
-  const [foodError, setFoodError] = useState("");
-  const [stays, setStays] = useState([]);
-  const [staysLoading, setStaysLoading] = useState(false);
-  const [staysError, setStaysError] = useState("");
-  const [openSection, setOpenSection] = useState("food");
-  const [showTravellerNeeds, setShowTravellerNeeds] = useState(false);
-  const [travellerNeeds, setTravellerNeeds] = useState([]);
-  const [specialNotes, setSpecialNotes] = useState("");
-  const [adjustment, setAdjustment] = useState("balanced");
-  const [adjustmentMessage, setAdjustmentMessage] = useState("");
+const travelStyle =
+  savedSelection?.travel_style ??
+  config.travelStyle ??
+  config.travel_style ??
+  "premium";
 
-  const durationDays = useMemo(
-    () => getDaysBetween(startDate, endDate),
-    [startDate, endDate]
-  );
+const totalBudget = Math.max(
+  1000,
+  Math.min(
+    100000,
+    Number(
+      savedSelection?.total_budget ??
+        config.totalBudget ??
+        config.total_budget ??
+        10000
+    )
+  )
+);
 
-  useEffect(() => {
-    if (!destinations.length) {
-      setActiveWeatherCity("");
-      return;
-    }
-    if (!destinations.includes(activeWeatherCity)) {
-      setActiveWeatherCity(destinations[0]);
-    }
-  }, [destinations, activeWeatherCity]);
-
- 
-const generatePreview = useCallback(async (adjustmentRequest = "") => {
-  if (!requestDestinations.length) {
-    setPageError(
-      "No destinations were carried forward. Go back and select at least one city."
-    );
-    return false;
+const interests = useMemo(() => {
+  if (
+    Array.isArray(savedSelection?.interests) &&
+    savedSelection.interests.length > 0
+  ) {
+    return savedSelection.interests;
   }
+  if (Array.isArray(config.interests) && config.interests.length > 0) {
+    return config.interests;
+  }
+  return ["Heritage & culture", "Local food"];
+}, [savedSelection, config]);
 
-  setLoading(true);
-  setPageError("");
+const [itinerary, setItinerary] = useState(initialItinerary);
+const [loading, setLoading] = useState(false);
+const [pageError, setPageError] = useState("");
+const [activeDay, setActiveDay] = useState(0);
+const [activeWeatherCity, setActiveWeatherCity] = useState(
+  destinations[0] ?? ""
+);
+const [weatherByCity, setWeatherByCity] = useState({});
+const [weatherLoading, setWeatherLoading] = useState(false);
+const [weatherError, setWeatherError] = useState("");
+const [foodByCity, setFoodByCity] = useState({});
+const [foodLoading, setFoodLoading] = useState(false);
+const [foodError, setFoodError] = useState("");
+const [stays, setStays] = useState([]);
+const [staysLoading, setStaysLoading] = useState(false);
+const [staysError, setStaysError] = useState("");
+const [openSection, setOpenSection] = useState("food");
+const [showTravellerNeeds, setShowTravellerNeeds] = useState(false);
+const [travellerNeeds, setTravellerNeeds] = useState([]);
+const [specialNotes, setSpecialNotes] = useState("");
+const [adjustment, setAdjustment] = useState("balanced");
+const [adjustmentMessage, setAdjustmentMessage] = useState("");
 
-  const payload = {
-    destinations: requestDestinations,
-    start_date: startDate,
-    end_date: endDate,
-    traveller_count: travellerCount || 1,
-    travel_style: travelStyle,
-    total_budget: totalBudget || 1000,
-    interests: Array.isArray(interests) ? interests : [],
-    selected_attraction_ids: effectiveSelectedAttractionIds,
-    adjustment_request: adjustmentRequest,
-  };
+const durationDays = useMemo(
+  () => getDaysBetween(startDate, endDate),
+  [startDate, endDate]
+);
 
-  console.log("Itinerary generation payload:", payload);
+useEffect(() => {
+  if (!destinations.length) {
+    setActiveWeatherCity("");
+    return;
+  }
+  if (!destinations.includes(activeWeatherCity)) {
+    setActiveWeatherCity(destinations[0]);
+  }
+}, [destinations, activeWeatherCity]);
 
-  try {
-    const response = await fetch(
-      `${API_BASE}/api/itineraries/generate`,
-      {
+const generatePreview = useCallback(
+  async (adjustmentRequest = "") => {
+    if (!requestDestinations.length) {
+      setPageError(
+        "No destinations were carried forward. Go back and select at least one city."
+      );
+      return false;
+    }
+
+    setLoading(true);
+    setPageError("");
+
+    const payload = {
+      destinations: requestDestinations,
+      start_date: startDate,
+      end_date: endDate,
+      traveller_count: travellerCount || 3,
+      travel_style: travelStyle,
+      total_budget: totalBudget || 10000,
+      interests: Array.isArray(interests) ? interests : [],
+      selected_attraction_ids: effectiveSelectedAttractionIds,
+      adjustment_request: adjustmentRequest,
+    };
+
+    console.log("Itinerary generation payload:", payload);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/itineraries/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => null);
+        const details = errorJson?.detail || (await response.text().catch(() => ""));
+        throw new Error(details || `Request failed (${response.status})`);
       }
-    );
 
-    if (!response.ok) {
-      const details = await response.text();
-      throw new Error(details || `Request failed (${response.status})`);
+      const result = await response.json();
+
+      setItinerary(result);
+      setActiveDay(0);
+
+      return true;
+    } catch (error) {
+      setPageError(
+        `We couldn't generate the itinerary. ${
+          error.message || "Check that the backend is running."
+        }`
+      );
+
+      return false;
+    } finally {
+      setLoading(false);
     }
+  },
+  [
+    requestDestinations,
+    startDate,
+    endDate,
+    travellerCount,
+    travelStyle,
+    totalBudget,
+    interests,
+    effectiveSelectedAttractionIds,
+  ]
+);
 
-    const result = await response.json();
+const autoGeneratedRef = useRef(false);
 
-    setItinerary(result);
+useEffect(() => {
+  if (initialItinerary) {
+    setItinerary(initialItinerary);
     setActiveDay(0);
-
-    return true;
-  } catch (error) {
-    setPageError(
-      `We couldn't generate the itinerary. ${
-        error.message || "Check that the backend is running."
-      }`
-    );
-
-    return false;
-  } finally {
-    setLoading(false);
+    return;
+  }
+  if (
+    !itinerary &&
+    !loading &&
+    requestDestinations.length > 0 &&
+    !autoGeneratedRef.current
+  ) {
+    autoGeneratedRef.current = true;
+    generatePreview();
   }
 }, [
-  requestDestinations,
-  startDate,
-  endDate,
-  travellerCount,
-  travelStyle,
-  totalBudget,
-  interests,
-  effectiveSelectedAttractionIds,
+  initialItinerary,
+  itinerary,
+  loading,
+  requestDestinations.length,
+  generatePreview,
 ]);
 
+const loadWeather = useCallback(async () => {
+  if (!destinations.length) return;
 
-  useEffect(() => {
-    if (initialItinerary) {
-      setItinerary(initialItinerary);
-      setActiveDay(0);
-    }
-  }, [initialItinerary]);
+  setWeatherLoading(true);
+  setWeatherError("");
 
-  const loadWeather = useCallback(async () => {
-    if (!destinations.length) return;
+  const WEATHER_CODE_DESCS = {
+    0: "Clear sky",
+    1: "Mainly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing rime fog",
+    51: "Light drizzle",
+    53: "Moderate drizzle",
+    55: "Dense drizzle",
+    61: "Slight rain",
+    63: "Moderate rain",
+    65: "Heavy rain",
+    80: "Rain showers",
+    81: "Moderate rain showers",
+    82: "Heavy rain showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with hail",
+    99: "Thunderstorm with heavy hail",
+  };
 
-    setWeatherLoading(true);
-    setWeatherError("");
+  const results = await Promise.all(
+    destinations.map(async (city) => {
+      try {
+        const url = new URL(`${API_BASE}/api/weather/forecast`);
+        url.searchParams.set("destination", city);
+        if (startDate) url.searchParams.set("start_date", startDate);
+        if (endDate) url.searchParams.set("end_date", endDate);
 
-    const results = await Promise.all(
-      destinations.map(async (city) => {
-        try {
-          const url = new URL(`${API_BASE}/api/weather/forecast`);
-          url.searchParams.set("destination", city);
-          if (startDate) url.searchParams.set("date", startDate);
-
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
-          return [city, await response.json()];
-        } catch (error) {
-          return [city, { _error: error.message }];
+        const response = await fetch(url);
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(
+            errData.detail || `Weather request failed (${response.status})`
+          );
         }
-      })
-    );
+        return [city, await response.json()];
+      } catch (error) {
+        return [city, { _error: error.message }];
+      }
+    })
+  );
 
-    
-    const next = Object.fromEntries(
-      results.map(([city, value]) => {
-        if (value?._error) {
-          return [city, value];
-        }
+  const next = Object.fromEntries(
+    results.map(([city, value]) => {
+      if (value?._error) {
+        return [city, value];
+      }
 
-        // The forecast endpoint returns values inside daily[].
-        const daily = Array.isArray(value?.daily)
-          ? value.daily
-          : [];
+      const daily = Array.isArray(value?.daily) ? value.daily : [];
+      const dailyMap = {};
 
-        const forecast =
-          daily.find((item) => item.date === startDate) ??
-          daily[0] ??
-          {};
-
-        const code = Number(forecast.weather_code);
-
-        const description =
-          ({
-            0: "Clear sky",
-            1: "Mainly clear",
-            2: "Partly cloudy",
-            3: "Overcast",
-            45: "Fog",
-            48: "Depositing rime fog",
-            51: "Light drizzle",
-            53: "Moderate drizzle",
-            55: "Dense drizzle",
-            61: "Slight rain",
-            63: "Moderate rain",
-            65: "Heavy rain",
-            80: "Rain showers",
-            81: "Moderate rain showers",
-            82: "Heavy rain showers",
-            95: "Thunderstorm",
-            96: "Thunderstorm with hail",
-            99: "Thunderstorm with heavy hail",
-          })[code] ?? "Weather forecast";
-
-        return [
-          city,
-          {
-            ...value,
-            date: forecast.date ?? startDate,
-            description,
+      for (const item of daily) {
+        if (item?.date) {
+          const itemCode = Number(item.weather_code);
+          dailyMap[item.date] = {
+            date: item.date,
+            description:
+              WEATHER_CODE_DESCS[itemCode] ?? "Forecast received",
             temperature:
-              forecast.temperature_max_c != null &&
-              forecast.temperature_min_c != null
-                ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
+              item.temperature_max_c != null && item.temperature_min_c != null
+                ? `${item.temperature_min_c}–${item.temperature_max_c}`
                 : null,
-            rain_probability:
-              forecast.precipitation_probability_max ?? null,
-            source: value?.source ?? "Open-Meteo",
-            advice:
-              forecast.precipitation_probability_max >= 40
-                ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
-                : "Check local conditions before starting outdoor activities.",
-          },
-        ];
-      })
+            rain_probability: item.precipitation_probability_max ?? null,
+            weather_code: itemCode,
+          };
+        }
+      }
+
+      const forecast =
+        daily.find((item) => item.date === startDate) ?? daily[0] ?? {};
+
+      const code = Number(forecast.weather_code);
+      const description =
+        WEATHER_CODE_DESCS[code] ?? "Weather forecast";
+
+      return [
+        city,
+        {
+          ...value,
+          daily,
+          dailyMap,
+          date: forecast.date ?? startDate,
+          description,
+          temperature:
+            forecast.temperature_max_c != null &&
+            forecast.temperature_min_c != null
+              ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
+              : null,
+          rain_probability: forecast.precipitation_probability_max ?? null,
+          source: value?.source ?? "Open-Meteo",
+          advice:
+            (forecast.precipitation_probability_max ?? 0) >= 40
+              ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
+              : "Check local conditions before starting outdoor activities.",
+        },
+      ];
+    })
+  );
+
+  setWeatherByCity(next);
+
+  const failed = results.filter(([, value]) => value?._error);
+  if (failed.length === results.length) {
+    setWeatherError(
+      "Weather data is currently unavailable for selected dates."
     );
+  }
+  setWeatherLoading(false);
+}, [destinations, startDate, endDate]);
 
-    setWeatherByCity(next);
-
-
-    const failed = results.filter(([, value]) => value?._error);
-    if (failed.length === results.length) {
-      setWeatherError("Weather data is unavailable right now. Please try again later.");
-    }
-    setWeatherLoading(false);
-  }, [destinations, startDate]);
-
-  useEffect(() => {
-    loadWeather();
-  }, [loadWeather]);
+useEffect(() => {
+  loadWeather();
+}, [loadWeather]);
 
   const loadFood = useCallback(async () => {
     if (!destinations.length) return;
@@ -529,6 +621,34 @@ const generatePreview = useCallback(async (adjustmentRequest = "") => {
     weather?.summary ??
     "";
   const WeatherIcon = getWeatherIcon(weatherDescription);
+
+  const getDayWeather = useCallback(
+    (day) => {
+      if (!day) return null;
+      const destName = String(
+        day.destination ?? day.destination_name ?? ""
+      ).toLowerCase();
+      const cityKey =
+        destinations.find(
+          (c) =>
+            c.toLowerCase() === destName ||
+            destName.includes(c.toLowerCase()) ||
+            c.toLowerCase().includes(destName)
+        ) || destinations[0];
+
+      const cityData = weatherByCity[cityKey];
+      if (!cityData || cityData._error) return null;
+
+      if (day.date && cityData.dailyMap?.[day.date]) {
+        return cityData.dailyMap[day.date];
+      }
+      return cityData;
+    },
+    [destinations, weatherByCity]
+  );
+
+  const selectedDayWeather = getDayWeather(selectedDay);
+  const DayWeatherIcon = getWeatherIcon(selectedDayWeather?.description);
 
   const activeFood = foodByCity[activeWeatherCity];
   const foodItems = Array.isArray(activeFood) ? activeFood : [];
@@ -1070,9 +1190,24 @@ return (
                       : "Discover Karnataka at your own pace"}
                   </p>
                 </div>
-                <span className="itinerary-day-detail__stamp">
-                  <Mountain size={19} /> Namma Nadu
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  {selectedDayWeather && (
+                    <div
+                      className="itinerary-day-weather-chip"
+                      title={selectedDayWeather.description || "Forecast"}
+                    >
+                      <DayWeatherIcon size={16} />
+                      <span>
+                        {selectedDayWeather.temperature
+                          ? `${selectedDayWeather.temperature}°C`
+                          : selectedDayWeather.description}
+                      </span>
+                    </div>
+                  )}
+                  <span className="itinerary-day-detail__stamp">
+                    <Mountain size={19} /> Namma Nadu
+                  </span>
+                </div>
               </div>
 
               {selectedDay?.summary && (
@@ -1116,9 +1251,38 @@ return (
                                 <Clock3 size={13} /> {stop.duration}
                               </span>
                             )}
-                            {stop?.category && (
+                            {stop?.meal_type === "lunch" ? (
+                              <span className="itinerary-stop__category itinerary-stop__category--meal">
+                                <Utensils size={13} /> Lunch
+                              </span>
+                            ) : stop?.meal_type === "dinner" ? (
+                              <span className="itinerary-stop__category itinerary-stop__category--meal">
+                                <Utensils size={13} /> Dinner
+                              </span>
+                            ) : stop?.meal_type === "breakfast" ? (
+                              <span className="itinerary-stop__category itinerary-stop__category--meal">
+                                <Coffee size={13} /> Breakfast
+                              </span>
+                            ) : stop?.category ? (
                               <span className="itinerary-stop__category">
                                 {stop.category}
+                              </span>
+                            ) : null}
+
+                            {stop?.source_status === "curated_reference" && (
+                              <span
+                                className="itinerary-verified-badge"
+                                title="Verified database record"
+                              >
+                                <Sparkles size={11} /> Verified stop
+                              </span>
+                            )}
+                            {stop?.source_status === "needs_verification" && (
+                              <span
+                                className="itinerary-unverified-badge"
+                                title="Regional dining suggestion"
+                              >
+                                Regional pick
                               </span>
                             )}
                           </div>

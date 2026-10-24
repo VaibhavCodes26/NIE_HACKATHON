@@ -42,19 +42,13 @@ class ItineraryRequest(BaseModel):
         if self.end_date < self.start_date:
             raise ValueError("End date must be on or after start date.")
 
-        if len(set(self.destinations)) != len(self.destinations):
-            raise ValueError("Duplicate destinations are not allowed.")
+        # Deduplicate preserving order
+        self.destinations = [d.strip() for d in dict.fromkeys(self.destinations) if d and d.strip()]
+        if not self.destinations:
+            raise ValueError("Select at least one destination.")
 
-        if any(not destination.strip() for destination in self.destinations):
-            raise ValueError("Destination IDs cannot be empty.")
-
-        if len(set(self.interests)) != len(self.interests):
-            raise ValueError("Duplicate interests are not allowed.")
-
-        if len(set(self.selected_attraction_ids)) != len(
-            self.selected_attraction_ids
-        ):
-            raise ValueError("Duplicate attraction IDs are not allowed.")
+        self.interests = list(dict.fromkeys(self.interests))
+        self.selected_attraction_ids = list(dict.fromkeys(self.selected_attraction_ids))
 
         return self
 
