@@ -13,6 +13,7 @@ import {
   Map,
   Check,
   MapPinned,
+  Languages,
 } from 'lucide-react';
 import TrainSearchPanel from './components/TrainSearchPanel';
 import HeroSection from './components/HeroSection';
@@ -238,6 +239,7 @@ export default function RouteDiscoveryPage({
   initialFrom = null,
   initialTo = null,
   onOpenItinerary,
+  onOpenSahayak,
 
 }) {
   const effectiveConfig = useMemo(() => {

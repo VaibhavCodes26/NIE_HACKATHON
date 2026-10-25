@@ -16,7 +16,8 @@ import './styles.css';
 import './route-discovery.css';
 import './FoodSpots.css';
 import ItineraryPage from "./ItineraryPage.jsx";
-
+import SahayakPage from "./SahayakPage.jsx";
+import SahayakFab from "./components/SahayakFab";
 
 const reduced = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -133,6 +134,11 @@ const onNav = (id) => {
     return;
   }
 
+  if (id === 'sahayak') {
+    navigate('/sahayak');
+    return;
+  }
+
   if (id === 'help') {
     setPanel({ type: id });
     return;
@@ -167,91 +173,115 @@ const onNav = (id) => {
   const onDestination = (id) =>
     setPanel({ type: 'destination', id });
 
-  // Page 1: Journey preferences.
-  if (currentPage === '/plan-journey') {
+  const renderContent = () => {
+    // Page 1: Journey preferences.
+    if (currentPage === '/plan-journey') {
+      return (
+        <PlanJourney
+          onBack={() => navigate('/')}
+          onDiveIntoJourney={(preferences) => {
+            setJourneyConfig(preferences);
+            navigate('/route-discovery');
+          }}
+        />
+      );
+    }
+
+    // Page 2: Route discovery, transport and tourism itinerary.
+    if (currentPage === '/route-discovery') {
+      return (
+        <RouteDiscoveryPage
+          journeyConfig={journeyConfig}
+          initialDestinations={journeyConfig?.destinations ?? []}
+          initialStartDate={journeyConfig?.startDate}
+          initialEndDate={journeyConfig?.endDate}
+          onContinue={() => navigate('/plan-journey')}
+          onOpenStays={() => navigate('/stays')}
+          onOpenItinerary={() => navigate('/itinerary')}
+          onOpenSahayak={() => navigate('/sahayak')}
+        />
+      );
+    }
+
+    // Stay page
+    if (currentPage === '/stays') {
+      return (
+        <Stays
+          journeyConfig={journeyConfig}
+          onBack={() => navigate('/route-discovery')}
+        />
+      );
+    }
+
+    // Page 3: Dedicated Food Spots page.
+    if (currentPage === '/food-spots') {
+      return (
+        <FoodSpots
+          onBack={() => navigate('/route-discovery')}
+        />
+      );
+    }
+
+    // Page 4: Itinerary page
+    if (currentPage === '/itinerary') {
+      return (
+        <ItineraryPage
+          journeyConfig={journeyConfig}
+          selectedAttractionIds={selectedAttractionIds}
+          onBack={() => navigate('/route-discovery')}
+        />
+      );
+    }
+
+    // Page 5: Travel Sahayak page
+    if (currentPage === '/sahayak') {
+      return (
+        <SahayakPage
+          journeyConfig={journeyConfig}
+          onBack={() => navigate('/')}
+        />
+      );
+    }
+
+    // Default page: Existing landing page.
     return (
-      <PlanJourney
-        onBack={() => navigate('/')}
-        onDiveIntoJourney={(preferences) => {
-          setJourneyConfig(preferences);
-          navigate('/route-discovery');
-        }}
-      />
+      <>
+        <a className="skip-link" href="#home">
+          Skip to content
+        </a>
+
+        <Navbar active={active} onNav={onNav} />
+
+        <main>
+          <Hero
+            onPlan={() => onNav('plan')}
+            onFood={openFood}
+            onCategory={onCategory}
+            onDestination={onDestination}
+          />
+
+          <Discovery onCategory={onCategory} />
+
+          <FoodSection />
+
+          <AboutSection />
+        </main>
+
+        <Footer />
+
+        <Panels panel={panel} onClose={close} />
+
+        {intro && <Intro onDone={finishIntro} />}
+      </>
     );
-  }
+  };
 
-  // Page 2: Route discovery, transport and tourism itinerary.
-  if (currentPage === '/route-discovery') {
-    return (
-      <RouteDiscoveryPage
-        journeyConfig={journeyConfig}
-        initialDestinations={journeyConfig?.destinations ?? []}
-        initialStartDate={journeyConfig?.startDate}
-        initialEndDate={journeyConfig?.endDate}
-        onContinue={() => navigate('/plan-journey')}
-        onOpenStays={() => navigate('/stays')}
-        onOpenItinerary={() => navigate('/itinerary')}
-      />
-    );
-  }
-  // stay page 
-  if (currentPage === '/stays') {
-  return (
-    <Stays
-      journeyConfig={journeyConfig}
-      onBack={() => navigate('/route-discovery')}
-    />
-  );
-}
-
-  // Page 3: Dedicated Food Spots page.
-  if (currentPage === '/food-spots') {
-    return (
-    <FoodSpots
-     onBack={() => navigate('/route-discovery')} />
-  );
-  }
-  //page 4 : itinerary page 
-  // Page 4: Itinerary page
-if (currentPage === '/itinerary') {
-  return (
-    <ItineraryPage
-      journeyConfig={journeyConfig}
-      selectedAttractionIds={selectedAttractionIds}
-      onBack={() => navigate('/route-discovery')}
-    />
-  );
-}
-
-  // Default page: Existing landing page.
   return (
     <>
-      <a className="skip-link" href="#home">
-        Skip to content
-      </a>
-
-      <Navbar active={active} onNav={onNav} />
-
-      <main>
-        <Hero
-          onPlan={() => onNav('plan')}
-          onFood={openFood}
-          onCategory={onCategory}
-          onDestination={onDestination}
-        />
-
-        <Discovery onCategory={onCategory} />
-
-        <FoodSection />
-
-        <AboutSection />
-      </main>
-
-      <Footer />
-
-      <Panels panel={panel} onClose={close} />
-
-      {intro && <Intro onDone={finishIntro} />}
+      {renderContent()}
+      {currentPage !== '/sahayak' && (
+        <SahayakFab journeyConfig={journeyConfig} />
+      )}
     </>
   );
 }

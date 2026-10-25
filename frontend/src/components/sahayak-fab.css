@@ -1,0 +1,278 @@
+/* =========================================================
+   NAMMAPRAYANA — SAHAYAK FLOATING ACTION BUTTON & PANEL
+   Karnataka heritage theme: Red & Turmeric Yellow
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@700&display=swap");
+
+.sfab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  background: #f5c518;
+  color: #a91f24;
+  box-shadow: 0 8px 24px rgba(72, 43, 20, 0.32);
+  display: grid;
+  place-items: center;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s ease,
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s;
+}
+
+.sfab:hover {
+  background: #ffd53d;
+  transform: scale(1.06);
+  box-shadow: 0 10px 28px rgba(72, 43, 20, 0.4);
+}
+
+.sfab.is-open {
+  background: #a91f24;
+  color: #ffffff;
+}
+
+.sfab:focus-visible {
+  outline: 3px solid #f5c518;
+  outline-offset: 3px;
+}
+
+.sfab-kn {
+  font-family: "Noto Sans Kannada", "Tunga", "Nirmala UI", sans-serif;
+  font-weight: 700;
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+/* ---------- first-visit pulse ring ---------- */
+.sfab.pulse::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 3px solid #f5c518;
+  pointer-events: none;
+  animation: sfab-ring 2s ease-out infinite;
+}
+
+@keyframes sfab-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* ---------- first-visit tooltip ---------- */
+.sfab-hint {
+  position: fixed;
+  right: 20px;
+  bottom: 92px;
+  z-index: 1000;
+  max-width: 250px;
+  padding: 12px 34px 12px 14px;
+  background: #ffffff;
+  color: #29231f;
+  border-radius: 14px;
+  border-left: 5px solid #f5c518;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  display: grid;
+  gap: 3px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  animation: sfab-hint-in 0.25s ease-out;
+}
+
+.sfab-hint strong {
+  font-size: 0.95rem;
+}
+
+.sfab-hint span {
+  color: #6b625a;
+}
+
+/* little tail pointing at the button */
+.sfab-hint::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.08);
+}
+
+.sfab-hint-x {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #6b625a;
+}
+
+@keyframes sfab-hint-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* NOTE: no transform on the panel, so the full-screen "Show to local" overlay inside it still covers the whole screen */
+.sfab-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 92px;
+  z-index: 1000;
+  width: min(420px, calc(100vw - 24px));
+  height: min(640px, calc(100dvh - 116px));
+  border-radius: 20px;
+  overflow: hidden;
+  background: #faf6ed;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(169, 31, 36, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sfab-panel.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.sfab-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 30;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  background: #ffffff;
+  color: #29231f;
+  font-size: 1.35rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.sfab-close:hover {
+  background: #fff3c4;
+  transform: scale(1.08);
+}
+
+.sfab-close:focus-visible {
+  outline: 2px solid #a91f24;
+  outline-offset: 2px;
+}
+
+/* Compact adjustments for SahayakPage inside the FAB popover */
+.sfab-panel .sh {
+  flex: 1;
+  /* fill the flex panel so the page scrolls inside it */
+  min-height: 0;
+  height: 100%;
+  max-width: 100%;
+  overflow-y: auto;
+  padding: 16px 14px 28px;
+  overscroll-behavior: contain;
+}
+
+.sfab-panel .sh-topbar {
+  display: none;
+}
+
+.sfab-panel .sh-head {
+  padding: 14px 44px 12px 14px;
+  margin-bottom: 14px;
+}
+
+.sfab-panel .sh-head h1,
+.sfab-panel .sh-head h2 {
+  font-size: 1.25rem;
+}
+
+.sfab-panel .sh-head p {
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.sfab-panel .sh-ask {
+  margin-bottom: 12px;
+}
+
+.sfab-panel .sh-ask input {
+  font-size: 0.88rem;
+  padding: 9px 12px;
+}
+
+.sfab-panel .sh-scn {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sfab-panel .sh-scn button {
+  font-size: 0.78rem;
+  padding: 6px 10px;
+}
+
+@media (max-width: 480px) {
+  .sfab {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .sfab-panel {
+    right: 12px;
+    bottom: 84px;
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 100px);
+  }
+
+  .sfab-hint {
+    right: 12px;
+    bottom: 84px;
+    max-width: calc(100vw - 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .sfab,
+  .sfab-panel,
+  .sfab-close {
+    transition: none;
+  }
+
+  .sfab.pulse::before,
+  .sfab-hint {
+    animation: none;
+  }
+}

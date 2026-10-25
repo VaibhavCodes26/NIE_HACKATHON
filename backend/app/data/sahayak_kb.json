@@ -1,0 +1,1099 @@
+{
+  "scenarios": [
+    {
+      "id": "transport",
+      "label": "Bus / Train",
+      "icon": "🚌"
+    },
+    {
+      "id": "stay",
+      "label": "Hotel / Stay",
+      "icon": "🏨"
+    },
+    {
+      "id": "directions",
+      "label": "Directions",
+      "icon": "🧭"
+    },
+    {
+      "id": "food",
+      "label": "Food & Dining",
+      "icon": "🍛"
+    },
+    {
+      "id": "shopping",
+      "label": "Shopping & Auto",
+      "icon": "🛍️"
+    },
+    {
+      "id": "temple",
+      "label": "Temples & Sights",
+      "icon": "🛕"
+    },
+    {
+      "id": "outdoor",
+      "label": "Nature / Trek",
+      "icon": "🥾"
+    },
+    {
+      "id": "numbers",
+      "label": "Numbers & Price",
+      "icon": "🔢"
+    },
+    {
+      "id": "emergency",
+      "label": "Emergency & Help",
+      "icon": "🚨"
+    },
+    {
+      "id": "general",
+      "label": "General & Greetings",
+      "icon": "🙏"
+    }
+  ],
+  "phrases": [
+    {
+      "id": "gen_namaskara",
+      "scenario": "general",
+      "kn": "ನಮಸ್ಕಾರ",
+      "roman": "namaskaara",
+      "deva": "नमस्कार",
+      "en": "Hello / Greetings"
+    },
+    {
+      "id": "gen_dhanyavada",
+      "scenario": "general",
+      "kn": "ಧನ್ಯವಾದಗಳು",
+      "roman": "dhanyavaadagalu",
+      "deva": "धन्यवाद",
+      "en": "Thank you very much"
+    },
+    {
+      "id": "gen_help",
+      "scenario": "general",
+      "kn": "ದಯವಿಟ್ಟು ಸಹಾಯ ಮಾಡಿ",
+      "roman": "dayavittu sahaaya maadi",
+      "deva": "दयविट्टु सहाय माडि",
+      "en": "Please help me"
+    },
+    {
+      "id": "gen_kannada_gottilla",
+      "scenario": "general",
+      "kn": "ನನಗೆ ಕನ್ನಡ ಗೊತ್ತಿಲ್ಲ",
+      "roman": "nanage kannada gottilla",
+      "deva": "ननगे कन्नड गोत्तिल्ल",
+      "en": "I don't know Kannada"
+    },
+    {
+      "id": "gen_swalpa",
+      "scenario": "general",
+      "kn": "ಸ್ವಲ್ಪ ಸ್ವಲ್ಪ ಕನ್ನಡ ಬರುತ್ತೆ",
+      "roman": "swalpa swalpa kannada barutte",
+      "deva": "स्वल्प स्वल्प कन्नड बरुत्ते",
+      "en": "I know a little Kannada"
+    },
+    {
+      "id": "food_water",
+      "scenario": "food",
+      "kn": "ಕುಡಿಯುವ ನೀರು ಕೊಡಿ",
+      "roman": "kudiyuva neeru kodi",
+      "deva": "कुडियुव नीरु कोडि",
+      "en": "Please give drinking water"
+    },
+    {
+      "id": "food_bill",
+      "scenario": "food",
+      "kn": "ಬಿಲ್ ಕೊಡಿ",
+      "roman": "bill kodi",
+      "deva": "बिल् कोडि",
+      "en": "Please bring the bill"
+    },
+    {
+      "id": "food_spicy",
+      "scenario": "food",
+      "kn": "ಖಾರ ಜಾಸ್ತಿ ಮಾಡಬೇಡಿ",
+      "roman": "khaara jaasti maadabedi",
+      "deva": "खार जास्ति माडबेडि",
+      "en": "Don't make it too spicy"
+    },
+    {
+      "id": "food_veg",
+      "scenario": "food",
+      "kn": "ವೆಜಿಟೇರಿಯನ್ ಊಟ ಇದೆಯಾ?",
+      "roman": "vegetarian oota ideyaa?",
+      "deva": "व्हेजिटेरियन् ऊट इदेया?",
+      "en": "Do you have vegetarian food?"
+    },
+    {
+      "id": "bar_howmuch",
+      "scenario": "shopping",
+      "kn": "ಇದು ಎಷ್ಟು ರೂಪಾಯಿ?",
+      "roman": "idu eshtu roopaayi?",
+      "deva": "इदु एष्टु रूपायि?",
+      "en": "How much is this / What is the price?"
+    },
+    {
+      "id": "bar_discount",
+      "scenario": "shopping",
+      "kn": "ಸ್ವಲ್ಪ ಕಡಿಮೆ ಮಾಡಿ",
+      "roman": "swalpa kadime maadi",
+      "deva": "स्वल्प कडिमे माडि",
+      "en": "Please reduce the price / Give a discount"
+    },
+    
+    {
+      "id": "bar_meter",
+      "scenario": "shopping",
+      "kn": "ಮೀಟರ್ ಹಾಕಿ",
+      "roman": "meter haaki",
+      "deva": "मीटर हाकि",
+      "en": "Please turn on the meter (for auto)"
+    },
+    {
+      "id": "bar_auto",
+      "scenario": "shopping",
+      "kn": "… ಗೆ ಎಷ್ಟು ತಗೊಳ್ತೀರಾ?",
+      "roman": "… ge eshtu tagolteera?",
+      "deva": "… गे एष्टु तगोळ्तीरा?",
+      "en": "How much will you charge to go to …?"
+    },
+    {
+      "id": "emg_help",
+      "scenario": "emergency",
+      "kn": "ದಯವಿಟ್ಟು ಕಾಪಾಡಿ!",
+      "roman": "dayavittu kaapaadi!",
+      "deva": "दयविट्टु कापाडि!",
+      "en": "Please help / emergency!"
+    },
+    {
+      "id": "emg_police",
+      "scenario": "emergency",
+      "kn": "ಪೊಲೀಸ್ ಸ್ಟೇಷನ್ ಎಲ್ಲಿದೆ?",
+      "roman": "police station ellide?",
+      "deva": "पोलीस् स्टेशन् एल्ಲಿदे?",
+      "en": "Where is the police station?"
+    },
+    {
+      "id": "temple_shoes",
+      "scenario": "temple",
+      "kn": "ಚಪ್ಪಲಿ ಎಲ್ಲಿ ಬಿಡಬೇಕು?",
+      "roman": "chappali elli bidabeku?",
+      "deva": "चप्पलि एल्लि बिडबेकु?",
+      "en": "Where do I leave my footwear?"
+    },
+    {
+      "id": "tr_busstand",
+      "scenario": "transport",
+      "kn": "ಬಸ್ ಸ್ಟ್ಯಾಂಡ್ ಎಲ್ಲಿದೆ?",
+      "roman": "bus stand ellide?",
+      "deva": "बस् स्टैंड् एल्लिदे?",
+      "en": "Where is the bus stand?"
+    },
+    {
+      "id": "tr_station",
+      "scenario": "transport",
+      "kn": "ರೈಲ್ವೆ ಸ್ಟೇಷನ್ ಎಲ್ಲಿದೆ?",
+      "roman": "railway station ellide?",
+      "deva": "रेल्वे स्टेशन् एल्लिदे?",
+      "en": "Where is the railway station?"
+    },
+    {
+      "id": "tr_bus_goes",
+      "scenario": "transport",
+      "kn": "ಈ ಬಸ್ … ಗೆ ಹೋಗುತ್ತಾ?",
+      "roman": "ee bus … ge hoguttaa?",
+      "deva": "ई बस् … गे होगुत्ता?",
+      "en": "Does this bus go to …? (say the place name)"
+    },
+    {
+      "id": "tr_nextbus",
+      "scenario": "transport",
+      "kn": "ಮುಂದಿನ ಬಸ್ ಯಾವಾಗ?",
+      "roman": "mundina bus yaavaaga?",
+      "deva": "मुंदिन बस् यावागा?",
+      "en": "When is the next bus?"
+    },
+    {
+      "id": "tr_time",
+      "scenario": "transport",
+      "kn": "ಬಸ್ ಎಷ್ಟು ಗಂಟೆಗೆ ಹೊರಡುತ್ತೆ?",
+      "roman": "bus eshtu gantege horaduttē?",
+      "deva": "बस् एष्टु गंटेगे होरडुत्ते?",
+      "en": "What time does the bus leave?"
+    },
+    {
+      "id": "tr_ticket",
+      "scenario": "transport",
+      "kn": "… ಗೆ ಒಂದು ಟಿಕೆಟ್ ಕೊಡಿ",
+      "roman": "… ge ondu ticket kodi",
+      "deva": "… गे ओन्दु टिकेट् कोडि",
+      "en": "One ticket to …, please."
+    },
+    {
+      "id": "tr_platform",
+      "scenario": "transport",
+      "kn": "ಯಾವ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್?",
+      "roman": "yaava platform?",
+      "deva": "याव प्लॅटफॉर्म्?",
+      "en": "Which platform?"
+    },
+    {
+      "id": "tr_howlong",
+      "scenario": "transport",
+      "kn": "ಎಷ್ಟು ಸಮಯ ಆಗುತ್ತೆ?",
+      "roman": "eshtu samaya aagutte?",
+      "deva": "एष्टु समय आगुत्ते?",
+      "en": "How long will it take?"
+    },
+    {
+      "id": "tr_nextstop",
+      "scenario": "transport",
+      "kn": "ಮುಂದಿನ ನಿಲ್ದಾಣ ಯಾವುದು?",
+      "roman": "mundina nildaana yaavudu?",
+      "deva": "मुंदिन निल्दाण यावुदु?",
+      "en": "What is the next stop?"
+    },
+    {
+      "id": "tr_tellme",
+      "scenario": "transport",
+      "kn": "… ಬಂದಾಗ ಹೇಳಿ",
+      "roman": "… bandaaga heli",
+      "deva": "… बंदागा हेलि",
+      "en": "Please tell me when … comes."
+    },
+    {
+      "id": "tr_getdown",
+      "scenario": "transport",
+      "kn": "ನಾನು ಇಲ್ಲಿ ಇಳಿಯಬೇಕು",
+      "roman": "naanu illi iliyabeku",
+      "deva": "नानु इल्लि इळियबेकु",
+      "en": "I need to get down here."
+    },
+    {
+      "id": "tr_seat",
+      "scenario": "transport",
+      "kn": "ಈ ಸೀಟ್ ಖಾಲಿ ಇದೆಯಾ?",
+      "roman": "ee seat khaali ideyaa?",
+      "deva": "ई सीट् खाली इदेया?",
+      "en": "Is this seat free?"
+    },
+    {
+      "id": "tr_late",
+      "scenario": "transport",
+      "kn": "ಬಸ್ ತಡವಾಗಿದೆಯಾ?",
+      "roman": "bus tadavaagideyaa?",
+      "deva": "बस् तडवागिदेया?",
+      "en": "Is the bus late?"
+    },
+    {
+      "id": "st_room",
+      "scenario": "stay",
+      "kn": "ರೂಮ್ ಖಾಲಿ ಇದೆಯಾ?",
+      "roman": "room khaali ideyaa?",
+      "deva": "रूम् खाली इदेया?",
+      "en": "Do you have a room available?"
+    },
+    {
+      "id": "st_rate",
+      "scenario": "stay",
+      "kn": "ಒಂದು ರಾತ್ರಿಗೆ ಎಷ್ಟು?",
+      "roman": "ondu raatrige eshtu?",
+      "deva": "ओन्दु रात्रिगे एष्टु?",
+      "en": "How much for one night?"
+    },
+    {
+      "id": "st_see",
+      "scenario": "stay",
+      "kn": "ರೂಮ್ ನೋಡಬಹುದಾ?",
+      "roman": "room nodabahudaa?",
+      "deva": "रूम् नोडबहुदा?",
+      "en": "Can I see the room?"
+    },
+    {
+      "id": "st_ac",
+      "scenario": "stay",
+      "kn": "ಎಸಿ ರೂಮ್ ಇದೆಯಾ?",
+      "roman": "AC room ideyaa?",
+      "deva": "ए.सी. रूम् इदेया?",
+      "en": "Do you have an AC room?"
+    },
+    {
+      "id": "st_hotwater",
+      "scenario": "stay",
+      "kn": "ಬಿಸಿ ನೀರು ಇದೆಯಾ?",
+      "roman": "bisi neeru ideyaa?",
+      "deva": "बिसि नीरु इदेया?",
+      "en": "Is there hot water?"
+    },
+    {
+      "id": "st_wifi",
+      "scenario": "stay",
+      "kn": "ವೈಫೈ ಇದೆಯಾ?",
+      "roman": "wifi ideyaa?",
+      "deva": "वाईफाई इदेया?",
+      "en": "Is there wifi?"
+    },
+    {
+      "id": "st_breakfast",
+      "scenario": "stay",
+      "kn": "ಬೆಳಗಿನ ತಿಂಡಿ ಸೇರಿದೆಯಾ?",
+      "roman": "belagina tindi serideyaa?",
+      "deva": "बेळगिन तिंडि सेरिदेया?",
+      "en": "Is breakfast included?"
+    },
+    {
+      "id": "st_checkout",
+      "scenario": "stay",
+      "kn": "ಚೆಕ್ ಔಟ್ ಎಷ್ಟು ಗಂಟೆಗೆ?",
+      "roman": "check out eshtu gantege?",
+      "deva": "चेक् आउट् एष्टु गंटेगे?",
+      "en": "What time is check-out?"
+    },
+    {
+      "id": "st_extrabed",
+      "scenario": "stay",
+      "kn": "ಇನ್ನೊಂದು ಹಾಸಿಗೆ ಬೇಕು",
+      "roman": "innondu haasige beku",
+      "deva": "इन्नोन्दु हासिगे बेकु",
+      "en": "I need one more bed."
+    },
+    {
+      "id": "st_acbroken",
+      "scenario": "stay",
+      "kn": "ಎಸಿ ಕೆಲಸ ಮಾಡ್ತಿಲ್ಲ",
+      "roman": "AC kelasa maadtilla",
+      "deva": "ए.सी. केलस माड्तिल्ला",
+      "en": "The AC is not working."
+    },
+    {
+      "id": "st_parking",
+      "scenario": "stay",
+      "kn": "ಪಾರ್ಕಿಂಗ್ ಇದೆಯಾ?",
+      "roman": "parking ideyaa?",
+      "deva": "पार्किंग् इदेया?",
+      "en": "Is there parking?"
+    },
+    {
+      "id": "st_aadhaar",
+      "scenario": "stay",
+      "kn": "ಆಧಾರ್ ಕಾರ್ಡ್ ಬೇಕಾ?",
+      "roman": "aadhaar card bekaa?",
+      "deva": "आधार् कार्ड् बेका?",
+      "en": "Do you need an Aadhaar card?"
+    },
+    {
+      "id": "st_luggage",
+      "scenario": "stay",
+      "kn": "ಲಗೇಜ್ ಇಲ್ಲಿ ಇಡಬಹುದಾ?",
+      "roman": "luggage illi idabahudaa?",
+      "deva": "लगेज् इल्लि इडबहुदा?",
+      "en": "Can I keep my luggage here?"
+    },
+    {
+      "id": "dir_where",
+      "scenario": "directions",
+      "kn": "… ಎಲ್ಲಿದೆ?",
+      "roman": "… ellide?",
+      "deva": "… एल्लिदे?",
+      "en": "Where is …? (say the place name)"
+    },
+    {
+      "id": "dir_how",
+      "scenario": "directions",
+      "kn": "… ಗೆ ಹೇಗೆ ಹೋಗುವುದು?",
+      "roman": "… ge hege hoguvudu?",
+      "deva": "… गे हेगे होगुवुदु?",
+      "en": "How do I get to …?"
+    },
+    {
+      "id": "dir_near",
+      "scenario": "directions",
+      "kn": "ಇಲ್ಲಿ ಹತ್ತಿರದಲ್ಲಿ … ಇದೆಯಾ?",
+      "roman": "illi hattiradalli … ideyaa?",
+      "deva": "इल्लि हत्तिरदल्लि … इदेया?",
+      "en": "Is there a … nearby?"
+    },
+    {
+      "id": "dir_walk",
+      "scenario": "directions",
+      "kn": "ನಡೆದು ಹೋಗಬಹುದಾ?",
+      "roman": "nadedu hogabahudaa?",
+      "deva": "नडेदु होगबहुदा?",
+      "en": "Can I walk there?"
+    },
+    {
+      "id": "dir_far",
+      "scenario": "directions",
+      "kn": "ತುಂಬಾ ದೂರನಾ?",
+      "roman": "tumba dooranaa?",
+      "deva": "तुंबा दूरना?",
+      "en": "Is it very far?"
+    },
+    {
+      "id": "dir_distance",
+      "scenario": "directions",
+      "kn": "ಇಲ್ಲಿಂದ ಎಷ್ಟು ದೂರ?",
+      "roman": "illinda eshtu doora?",
+      "deva": "इल्लिंद एष्टु दूर?",
+      "en": "How far is it from here?"
+    },
+    {
+      "id": "dir_atm",
+      "scenario": "directions",
+      "kn": "ಎಟಿಎಂ ಎಲ್ಲಿದೆ?",
+      "roman": "ATM ellide?",
+      "deva": "ए.टी.एम. एल्लिदे?",
+      "en": "Where is an ATM?"
+    },
+    {
+      "id": "dir_path",
+      "scenario": "directions",
+      "kn": "ಈ ದಾರಿ ಸರಿಯಾ?",
+      "roman": "ee daari sariyaa?",
+      "deva": "ई दारि सरिया?",
+      "en": "Is this the right way?"
+    },
+    {
+      "id": "dir_back",
+      "scenario": "directions",
+      "kn": "ಹಿಂದೆ ಹೋಗಿ",
+      "roman": "hinde hogi",
+      "deva": "हिंदे होगि",
+      "en": "Go back."
+    },
+    {
+      "id": "food_menu",
+      "scenario": "food",
+      "kn": "ಮೆನು ಕೊಡಿ",
+      "roman": "menu kodi",
+      "deva": "मेनू कोडि",
+      "en": "Please give me the menu."
+    },
+    {
+      "id": "food_meals",
+      "scenario": "food",
+      "kn": "ಮೀಲ್ಸ್ ಇದೆಯಾ?",
+      "roman": "meals ideyaa?",
+      "deva": "मील्स् इदेया?",
+      "en": "Do you have meals (thali)?"
+    },
+    {
+      "id": "food_nonveg",
+      "scenario": "food",
+      "kn": "ನಾನ್ ವೆಜ್ ಇದೆಯಾ?",
+      "roman": "non-veg ideyaa?",
+      "deva": "नॉन् वेज् इदेया?",
+      "en": "Do you have non-veg?"
+    },
+    {
+      "id": "food_idli",
+      "scenario": "food",
+      "kn": "ಎರಡು ಇಡ್ಲಿ ಕೊಡಿ",
+      "roman": "eradu idli kodi",
+      "deva": "एरडु इड्लि कोडि",
+      "en": "Two idlis, please."
+    },
+    {
+      "id": "food_coffee",
+      "scenario": "food",
+      "kn": "ಒಂದು ಕಾಫಿ ಕೊಡಿ",
+      "roman": "ondu coffee kodi",
+      "deva": "ओन्दु कॉफी कोडि",
+      "en": "One coffee, please."
+    },
+    {
+      "id": "food_nosugar",
+      "scenario": "food",
+      "kn": "ಸಕ್ಕರೆ ಕಡಿಮೆ ಹಾಕಿ",
+      "roman": "sakkare kadime haaki",
+      "deva": "सक्करे कडिमे हाकि",
+      "en": "Less sugar, please."
+    },
+    {
+      "id": "food_more",
+      "scenario": "food",
+      "kn": "ಇನ್ನೊಂದು ಬೇಕು",
+      "roman": "innondu beku",
+      "deva": "इन्नोन्दु बेकु",
+      "en": "I want one more."
+    },
+    {
+      "id": "food_enough",
+      "scenario": "food",
+      "kn": "ಸಾಕು",
+      "roman": "saaku",
+      "deva": "साकु",
+      "en": "Enough, thank you."
+    },
+    {
+      "id": "food_parcel",
+      "scenario": "food",
+      "kn": "ಪಾರ್ಸೆಲ್ ಮಾಡಿ",
+      "roman": "parcel maadi",
+      "deva": "पार्सल् माडि",
+      "en": "Please pack it to take away."
+    },
+    {
+      "id": "food_noonion",
+      "scenario": "food",
+      "kn": "ಈರುಳ್ಳಿ ಬೇಡ",
+      "roman": "eerulli beda",
+      "deva": "ईरुळ्ळि बेड",
+      "en": "No onion, please."
+    },
+    {
+      "id": "food_allergy",
+      "scenario": "food",
+      "kn": "ನನಗೆ ಕಡಲೆಕಾಯಿ ಅಲರ್ಜಿ ಇದೆ",
+      "roman": "nanage kadalekaayi allergy ide",
+      "deva": "ननगे कडलेकायि अलर्जी इदे",
+      "en": "I am allergic to peanuts."
+    },
+    {
+      "id": "food_cleanwater",
+      "scenario": "food",
+      "kn": "ಇದು ಶುದ್ಧ ನೀರಾ?",
+      "roman": "idu shuddha neeraa?",
+      "deva": "इदु शुद्ध नीरा?",
+      "en": "Is this purified water?"
+    },
+    {
+      "id": "temple_open",
+      "scenario": "temple",
+      "kn": "ದೇವಸ್ಥಾನ ಎಷ್ಟು ಗಂಟೆಗೆ ತೆರೆಯುತ್ತೆ?",
+      "roman": "devasthaana eshtu gantege tereyutte?",
+      "deva": "देवस्थान एष्टु गंटेगे तेरेयुत्ते?",
+      "en": "What time does the temple open?"
+    },
+    {
+      "id": "temple_close",
+      "scenario": "temple",
+      "kn": "ಎಷ್ಟು ಗಂಟೆಗೆ ಮುಚ್ಚುತ್ತೆ?",
+      "roman": "eshtu gantege muchchutte?",
+      "deva": "एष्टु गंटेगे मुच्चुत्ते?",
+      "en": "What time does it close?"
+    },
+    {
+      "id": "temple_inside",
+      "scenario": "temple",
+      "kn": "ಒಳಗೆ ಹೋಗಬಹುದಾ?",
+      "roman": "olage hogabahudaa?",
+      "deva": "ओळगे होगबहुदा?",
+      "en": "Can I go inside?"
+    },
+    {
+      "id": "temple_dress",
+      "scenario": "temple",
+      "kn": "ಈ ಬಟ್ಟೆ ಹಾಕಿಕೊಂಡು ಒಳಗೆ ಬರಬಹುದಾ?",
+      "roman": "ee batte haakikondu olage barabahudaa?",
+      "deva": "ई बट्टे हाकिकोंडु ओळगे बरबहुदा?",
+      "en": "Can I enter wearing these clothes?"
+    },
+    {
+      "id": "temple_prasada",
+      "scenario": "temple",
+      "kn": "ಪ್ರಸಾದ ಎಲ್ಲಿ ಸಿಗುತ್ತೆ?",
+      "roman": "prasaada elli siguttē?",
+      "deva": "प्रसाद एल्लि सिगुत्ते?",
+      "en": "Where can I get prasada?"
+    },
+    {
+      "id": "sight_guide",
+      "scenario": "temple",
+      "kn": "ಗೈಡ್ ಸಿಗುತ್ತಾರಾ?",
+      "roman": "guide siguttaaraa?",
+      "deva": "गाईड् सिगुत्तारा?",
+      "en": "Are guides available?"
+    },
+    {
+      "id": "sight_guidefee",
+      "scenario": "temple",
+      "kn": "ಗೈಡ್ ಚಾರ್ಜ್ ಎಷ್ಟು?",
+      "roman": "guide charge eshtu?",
+      "deva": "गाईड् चार्ज् एष्टु?",
+      "en": "How much is the guide charge?"
+    },
+    {
+      "id": "sight_photome",
+      "scenario": "temple",
+      "kn": "ದಯವಿಟ್ಟು ಒಂದು ಫೋಟೋ ತೆಗೆದುಕೊಡಿ",
+      "roman": "dayavittu ondu photo tegedukodi",
+      "deva": "दयविट्टु ओन्दु फोटो तेगेदुकोडि",
+      "en": "Please take a photo of me."
+    },
+    {
+      "id": "sight_nearby",
+      "scenario": "temple",
+      "kn": "ಹತ್ತಿರದಲ್ಲಿ ನೋಡಲು ಏನಿದೆ?",
+      "roman": "hattiradalli nodalu enide?",
+      "deva": "हत्तिरदल्लि नोडलु एनिदे?",
+      "en": "What is there to see nearby?"
+    },
+    {
+      "id": "sight_entry",
+      "scenario": "temple",
+      "kn": "ಎಂಟ್ರಿ ಫೀಸ್ ಎಷ್ಟು?",
+      "roman": "entry fee eshtu?",
+      "deva": "एंट्री फीस् एष्टु?",
+      "en": "How much is the entry fee?"
+    },
+    {
+      "id": "out_safe",
+      "scenario": "outdoor",
+      "kn": "ಇಲ್ಲಿ ಸುರಕ್ಷಿತವಾ?",
+      "roman": "illi surakshitavaa?",
+      "deva": "इल्लि सुरक्षितवा?",
+      "en": "Is it safe here?"
+    },
+    {
+      "id": "out_trektime",
+      "scenario": "outdoor",
+      "kn": "ಟ್ರೆಕ್ಕಿಂಗ್‌ಗೆ ಎಷ್ಟು ಗಂಟೆ ಬೇಕು?",
+      "roman": "trekking-ge eshtu gante beku?",
+      "deva": "ट्रेकिंग्गे एष्टु गंटे बेकु?",
+      "en": "How many hours does the trek take?"
+    },
+    {
+      "id": "out_rain",
+      "scenario": "outdoor",
+      "kn": "ಮಳೆ ಬರುತ್ತಾ?",
+      "roman": "male baruttaa?",
+      "deva": "मळे बरुत्ता?",
+      "en": "Will it rain?"
+    },
+    {
+      "id": "out_swim",
+      "scenario": "outdoor",
+      "kn": "ಇಲ್ಲಿ ಈಜಬಹುದಾ?",
+      "roman": "illi eejabahudaa?",
+      "deva": "इल्लि ईजबहुदा?",
+      "en": "Can we swim here?"
+    },
+    {
+      "id": "out_coracle",
+      "scenario": "outdoor",
+      "kn": "ತೆಪ್ಪದ ಸವಾರಿ ಎಷ್ಟು?",
+      "roman": "teppada savaari eshtu?",
+      "deva": "तेप्पद सवारि एष्टु?",
+      "en": "How much is the coracle ride?"
+    },
+    {
+      "id": "out_sunset",
+      "scenario": "outdoor",
+      "kn": "ಸೂರ್ಯಾಸ್ತ ನೋಡಲು ಎಲ್ಲಿ ಹೋಗಬೇಕು?",
+      "roman": "sooryaasta nodalu elli hogabeku?",
+      "deva": "सूर्यास्त नोडलु एल्लि होगबेकु?",
+      "en": "Where should I go to watch the sunset?"
+    },
+    {
+      "id": "bar_offer",
+      "scenario": "shopping",
+      "kn": "… ರೂಪಾಯಿ ಕೊಡ್ತೀನಿ",
+      "roman": "… roopaayi kodteeni",
+      "deva": "… रूपायि कोड्तीनि",
+      "en": "I will give … rupees. (say the number first)"
+    },
+    {
+      "id": "bar_ok",
+      "scenario": "shopping",
+      "kn": "ಸರಿ, ಒಪ್ಪಿದೆ",
+      "roman": "sari, oppide",
+      "deva": "सरि, ओप्पिदे",
+      "en": "Okay, agreed."
+    },
+    {
+      "id": "bar_cheaper",
+      "scenario": "shopping",
+      "kn": "ಬೇರೆ ಅಂಗಡಿಯಲ್ಲಿ ಕಡಿಮೆ ಇದೆ",
+      "roman": "bere angadiyalli kadime ide",
+      "deva": "बेरे अंगडियल्लि कडिमे इदे",
+      "en": "It is cheaper in another shop."
+    },
+    {
+      "id": "shop_colour",
+      "scenario": "shopping",
+      "kn": "ಬೇರೆ ಬಣ್ಣ ಇದೆಯಾ?",
+      "roman": "bere banna ideyaa?",
+      "deva": "बेरे बण्ण इदेया?",
+      "en": "Do you have another colour?"
+    },
+    {
+      "id": "shop_try",
+      "scenario": "shopping",
+      "kn": "ಇದನ್ನ ಟ್ರೈ ಮಾಡಬಹುದಾ?",
+      "roman": "idanna try maadabahudaa?",
+      "deva": "इदन्न ट्राय् माडबहुदा?",
+      "en": "Can I try this on?"
+    },
+    {
+      "id": "shop_original",
+      "scenario": "shopping",
+      "kn": "ಇದು ಒರಿಜಿನಲ್ಲಾ?",
+      "roman": "idu originalaa?",
+      "deva": "इदु ऑरिजिनल्ला?",
+      "en": "Is this original?"
+    },
+    {
+      "id": "shop_silk",
+      "scenario": "shopping",
+      "kn": "ಇದು ಶುದ್ಧ ರೇಷ್ಮೆನಾ?",
+      "roman": "idu shuddha reshmenaa?",
+      "deva": "इदु शुद्ध रेश्मेना?",
+      "en": "Is this pure silk?"
+    },
+    {
+      "id": "shop_pack",
+      "scenario": "shopping",
+      "kn": "ಇದನ್ನ ಪ್ಯಾಕ್ ಮಾಡಿ",
+      "roman": "idanna pack maadi",
+      "deva": "इदन्न पॅक् माडि",
+      "en": "Please pack this."
+    },
+    {
+      "id": "shop_upi",
+      "scenario": "shopping",
+      "kn": "ಯುಪಿಐ ತಗೊಳ್ತೀರಾ?",
+      "roman": "UPI tagolteera?",
+      "deva": "यू.पी.आई. तगोळ्तीरा?",
+      "en": "Do you accept UPI?"
+    },
+    {
+      "id": "num_1",
+      "scenario": "numbers",
+      "kn": "ಒಂದು",
+      "roman": "ondu",
+      "deva": "ओन्दु",
+      "en": "1 (one)"
+    },
+    {
+      "id": "num_2",
+      "scenario": "numbers",
+      "kn": "ಎರಡು",
+      "roman": "eradu",
+      "deva": "एरडु",
+      "en": "2 (two)"
+    },
+    {
+      "id": "num_3",
+      "scenario": "numbers",
+      "kn": "ಮೂರು",
+      "roman": "mooru",
+      "deva": "मूरु",
+      "en": "3 (three)"
+    },
+    {
+      "id": "num_4",
+      "scenario": "numbers",
+      "kn": "ನಾಲ್ಕು",
+      "roman": "naalku",
+      "deva": "नाल्कु",
+      "en": "4 (four)"
+    },
+    {
+      "id": "num_5",
+      "scenario": "numbers",
+      "kn": "ಐದು",
+      "roman": "aidu",
+      "deva": "ऐदु",
+      "en": "5 (five)"
+    },
+    {
+      "id": "num_10",
+      "scenario": "numbers",
+      "kn": "ಹತ್ತು",
+      "roman": "hattu",
+      "deva": "हत्तु",
+      "en": "10 (ten)"
+    },
+    {
+      "id": "num_20",
+      "scenario": "numbers",
+      "kn": "ಇಪ್ಪತ್ತು",
+      "roman": "ippattu",
+      "deva": "इप्पत्तु",
+      "en": "20 (twenty)"
+    },
+    {
+      "id": "num_50",
+      "scenario": "numbers",
+      "kn": "ಐವತ್ತು",
+      "roman": "aivattu",
+      "deva": "ऐवत्तु",
+      "en": "50 (fifty)"
+    },
+    {
+      "id": "num_100",
+      "scenario": "numbers",
+      "kn": "ನೂರು",
+      "roman": "nooru",
+      "deva": "नूरु",
+      "en": "100 (one hundred)"
+    },
+    {
+      "id": "num_200",
+      "scenario": "numbers",
+      "kn": "ಇನ್ನೂರು",
+      "roman": "innooru",
+      "deva": "इन्नूरु",
+      "en": "200 (two hundred)"
+    },
+    {
+      "id": "num_500",
+      "scenario": "numbers",
+      "kn": "ಐನೂರು",
+      "roman": "ainooru",
+      "deva": "ऐनूरु",
+      "en": "500 (five hundred)"
+    },
+    {
+      "id": "num_1000",
+      "scenario": "numbers",
+      "kn": "ಸಾವಿರ",
+      "roman": "saavira",
+      "deva": "साविर",
+      "en": "1000 (one thousand)"
+    },
+    {
+      "id": "num_rupees",
+      "scenario": "numbers",
+      "kn": "ರೂಪಾಯಿ",
+      "roman": "roopaayi",
+      "deva": "रूपायि",
+      "en": "Rupees"
+    },
+    {
+      "id": "emg_lost",
+      "scenario": "emergency",
+      "kn": "ನಾನು ದಾರಿ ತಪ್ಪಿದ್ದೇನೆ",
+      "roman": "naanu daari tappiddene",
+      "deva": "नानु दारि तप्पिद्देने",
+      "en": "I am lost."
+    },
+    {
+      "id": "emg_phone",
+      "scenario": "emergency",
+      "kn": "ನನ್ನ ಫೋನ್ ಕಳೆದುಹೋಗಿದೆ",
+      "roman": "nanna phone kaleduhogide",
+      "deva": "नन्न फोन् कळेदुहोगिदे",
+      "en": "I have lost my phone."
+    },
+    {
+      "id": "emg_bag",
+      "scenario": "emergency",
+      "kn": "ನನ್ನ ಬ್ಯಾಗ್ ಕಳೆದುಹೋಗಿದೆ",
+      "roman": "nanna bag kaleduhogide",
+      "deva": "नन्न बॅग् कळेदुहोगिदे",
+      "en": "I have lost my bag."
+    },
+    {
+      "id": "emg_doctor",
+      "scenario": "emergency",
+      "kn": "ಡಾಕ್ಟರ್ ಬೇಕು",
+      "roman": "doctor beku",
+      "deva": "डॉक्टर् बेकु",
+      "en": "I need a doctor."
+    },
+    {
+      "id": "emg_pharmacy",
+      "scenario": "emergency",
+      "kn": "ಮೆಡಿಕಲ್ ಶಾಪ್ ಎಲ್ಲಿದೆ?",
+      "roman": "medical shop ellide?",
+      "deva": "मेडिकल् शॉप् एल्लिदे?",
+      "en": "Where is a pharmacy?"
+    },
+    {
+      "id": "emg_unwell",
+      "scenario": "emergency",
+      "kn": "ನನಗೆ ಹುಷಾರಿಲ್ಲ",
+      "roman": "nanage hushaarilla",
+      "deva": "ननगे हुषारिल्ल",
+      "en": "I am not feeling well."
+    },
+    {
+      "id": "emg_ambulance",
+      "scenario": "emergency",
+      "kn": "ಆಂಬ್ಯುಲೆನ್ಸ್ ಕರೆಯಿರಿ",
+      "roman": "ambulance kareyiri",
+      "deva": "ऍम्ब्युलन्स् करेयिरि",
+      "en": "Please call an ambulance."
+    },
+    {
+      "id": "emg_leavealone",
+      "scenario": "emergency",
+      "kn": "ನನಗೆ ತೊಂದರೆ ಮಾಡಬೇಡಿ",
+      "roman": "nanage tondare maadabedi",
+      "deva": "ननगे तोंदरे माडबेडि",
+      "en": "Don't bother me."
+    },
+    {
+      "id": "gen_yes",
+      "scenario": "general",
+      "kn": "ಹೌದು",
+      "roman": "haudu",
+      "deva": "हौदु",
+      "en": "Yes."
+    },
+    {
+      "id": "gen_no",
+      "scenario": "general",
+      "kn": "ಇಲ್ಲ",
+      "roman": "illa",
+      "deva": "इल्ल",
+      "en": "No."
+    },
+    {
+      "id": "gen_sorry",
+      "scenario": "general",
+      "kn": "ಕ್ಷಮಿಸಿ",
+      "roman": "kshamisi",
+      "deva": "क्षमिसि",
+      "en": "Sorry / excuse me."
+    },
+    {
+      "id": "gen_repeat",
+      "scenario": "general",
+      "kn": "ಇನ್ನೊಮ್ಮೆ ಹೇಳಿ",
+      "roman": "innomme heli",
+      "deva": "इन्नोम्मे हेलि",
+      "en": "Please say it once more."
+    },
+    {
+      "id": "gen_understood",
+      "scenario": "general",
+      "kn": "ಅರ್ಥವಾಯ್ತು",
+      "roman": "arthavaaytu",
+      "deva": "अर्थवाय्तु",
+      "en": "I understood."
+    },
+    {
+      "id": "gen_notunderstood",
+      "scenario": "general",
+      "kn": "ಅರ್ಥ ಆಗಲಿಲ್ಲ",
+      "roman": "artha aagalilla",
+      "deva": "अर्थ आगलिल्ल",
+      "en": "I did not understand."
+    },
+    {
+      "id": "gen_english",
+      "scenario": "general",
+      "kn": "ಇಂಗ್ಲಿಷ್ ಬರುತ್ತಾ?",
+      "roman": "English baruttaa?",
+      "deva": "इंग्लिश् बरुत्ता?",
+      "en": "Do you know English?"
+    },
+    {
+      "id": "gen_whatsthis",
+      "scenario": "general",
+      "kn": "ಇದು ಏನು?",
+      "roman": "idu enu?",
+      "deva": "इदु एनु?",
+      "en": "What is this?"
+    },
+    {
+      "id": "gen_myname",
+      "scenario": "general",
+      "kn": "ನನ್ನ ಹೆಸರು …",
+      "roman": "nanna hesaru …",
+      "deva": "नन्न हेसरु …",
+      "en": "My name is …"
+    },
+    {
+      "id": "gen_noproblem",
+      "scenario": "general",
+      "kn": "ಪರವಾಗಿಲ್ಲ",
+      "roman": "paravaagilla",
+      "deva": "परवागिल्ल",
+      "en": "No problem."
+    },
+    {
+      "id": "gen_bye",
+      "scenario": "general",
+      "kn": "ಹೋಗಿ ಬರ್ತೀನಿ",
+      "roman": "hogi barteeni",
+      "deva": "होगि बर्तीनि",
+      "en": "Goodbye (I'll take your leave)."
+    }
+  ],
+  "tips": [
+    {
+      "id": "tip_shop_1",
+      "scenario": "shopping",
+      "en": "For auto rickshaws, ask them to use the meter ('meter haaki') or agree on a fixed price before getting in. During peak hours or rain, 1.5x meter rate is common."
+    },
+    {
+      "id": "tip_temple_1",
+      "scenario": "temple",
+      "en": "Always remove shoes before entering temple premises. Dress modestly covering shoulders and knees. Photography is often prohibited in the inner sanctum."
+    },
+    {
+      "id": "tip_food_1",
+      "scenario": "food",
+      "en": "Traditional South Indian meals are served on banana leaves or steel thalis. Filter coffee is traditionally served in a dabarah and tumbler."
+    },
+    {
+      "id": "tip_emg_112",
+      "scenario": "emergency",
+      "en": "India's national emergency number is 112 (police, ambulance, fire). Keep it ready, and share your live location with a trusted contact when travelling alone."
+    },
+    {
+      "id": "tip_emg_2",
+      "scenario": "emergency",
+      "en": "If someone keeps bothering you in a crowd, move towards a shop or a group of families and say it loudly. Locals usually step in to help."
+    },
+    {
+      "id": "tip_tr_1",
+      "scenario": "transport",
+      "en": "Many bus destination boards are only in Kannada. Confirm the destination with the conductor before boarding."
+    },
+    {
+      "id": "tip_tr_2",
+      "scenario": "transport",
+      "en": "Karnataka's Shakti scheme gives eligible women free travel on ordinary state-run buses. Carry a valid photo ID and check current rules at the counter."
+    },
+    {
+      "id": "tip_tr_3",
+      "scenario": "transport",
+      "en": "Book long-distance buses and trains ahead for weekends and festivals. Overnight buses are common between Bengaluru and the coast or north Karnataka."
+    },
+    {
+      "id": "tip_stay_1",
+      "scenario": "stay",
+      "en": "Ask to see the room before paying, confirm whether the quoted price includes taxes, and ask the check-out time. Hotels will ask for photo ID by law."
+    },
+    {
+      "id": "tip_stay_2",
+      "scenario": "stay",
+      "en": "In peak season and festivals (Dasara, Hampi Utsav) prices rise sharply. Book early and confirm the booking by phone."
+    },
+    {
+      "id": "tip_out_1",
+      "scenario": "outdoor",
+      "en": "Start treks and sightseeing early in hot places like Hampi. Carry water, a hat, and sturdy footwear."
+    },
+    {
+      "id": "tip_out_2",
+      "scenario": "outdoor",
+      "en": "In monsoon, trails and rocks get slippery and some waterfalls are unsafe. Follow local guides and forest-department rules; some treks need prior permission."
+    },
+    {
+      "id": "tip_num_1",
+      "scenario": "numbers",
+      "en": "Saying the price in Kannada numbers while bargaining shows you know the local rate and often helps you get a fairer price."
+    },
+    {
+      "id": "tip_dir_1",
+      "scenario": "directions",
+      "en": "Ask two different people before trusting directions. Locals often answer 'it's just there' even for long distances, so ask for time or kilometres."
+    },
+    {
+      "id": "tip_gen_2",
+      "scenario": "general",
+      "en": "To get someone's attention politely, start with 'ree' or 'sir/madam', then ask your question slowly. Smiling goes a long way."
+    },
+    {
+      "id": "tip_food_3",
+      "scenario": "food",
+      "en": "Small eateries and stalls increasingly accept UPI, but keep some cash for tea stalls and street vendors."
+    }
+  ]
+}

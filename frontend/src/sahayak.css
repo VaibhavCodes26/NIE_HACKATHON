@@ -1,0 +1,734 @@
+/* =========================================================
+   NAMMAPRAYANA — TRAVEL SAHAYAK
+   Karnataka heritage: Kumkum Red + Karnataka Flag Yellow
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap");
+
+.sh {
+  --ink: #29231f;
+  --muted: #756c62;
+  --kumkum: #a91f24;
+  --kumkum-dark: #80171b;
+  --turmeric: #f5c518;
+  --turmeric-soft: #fff1b8;
+  --line: #e8dccb;
+  --bg: #faf6ed;
+  --card: #fffdf8;
+  --green: #315b3c;
+  --shadow: 0 8px 26px rgba(72, 43, 20, 0.07);
+
+  width: 100%;
+  max-width: 760px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 18px 88px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans", "Noto Sans Devanagari", system-ui, sans-serif;
+  line-height: 1.55;
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+}
+
+.sh *,
+.sh *::before,
+.sh *::after {
+  box-sizing: border-box;
+}
+
+.sh button,
+.sh input {
+  font: inherit;
+}
+
+.sh button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sh button:focus-visible,
+.sh input:focus-visible {
+  outline: 3px solid var(--turmeric);
+  outline-offset: 3px;
+}
+
+.sh button:disabled {
+  cursor: not-allowed;
+}
+
+/* -------------------- TOP BAR -------------------- */
+
+.sh-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.sh-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(65, 43, 20, 0.03);
+  transition: background 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sh-back-btn:hover {
+  background: var(--turmeric-soft);
+  border-color: var(--turmeric);
+  transform: translateX(-2px);
+}
+
+/* -------------------- HEADER -------------------- */
+
+.sh-head {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 24px 22px;
+  overflow: hidden;
+  border: 1px solid #ead7b6;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(245, 197, 24, 0.2), transparent 38%),
+    linear-gradient(135deg, #fffdf7 0%, #f9edda 100%);
+  box-shadow: var(--shadow);
+}
+
+.sh-head::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  bottom: -42px;
+  width: 130px;
+  height: 130px;
+  border: 18px solid rgba(169, 31, 36, 0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sh-head h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Bricolage Grotesque", "Noto Sans", sans-serif;
+  font-size: clamp(1.9rem, 6vw, 2.45rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.sh-head h1 span {
+  display: block;
+  margin-top: 7px;
+  color: var(--kumkum);
+  font-family: "Noto Sans Kannada", "Noto Sans Devanagari", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.sh-head p {
+  position: relative;
+  z-index: 1;
+  max-width: 50ch;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+/* -------------------- LANGUAGE SELECTOR -------------------- */
+
+.sh-langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.sh-langs button {
+  min-height: 40px;
+  padding: 8px 17px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sh-langs button:hover {
+  border-color: var(--kumkum);
+  transform: translateY(-1px);
+}
+
+.sh-langs button.on {
+  border-color: var(--kumkum);
+  background: var(--kumkum);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(169, 31, 36, 0.18);
+}
+
+/* -------------------- ASK / SEARCH BAR -------------------- */
+
+.sh-ask {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+  margin: 22px 0 12px;
+}
+
+.sh-ask input {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 13px 15px;
+  border: 1.5px solid var(--line);
+  border-radius: 13px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.96rem;
+  box-shadow: 0 2px 8px rgba(65, 43, 20, 0.025);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sh-ask input::placeholder {
+  color: #9b9083;
+  opacity: 1;
+}
+
+.sh-ask input:focus {
+  border-color: var(--kumkum);
+  box-shadow: 0 0 0 3px rgba(169, 31, 36, 0.08);
+  outline: none;
+}
+
+.sh-ask .mic,
+.sh-ask .go {
+  flex-shrink: 0;
+  min-height: 52px;
+  border-radius: 13px;
+  transition: background 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sh-ask .mic {
+  min-width: 50px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.sh-ask .mic:hover {
+  border-color: var(--turmeric);
+  background: var(--turmeric-soft);
+}
+
+.sh-ask .mic.live {
+  border-color: var(--kumkum);
+  background: var(--kumkum);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(169, 31, 36, 0.1);
+  animation: sh-mic-pulse 1.5s ease-in-out infinite;
+}
+
+.sh-ask .go {
+  padding: 0 22px;
+  border: 1px solid var(--kumkum);
+  background: var(--kumkum);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(169, 31, 36, 0.12);
+}
+
+.sh-ask .go:hover:not(:disabled) {
+  border-color: var(--kumkum-dark);
+  background: var(--kumkum-dark);
+  box-shadow: 0 6px 14px rgba(169, 31, 36, 0.2);
+  transform: translateY(-1px);
+}
+
+.sh-ask .go:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.sh-ask .go:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+/* -------------------- SCENARIO CHIPS -------------------- */
+
+.sh-scn {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #d7c6a8 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sh-scn button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 9px 15px;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: var(--card);
+  color: #51463c;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, transform 0.2s ease;
+}
+
+.sh-scn button:hover {
+  border-color: #d9b84b;
+  background: #fff8df;
+  transform: translateY(-1px);
+}
+
+.sh-scn button.on {
+  border-color: var(--turmeric);
+  background: var(--turmeric-soft);
+  color: #4b3710;
+  box-shadow: inset 0 -3px 0 var(--turmeric);
+}
+
+/* -------------------- ERROR MESSAGE -------------------- */
+
+.sh-err {
+  margin: 12px 0 0;
+  padding: 11px 14px;
+  border: 1px solid #f0c7c4;
+  border-radius: 10px;
+  background: #fff0ee;
+  color: var(--kumkum-dark);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* -------------------- RESULTS -------------------- */
+
+.sh-res {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.sh-answer {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.03rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+/* Main phrase / hero card */
+
+.sh-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 23px 22px;
+  border: 1px solid #e2b200;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #ffda4a 0%, #f5c518 100%);
+  color: #30250b;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(177, 130, 0, 0.12);
+}
+
+.sh-hero::after {
+  content: "";
+  position: absolute;
+  right: -32px;
+  bottom: -45px;
+  width: 120px;
+  height: 120px;
+  border: 15px solid rgba(117, 77, 0, 0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sh-hero .kn {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: "Noto Sans Kannada", sans-serif;
+  font-size: clamp(1.7rem, 7vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.sh-hero .hint {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 9px;
+  color: #5c4715;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* Supporting phrase cards */
+
+.sh-card {
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--kumkum);
+  border-radius: 13px;
+  background: var(--card);
+  box-shadow: 0 3px 12px rgba(72, 43, 20, 0.035);
+  overflow-wrap: anywhere;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sh-card:hover {
+  border-color: #d8c4a6;
+  border-left-color: var(--kumkum);
+  box-shadow: 0 7px 18px rgba(72, 43, 20, 0.075);
+  transform: translateY(-2px);
+}
+
+.sh-card .kn {
+  color: var(--kumkum-dark);
+  font-family: "Noto Sans Kannada", sans-serif;
+  font-size: clamp(1.3rem, 5vw, 1.65rem);
+  font-weight: 700;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.sh-card .rm {
+  margin-top: 5px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.sh-card .rm2 {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.sh-card .mn {
+  margin-top: 9px;
+  color: #51463c;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.sh-card .act {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.sh-card .act button {
+  min-height: 39px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fffaf0;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sh-card .act button:hover {
+  border-color: var(--turmeric);
+  background: var(--turmeric-soft);
+}
+
+/* -------------------- TRAVEL TIPS -------------------- */
+
+.sh-tips {
+  padding: 8px 18px 14px;
+  border: 1px dashed #d9b84b;
+  border-radius: 13px;
+  background: #fffaf0;
+}
+
+.sh-tips h3 {
+  margin: 13px 0 7px;
+  color: var(--kumkum-dark);
+  font-family: "Bricolage Grotesque", "Noto Sans", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.sh-tips ul,
+.sh-tips ol {
+  padding-left: 22px;
+}
+
+.sh-tips li {
+  margin: 8px 0;
+  color: #51463c;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.sh-tips li::marker {
+  color: var(--kumkum);
+}
+
+.sh-foot {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+/* -------------------- SHOW PHRASE TO LOCAL -------------------- */
+
+.sh-full {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 28px;
+  overflow-y: auto;
+  background: #fffdf7;
+  color: var(--ink);
+  text-align: center;
+}
+
+.sh-full::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 2px solid var(--turmeric);
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.sh-full .kn {
+  position: relative;
+  z-index: 1;
+  max-width: 950px;
+  color: var(--kumkum-dark);
+  font-family: "Noto Sans Kannada", sans-serif;
+  font-size: clamp(2.3rem, 10vw, 5rem);
+  font-weight: 700;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.sh-full .rm {
+  position: relative;
+  z-index: 1;
+  max-width: 650px;
+  color: var(--muted);
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  line-height: 1.7;
+}
+
+.sh-full button {
+  position: relative;
+  z-index: 1;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--kumkum);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 5px 14px rgba(169, 31, 36, 0.18);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.sh-full button:hover {
+  background: var(--kumkum-dark);
+  transform: translateY(-1px);
+}
+
+.sh-full small {
+  position: absolute;
+  right: 30px;
+  bottom: 28px;
+  left: 30px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* -------------------- TOAST -------------------- */
+
+.sh-toast {
+  position: fixed;
+  z-index: 1100;
+  right: 16px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 16px;
+  width: fit-content;
+  max-width: min(480px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: #29231f;
+  color: #fffdf7;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  animation: sh-toast-in 0.2s ease-out;
+}
+
+/* -------------------- ANIMATIONS -------------------- */
+
+@keyframes sh-mic-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(169, 31, 36, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(169, 31, 36, 0.04);
+  }
+}
+
+@keyframes sh-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+
+@media (max-width: 520px) {
+  .sh {
+    padding: 16px 13px 76px;
+  }
+
+  .sh-topbar {
+    margin-bottom: 19px;
+  }
+
+  .sh-head {
+    padding: 20px 17px;
+    border-radius: 16px;
+  }
+
+  .sh-head h1 {
+    font-size: 1.9rem;
+  }
+
+  .sh-ask {
+    gap: 7px;
+  }
+
+  .sh-ask input {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .sh-ask .mic {
+    min-width: 44px;
+    padding: 0 10px;
+  }
+
+  .sh-ask .go {
+    padding: 0 15px;
+    font-size: 0.9rem;
+  }
+
+  .sh-langs {
+    gap: 7px;
+  }
+
+  .sh-langs button {
+    padding: 8px 13px;
+  }
+
+  .sh-hero {
+    padding: 19px 17px;
+  }
+
+  .sh-card {
+    padding: 14px;
+  }
+
+  .sh-card .act button {
+    flex: 1 1 auto;
+  }
+
+  .sh-full {
+    padding: 24px;
+  }
+
+  .sh-full::before {
+    inset: 8px;
+    border-radius: 14px;
+  }
+
+  .sh-full small {
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .sh-ask {
+    flex-wrap: wrap;
+  }
+
+  .sh-ask input {
+    flex: 1 1 100%;
+  }
+
+  .sh-ask .mic,
+  .sh-ask .go {
+    flex: 1;
+  }
+
+  .sh-head h1 {
+    font-size: 1.7rem;
+  }
+}
+
+/* Respect device motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  .sh *,
+  .sh *::before,
+  .sh *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

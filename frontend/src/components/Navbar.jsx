@@ -8,7 +8,10 @@ export default function Navbar({ active, onNav }) {
   const { t, lang, setLang } = useI18n();
   const [open, setOpen] = useState(false);
   const items = [
-    ['plan', 'nav.plan'], ['food', 'nav.food'], ['help', 'nav.help'], ['about', 'nav.about'],
+    ['plan', 'nav.plan'],
+    ['food', 'nav.food'],
+    ['help', 'nav.help'],
+    ['about', 'nav.about'],
   ];
   const go = (id) => { setOpen(false); onNav(id); };
 

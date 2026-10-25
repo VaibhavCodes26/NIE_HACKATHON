@@ -20,4 +20,4 @@ elapsed = time.perf_counter() - start
 
 print("\nGemini response:")
 print(interaction.output_text)
-print(f"\n⏱️ Total time: {elapsed:.2f} seconds")
+print(f"\n[Time] Total time: {elapsed:.2f} seconds")

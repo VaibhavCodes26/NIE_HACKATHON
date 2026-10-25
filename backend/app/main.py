@@ -29,6 +29,7 @@ from app.services.gemini_service import generate_itinerary
 from app.services.railradar_service import railradar_get
 from app.services.stays_service import recommend_stays
 from app.services.weather_service import get_weather_forecast
+from app.routes.sahayak import router as sahayak_router
 
 
 # Load E:\NIE_HACKATHON\backend\.env regardless of the terminal's working directory.
@@ -42,6 +43,7 @@ app = FastAPI(
 )
 
 app.include_router(trains_router)
+app.include_router(sahayak_router)
 
 app.add_middleware(
     CORSMiddleware,

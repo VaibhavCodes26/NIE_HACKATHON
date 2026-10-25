@@ -10,7 +10,7 @@ export const T = {
   en: {
     tagline: 'Explore. Taste. Travel.',
     skip: 'Skip intro',
-    'nav.plan': 'Plan', 'nav.food': 'Food Spots', 'nav.help': 'Help', 'nav.about': 'About Us',
+    'nav.plan': 'Plan', 'nav.food': 'Food Spots', 'nav.sahayak': 'Travel Sahayak', 'nav.help': 'Help', 'nav.about': 'About Us',
     'nav.menu': 'Menu', 'lang.label': 'Language', close: 'Close',
     'hero.en': 'Our Karnataka, Our Pride',
     'hero.sub': 'From ancient temples to majestic palaces, from flavourful cuisine to vibrant culture — Karnataka is a land of timeless heritage and endless journeys.',
@@ -48,7 +48,7 @@ export const T = {
   hi: {
     tagline: 'खोजिए। चखिए। घूमिए।',
     skip: 'इंट्रो छोड़ें',
-    'nav.plan': 'योजना', 'nav.food': 'खान-पान स्थल', 'nav.help': 'सहायता', 'nav.about': 'हमारे बारे में',
+    'nav.plan': 'योजना', 'nav.food': 'खान-पान स्थल', 'nav.sahayak': 'यात्रा सहायक', 'nav.help': 'सहायता', 'nav.about': 'हमारे बारे में',
     'nav.menu': 'मेन्यू', 'lang.label': 'भाषा', close: 'बंद करें',
     'hero.en': 'हमारा कर्नाटक, हमारा गौरव',
     'hero.sub': 'प्राचीन मंदिरों से भव्य महलों तक, स्वादिष्ट व्यंजनों से जीवंत संस्कृति तक — कर्नाटक शाश्वत विरासत और अंतहीन यात्राओं की भूमि है।',
@@ -78,7 +78,7 @@ export const T = {
   kn: {
     tagline: 'ಅನ್ವೇಷಿಸಿ. ಸವಿಯಿರಿ. ಪ್ರಯಾಣಿಸಿ.',
     skip: 'ಪರಿಚಯ ಬಿಟ್ಟುಬಿಡಿ',
-    'nav.plan': 'ಯೋಜನೆ', 'nav.food': 'ಆಹಾರ ತಾಣಗಳು', 'nav.help': 'ಸಹಾಯ', 'nav.about': 'ನಮ್ಮ ಬಗ್ಗೆ',
+    'nav.plan': 'ಯೋಜನೆ', 'nav.food': 'ಆಹಾರ ತಾಣಗಳು', 'nav.sahayak': 'ನಮ್ಮ ಸಹಾಯಕ', 'nav.help': 'ಸಹಾಯ', 'nav.about': 'ನಮ್ಮ ಬಗ್ಗೆ',
     'nav.menu': 'ಮೆನು', 'lang.label': 'ಭಾಷೆ', close: 'ಮುಚ್ಚಿ',
     'hero.en': 'ನಮ್ಮ ಕರ್ನಾಟಕ, ನಮ್ಮ ಹೆಮ್ಮೆ',
     'hero.sub': 'ಪ್ರಾಚೀನ ದೇವಾಲಯಗಳಿಂದ ಭವ್ಯ ಅರಮನೆಗಳವರೆಗೆ, ರುಚಿಕರ ಆಹಾರದಿಂದ ರೋಮಾಂಚಕ ಸಂಸ್ಕೃತಿಯವರೆಗೆ — ಕರ್ನಾಟಕ ಕಾಲಾತೀತ ಪರಂಪರೆ ಮತ್ತು ಅಂತ್ಯವಿಲ್ಲದ ಪ್ರಯಾಣಗಳ ನಾಡು.',
