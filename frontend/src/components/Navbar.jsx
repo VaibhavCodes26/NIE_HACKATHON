@@ -10,6 +10,7 @@ export default function Navbar({ active, onNav }) {
   const items = [
     ['plan', 'nav.plan'],
     ['food', 'nav.food'],
+    ['drishti', 'nav.drishti'],
     ['help', 'nav.help'],
     ['about', 'nav.about'],
   ];

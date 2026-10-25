@@ -1,13 +1,14 @@
 from datetime import date 
 from enum import Enum
-from typing import Literal
-from pydantic import BaseModel,ConfigDict,Field,model_validator
+from typing import Any, Literal
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-class TravelStyle(str,Enum):
-    BUDGET ="budget"
-    COMFORTABLE="comfortable"
-    PREMIUM="premium"
-    ULTRA_PREMIUM="ultra-premium"
+
+class TravelStyle(str, Enum):
+    BUDGET = "budget"
+    COMFORTABLE = "comfortable"
+    PREMIUM = "premium"
+    ULTRA_PREMIUM = "ultra-premium"
     
 
 class Interest(str, Enum):
@@ -21,22 +22,21 @@ class Interest(str, Enum):
     FESTIVALS = "Festivals & traditions"
 
 
-
 class ItineraryRequest(BaseModel):
-    """Data received from the PlanJourney.jsx form."""
+    """Data received from the PlanJourney form or ItineraryPage."""
 
     destinations: list[str] = Field(min_length=1, max_length=8)
-
     selected_attraction_ids: list[int] = Field(default_factory=list, max_length=100)
-
     start_date: date
     end_date: date
-
     traveller_count: int = Field(ge=1, le=30)
     travel_style: TravelStyle
     total_budget: int = Field(ge=1000, le=100000)
     interests: list[Interest] = Field(default_factory=list, max_length=8)
     adjustment_request: str = Field(default="", max_length=2000)
+    pace: str = Field(default="balanced")
+    profile: dict[str, bool] = Field(default_factory=dict)
+
     @model_validator(mode="after")
     def validate_trip(self):
         if self.end_date < self.start_date:
@@ -80,6 +80,11 @@ class ItineraryStop(BaseModel):
         "curated_reference", "needs_verification"
     ] = "needs_verification"
     attraction_id: int | None = None
+    food_spot_id: int | None = None
+    meal_type: str | None = None
+    effort: int | None = None
+    level: str | None = None
+    city: str | None = None
 
 
 class ItineraryDay(BaseModel):
@@ -91,10 +96,25 @@ class ItineraryDay(BaseModel):
     attraction_id: int | None = None
     intercity_transfer_from_previous: dict | None = None
     weather_status: str = "not_requested"
+    effort_total: int | None = None
+    capacity: int | None = None
+    status: str | None = None
+    notes: list[str] = Field(default_factory=list)
+
+
+class DeferredAttraction(BaseModel):
+    id: int | str | None = None
+    name: str
+    city: str | None = None
+    category: str | None = None
+    effort: int | None = None
+    level: str | None = None
+    code: str | None = None
+    reason: str | None = None
 
 
 class ItineraryPreviewResponse(BaseModel):
-    """Response shape consumed by PlanJourney.jsx."""
+    """Response shape consumed by PlanJourney.jsx and preview clients."""
 
     status: Literal["preview"] = "preview"
     title: str
@@ -110,6 +130,5 @@ class ItineraryPreviewResponse(BaseModel):
     days: list[ItineraryDay]
     warnings: list[ItineraryWarning]
     data_policy: str
-
-    
-    
+    gati: dict | None = None
+    deferred: list[DeferredAttraction] = Field(default_factory=list)

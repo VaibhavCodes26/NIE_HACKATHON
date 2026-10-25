@@ -17,6 +17,7 @@ import './route-discovery.css';
 import './FoodSpots.css';
 import ItineraryPage from "./ItineraryPage.jsx";
 import SahayakPage from "./SahayakPage.jsx";
+import DrishtiPage from "./DrishtiPage.jsx";
 import SahayakFab from "./components/SahayakFab";
 
 const reduced = () =>
@@ -134,6 +135,11 @@ const onNav = (id) => {
     return;
   }
 
+  if (id === 'drishti') {
+    navigate('/drishti');
+    return;
+  }
+
   if (id === 'sahayak') {
     navigate('/sahayak');
     return;
@@ -238,6 +244,15 @@ const onNav = (id) => {
       return (
         <SahayakPage
           journeyConfig={journeyConfig}
+          onBack={() => navigate('/')}
+        />
+      );
+    }
+
+    // Page 6: Namma Drishti page
+    if (currentPage === '/drishti') {
+      return (
+        <DrishtiPage
           onBack={() => navigate('/')}
         />
       );

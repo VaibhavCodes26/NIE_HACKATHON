@@ -1,0 +1,473 @@
+/* Namma Gati: stamina-aware effort planner & meter styling */
+/* Brand Palette: Karnataka Red #a91f24, Turmeric Gold #f5c518, Sand Cream #fbf8f2, Deep Charcoal #241c18 */
+
+.gm {
+  background: #ffffff;
+  border: 1px solid #eadfc9;
+  border-radius: 18px;
+  padding: 22px;
+  color: #241c18;
+  display: grid;
+  gap: 18px;
+  box-shadow: 0 4px 20px rgba(78, 48, 24, 0.05);
+  font-family: inherit;
+  margin: 18px 0;
+}
+
+.gm--compact {
+  padding: 16px;
+  gap: 12px;
+}
+
+/* Head */
+.gm-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f2eadb;
+}
+
+.gm-head__main {
+  flex: 1;
+  min-width: 260px;
+}
+
+.gm-badge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.gm-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gm-pill--brand {
+  background: #a91f24;
+  color: #ffffff;
+}
+
+.gm-pill--ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.gm-pill--heavy {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.gm-pill--constrained {
+  background: #fff8e1;
+  color: #f57f17;
+  border: 1px solid #ffe082;
+}
+
+.gm-pill--pace {
+  background: #f4eee1;
+  color: #5d4037;
+}
+
+.gm-head h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #241c18;
+  letter-spacing: -0.01em;
+}
+
+.gm-head p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #6d6259;
+  line-height: 1.45;
+}
+
+.gm-head__stats {
+  display: flex;
+  gap: 12px;
+}
+
+.gm-stat-item {
+  background: #fbf8f2;
+  border: 1px solid #eee4d3;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.gm-stat-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8c7e72;
+}
+
+.gm-stat-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #a91f24;
+}
+
+/* Warnings */
+.gm-warnings {
+  display: grid;
+  gap: 8px;
+}
+
+.gm-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  color: #8d4f00;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.gm-warn svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Days Grid */
+.gm-days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.gm-day {
+  background: #fdfbf7;
+  border: 1px solid #eee4d3;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.gm-day:hover {
+  border-color: #d8c5aa;
+  box-shadow: 0 3px 12px rgba(80, 50, 20, 0.06);
+}
+
+.gm-day.is-active {
+  border-color: #a91f24;
+  box-shadow: 0 0 0 2px rgba(169, 31, 36, 0.15);
+}
+
+.gm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.gm-day-title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.gm-day-dest {
+  color: #a91f24;
+  font-weight: 600;
+}
+
+.gm-day-date {
+  color: #8c7e72;
+  font-size: 0.78rem;
+}
+
+.gm-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f4efe3;
+  color: #554a42;
+}
+
+.gm-tag.heavy {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.gm-tag.ok {
+  background: #fff8e1;
+  color: #b26a00;
+  border: 1px solid #ffe082;
+}
+
+.gm-tag.light, .gm-tag.free {
+  background: #f1f8e9;
+  color: #33691e;
+}
+
+/* Effort Bar */
+.gm-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #ebe1cf;
+  overflow: hidden;
+  position: relative;
+}
+
+.gm-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #f5c518;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gm-bar span.heavy {
+  background: linear-gradient(90deg, #f5c518, #a91f24);
+}
+
+.gm-bar span.light, .gm-bar span.free {
+  background: #81c784;
+}
+
+.gm-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: #7a6e64;
+}
+
+.gm-num strong {
+  color: #241c18;
+}
+
+/* Stops list */
+.gm-stops {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.gm-stops li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding: 5px 8px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #f0e6d6;
+}
+
+.gm-stop-name {
+  font-weight: 600;
+  color: #29231f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.gm-stop-cat {
+  font-size: 0.72rem;
+  color: #8c7e72;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #81c784;
+}
+
+.dot.medium {
+  background: #f5c518;
+}
+
+.dot.high {
+  background: #a91f24;
+}
+
+.gm-effort-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #f4efe3;
+  color: #6d6259;
+  flex-shrink: 0;
+}
+
+.gm-effort-badge.high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.gm-effort-badge.medium {
+  background: #fff8e1;
+  color: #b26a00;
+}
+
+.gm-effort-badge.low {
+  background: #f1f8e9;
+  color: #33691e;
+}
+
+.gm-empty-note {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: #8c7e72;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gm-notes-list {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.gm-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7b6e62;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.35;
+}
+
+/* Deferred section */
+.gm-deferred-section {
+  background: #fffbf5;
+  border: 1px dashed #e2a6a8;
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.gm-deferred-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gm-deferred-icon {
+  color: #a91f24;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.gm-deferred-header strong {
+  font-size: 0.95rem;
+  color: #a91f24;
+}
+
+.gm-deferred-header p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #6d6259;
+  line-height: 1.4;
+}
+
+.gm-deferred-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.gm-deferred-item {
+  background: #ffffff;
+  border: 1px solid #ebd9c8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gm-deferred-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gm-deferred-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #29231f;
+}
+
+.gm-deferred-effort {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #ffebee;
+  color: #c62828;
+}
+
+.gm-deferred-city {
+  font-size: 0.76rem;
+  color: #8c7e72;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.gm-deferred-reason {
+  margin: 3px 0 0;
+  font-size: 0.78rem;
+  color: #b26a00;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .gm {
+    padding: 14px;
+  }
+  .gm-head__stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .gm-days-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-bar span {
+    transition: none;
+  }
+}

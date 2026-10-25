@@ -3734,3 +3734,58 @@
   border: 1px solid #eedec3;
 }
 
+/* Namma Gati Stamina Badges & Chips */
+.itinerary-day-effort-chip {
+  background: #fdfaf3;
+  border: 1px solid #eadbc3;
+  color: #5c4a3e;
+}
+
+.itinerary-day-effort-chip.heavy {
+  background: #ffebee;
+  border-color: #ffcdd2;
+  color: #c62828;
+}
+
+.itinerary-day-effort-chip.ok {
+  background: #fff8e1;
+  border-color: #ffe082;
+  color: #b26a00;
+}
+
+.itinerary-day-effort-chip.light, .itinerary-day-effort-chip.free {
+  background: #f1f8e9;
+  border-color: #dcedc8;
+  color: #33691e;
+}
+
+.itinerary-stop__effort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.itinerary-stop__effort.high {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.itinerary-stop__effort.medium {
+  background: #fff8e1;
+  color: #b26a00;
+  border: 1px solid #ffe082;
+}
+
+.itinerary-stop__effort.low {
+  background: #f1f8e9;
+  color: #33691e;
+  border: 1px solid #dcedc8;
+}
+
+

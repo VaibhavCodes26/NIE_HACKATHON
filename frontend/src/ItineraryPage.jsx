@@ -25,9 +25,12 @@ import {
   AlertTriangle,
   Coffee,
   Mountain,
+  Flame,
+  Activity,
 } from "lucide-react";
 import "./ItineraryPage.css";
 import { KaMark, Wordmark } from "./components/Logo.jsx";
+import GatiMeter from "./components/GatiMeter.jsx";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
@@ -320,6 +323,19 @@ const generatePreview = useCallback(
     setLoading(true);
     setPageError("");
 
+    const profile = {
+      senior: travellerNeeds.some((n) => n.toLowerCase().includes("senior")),
+      child: travellerNeeds.some((n) => n.toLowerCase().includes("child")),
+      pregnant: travellerNeeds.some((n) => n.toLowerCase().includes("pregnant")),
+      mobility: travellerNeeds.some((n) => n.toLowerCase().includes("mobility") || n.toLowerCase().includes("accessibility")),
+    };
+
+    const pace = (adjustment === "relaxed" || adjustment === "easy-pace" || adjustment === "less-walking")
+      ? "relaxed"
+      : (adjustment === "packed")
+      ? "packed"
+      : "balanced";
+
     const payload = {
       destinations: requestDestinations,
       start_date: startDate,
@@ -330,9 +346,11 @@ const generatePreview = useCallback(
       interests: Array.isArray(interests) ? interests : [],
       selected_attraction_ids: effectiveSelectedAttractionIds,
       adjustment_request: adjustmentRequest,
+      pace,
+      profile,
     };
 
-    console.log("Itinerary generation payload:", payload);
+    console.log("Itinerary generation payload with Gati pacing:", payload);
 
     try {
       const response = await fetch(`${API_BASE}/api/itineraries/generate`, {
@@ -374,6 +392,8 @@ const generatePreview = useCallback(
     totalBudget,
     interests,
     effectiveSelectedAttractionIds,
+    adjustment,
+    travellerNeeds,
   ]
 );
 
@@ -1146,7 +1166,16 @@ return (
             </p>
           </div>
         ) : days.length > 0 ? (
-          <div className="itinerary-day-layout">
+          <>
+            {itinerary?.gati && (
+              <GatiMeter
+                gati={itinerary.gati}
+                onSelectDay={setActiveDay}
+                activeDayIndex={activeDay}
+              />
+            )}
+
+            <div className="itinerary-day-layout">
             <nav className="itinerary-day-nav" aria-label="Itinerary days">
               {days.map((day, index) => (
                 <button
@@ -1190,7 +1219,7 @@ return (
                       : "Discover Karnataka at your own pace"}
                   </p>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                   {selectedDayWeather && (
                     <div
                       className="itinerary-day-weather-chip"
@@ -1202,6 +1231,15 @@ return (
                           ? `${selectedDayWeather.temperature}°C`
                           : selectedDayWeather.description}
                       </span>
+                    </div>
+                  )}
+                  {selectedDay?.effort_total != null && (
+                    <div
+                      className={`itinerary-day-weather-chip itinerary-day-effort-chip ${selectedDay.status || "ok"}`}
+                      title={`Stamina effort: ${selectedDay.effort_total} pts · Capacity: ${selectedDay.capacity || 110} pts`}
+                    >
+                      <Flame size={15} />
+                      <span>{selectedDay.effort_total} / {selectedDay.capacity || 110} pts</span>
                     </div>
                   )}
                   <span className="itinerary-day-detail__stamp">
@@ -1285,6 +1323,15 @@ return (
                                 Regional pick
                               </span>
                             )}
+
+                            {stop?.effort != null && (
+                              <span
+                                className={`itinerary-stop__effort ${stop.level || (stop.effort < 25 ? "low" : stop.effort < 50 ? "medium" : "high")}`}
+                                title={`Effort score: ${stop.effort} pts`}
+                              >
+                                <Flame size={11} /> {stop.effort} pts
+                              </span>
+                            )}
                           </div>
 
                           <h4>{getStopName(stop)}</h4>
@@ -1332,7 +1379,8 @@ return (
                 )}
             </div>
           </div>
-        ) : !pageError ? (
+        </>
+      ) : !pageError ? (
           <div className="itinerary-loading-panel itinerary-loading-panel--empty">
             <Compass size={27} />
             <strong>Your itinerary will appear here.</strong>

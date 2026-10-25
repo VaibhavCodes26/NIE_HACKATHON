@@ -18,18 +18,46 @@ from sqlalchemy.orm import Session
 from app.database import create_tables, get_db
 from app.models import Attraction, Destination, FoodSpot
 from app.routes.trains import router as trains_router
+from app.routes.sahayak import router as sahayak_router
+from app.routes.gati import router as gati_router
+from app.routes.drishti import router as drishti_router
 from app.schemas import (
+    DeferredAttraction,
     ItineraryDay,
     ItineraryPreviewResponse,
     ItineraryRequest,
     ItineraryStop,
     ItineraryWarning,
 )
+from app.services import gati_service
 from app.services.gemini_service import generate_itinerary
 from app.services.railradar_service import railradar_get
 from app.services.stays_service import recommend_stays
 from app.services.weather_service import get_weather_forecast
-from app.routes.sahayak import router as sahayak_router
+
+
+def _extract_pacing_profile(request: ItineraryRequest) -> tuple[str, dict[str, bool]]:
+    """Extract explicit or implicit pace and profile settings from the request."""
+    pace = str(getattr(request, "pace", "balanced") or "balanced").strip().lower()
+    profile = dict(getattr(request, "profile", {}) or {})
+
+    adj = str(getattr(request, "adjustment_request", "") or "")
+    if adj:
+        adj_lower = adj.lower()
+        if "senior" in adj_lower:
+            profile["senior"] = True
+        if "pregnant" in adj_lower or "pregnancy" in adj_lower:
+            profile["pregnant"] = True
+        if "child" in adj_lower or "kid" in adj_lower:
+            profile["child"] = True
+        if "mobility" in adj_lower or "accessibility" in adj_lower or "wheelchair" in adj_lower:
+            profile["mobility"] = True
+        if "relaxed" in adj_lower or "easy pace" in adj_lower or "less walking" in adj_lower or "easy-pace" in adj_lower or "less-walking" in adj_lower:
+            pace = "relaxed"
+        elif "packed" in adj_lower or "fast" in adj_lower:
+            pace = "packed"
+
+    return pace, profile
 
 
 # Load E:\NIE_HACKATHON\backend\.env regardless of the terminal's working directory.
@@ -44,6 +72,8 @@ app = FastAPI(
 
 app.include_router(trains_router)
 app.include_router(sahayak_router)
+app.include_router(gati_router)
+app.include_router(drishti_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -349,19 +379,36 @@ def generate_ai_itinerary(
 
         attractions = (matching or all_attractions)[:40]
 
+    dest_id_to_name = {item.id: item.name for item in selected_destinations}
+
     attraction_records = [
         {
             "id": item.id,
             "name": item.name,
             "destination_id": item.destination_id,
+            "city": dest_id_to_name.get(item.destination_id, item.destination_id),
             "category": item.category,
             "description": item.description,
             "suggested_time": item.suggested_time,
             "estimated_duration_minutes": item.estimated_duration_minutes,
+            "duration_hours": (item.estimated_duration_minutes / 60.0) if item.estimated_duration_minutes else None,
             "source_status": item.source_status,
+            "is_must_visit": item.is_must_visit,
+            "tags": item.interest_tags or [],
         }
         for item in attractions
     ]
+
+    # Calculate authoritative Namma Gati pacing schedule before Gemini
+    pace_choice, profile_choice = _extract_pacing_profile(request)
+    gati_plan = gati_service.plan(
+        stops=attraction_records,
+        n_days=duration_days,
+        profile=profile_choice,
+        cities=[item.name for item in selected_destinations],
+        pace=pace_choice,
+        start_date=request.start_date,
+    )
 
     food_rows = db.scalars(
         select(FoodSpot).order_by(FoodSpot.city, FoodSpot.spot_id)
@@ -452,6 +499,7 @@ def generate_ai_itinerary(
             food_spots=food_records,
             weather_data=weather_records,
             adjustment_request=request.adjustment_request,
+            gati_plan=gati_plan,
         )
     except (RuntimeError, ValueError) as exc:
         raise HTTPException(
@@ -465,6 +513,8 @@ def generate_ai_itinerary(
             detail="The AI itinerary service is temporarily unavailable.",
         ) from exc
 
+    result["gati"] = gati_plan
+    result["deferred"] = gati_plan.get("deferred", [])
     result["weather_warnings"] = weather_warnings
     result["weather_source"] = "Open-Meteo"
     result["generation_status"] = "ai_generated"
@@ -588,98 +638,90 @@ def preview_itinerary(
     else:
         attractions = all_attractions
 
-    attractions_by_destination = {
-        destination_id: [] for destination_id in request.destinations
-    }
+    dest_id_to_name = {destination.id: destination.name for destination in selected_destinations}
 
-    for attraction in attractions:
-        attractions_by_destination[attraction.destination_id].append(attraction)
+    attraction_records = [
+        {
+            "id": attraction.id,
+            "name": attraction.name,
+            "destination_id": attraction.destination_id,
+            "city": dest_id_to_name.get(attraction.destination_id, attraction.destination_id),
+            "category": attraction.category,
+            "description": attraction.description,
+            "suggested_time": attraction.suggested_time,
+            "estimated_duration_minutes": attraction.estimated_duration_minutes,
+            "duration_hours": (attraction.estimated_duration_minutes / 60.0) if attraction.estimated_duration_minutes else None,
+            "source_status": attraction.source_status,
+            "is_must_visit": attraction.is_must_visit,
+            "tags": attraction.interest_tags or [],
+        }
+        for attraction in attractions
+    ]
 
-    selected_interests = {
-        interest.value.lower() for interest in request.interests
-    }
-
-    if not selected_mode and selected_interests:
-        for destination_id, destination_attractions in (
-            attractions_by_destination.items()
-        ):
-            matching = [
-                attraction
-                for attraction in destination_attractions
-                if any(
-                    tag.lower() in selected_interests
-                    for tag in (attraction.interest_tags or [])
-                )
-            ]
-
-            if matching:
-                attractions_by_destination[destination_id] = matching
-
-    destination_count = len(selected_destinations)
-    base_days = duration_days // destination_count
-    extra_days = duration_days % destination_count
+    pace_choice, profile_choice = _extract_pacing_profile(request)
+    gati_plan = gati_service.plan(
+        stops=attraction_records,
+        n_days=duration_days,
+        profile=profile_choice,
+        cities=[d.name for d in selected_destinations],
+        pace=pace_choice,
+        start_date=request.start_date,
+    )
 
     days = []
     warnings = []
-    current_date = request.start_date
-    needs_verification = False
-    empty_destinations = []
-    overloaded_days = []
 
-    for index, destination in enumerate(selected_destinations):
-        assigned_days = base_days + (1 if index < extra_days else 0)
-        destination_attractions = attractions_by_destination[destination.id]
+    for day_idx, gd in enumerate(gati_plan.get("days", []), start=1):
+        d_name = gd.get("destination") or (" + ".join(gd.get("cities", [])) if gd.get("cities") else "Karnataka")
+        matched_dest_id = ""
+        if gd.get("cities"):
+            first_c = gd["cities"][0].lower()
+            for d_obj in selected_destinations:
+                if d_obj.name.lower() in first_c or first_c in d_obj.name.lower():
+                    matched_dest_id = d_obj.id
+                    break
+        if not matched_dest_id and selected_destinations:
+            matched_dest_id = selected_destinations[min(day_idx - 1, len(selected_destinations) - 1)].id
 
-        if not destination_attractions and not selected_mode:
-            empty_destinations.append(destination.name)
+        day_date = request.start_date + timedelta(days=day_idx - 1)
 
-        daily_attraction_groups = [
-            destination_attractions[local_day::assigned_days]
-            for local_day in range(assigned_days)
+        day_stops = [
+            ItineraryStop(
+                attraction_id=s.get("id"),
+                name=s.get("name", "Attraction"),
+                category=s.get("category", "Tourist attraction"),
+                description=s.get("description", ""),
+                suggested_time=s.get("suggested_time") or "Morning",
+                source_status=s.get("source_status", "curated_reference"),
+                effort=s.get("effort"),
+                level=s.get("level"),
+                city=s.get("city"),
+            )
+            for s in gd.get("stops", [])
         ]
 
-        for daily_attractions in daily_attraction_groups:
-            day_number = len(days) + 1
-
-            if len(daily_attractions) > 3:
-                overloaded_days.append(day_number)
-
-            stops = []
-
-            for attraction in daily_attractions:
-                source_status = (
-                    "curated_reference"
-                    if attraction.source_status == "curated_reference"
-                    else "needs_verification"
-                )
-
-                if source_status == "needs_verification":
-                    needs_verification = True
-
-                stops.append(
-                    ItineraryStop(
-                        attraction_id=attraction.id,
-                        name=attraction.name,
-                        category=attraction.category,
-                        description=attraction.description,
-                        suggested_time=attraction.suggested_time,
-                        source_status=source_status,
-                    )
-                )
-
-            days.append(
-                ItineraryDay(
-                    day_number=day_number,
-                    date=current_date,
-                    destination_id=destination.id,
-                    destination_name=destination.name,
-                    stops=stops,
-                    intercity_transfer_from_previous=None,
-                    weather_status="not_requested",
-                )
+        days.append(
+            ItineraryDay(
+                day_number=day_idx,
+                date=day_date,
+                destination_id=matched_dest_id,
+                destination_name=d_name,
+                stops=day_stops,
+                effort_total=gd.get("total", 0),
+                capacity=gd.get("capacity", gati_plan.get("summary", {}).get("capacity", 110)),
+                status=gd.get("status", "ok"),
+                notes=gd.get("notes", []),
             )
+        )
 
-            current_date += timedelta(days=1)
+    for w in gati_plan.get("warnings", []):
+        warnings.append(
+            ItineraryWarning(
+                code="GATI_PACING",
+                message=w,
+                severity="info",
+            )
+        )
 
     if selected_mode and not request.selected_attraction_ids:
         warnings.append(
@@ -691,44 +733,6 @@ def preview_itinerary(
                     "recommendations."
                 ),
                 severity="warning",
-            )
-        )
-
-    if empty_destinations:
-        warnings.append(
-            ItineraryWarning(
-                code="NO_ATTRACTIONS",
-                message=(
-                    "No attractions are currently available in the database for: "
-                    + ", ".join(empty_destinations)
-                    + ". Add curated attraction data before relying on this itinerary."
-                ),
-                severity="warning",
-            )
-        )
-
-    if overloaded_days:
-        warnings.append(
-            ItineraryWarning(
-                code="BUSY_DAYS",
-                message=(
-                    "Some days contain more than three selected attractions "
-                    f"(day numbers: {overloaded_days}). All selected places "
-                    "are retained, but consider adding time or removing stops."
-                ),
-                severity="warning",
-            )
-        )
-
-    if needs_verification:
-        warnings.append(
-            ItineraryWarning(
-                code="VERIFY_ATTRACTIONS",
-                message=(
-                    "Some attraction details are awaiting verification. "
-                    "Check local access, opening hours and travel conditions before visiting."
-                ),
-                severity="info",
             )
         )
 
@@ -746,6 +750,20 @@ def preview_itinerary(
 
     destination_names = [
         destination.name for destination in selected_destinations
+    ]
+
+    deferred_objs = [
+        DeferredAttraction(
+            id=d_item.get("id"),
+            name=d_item.get("name", "Deferred attraction"),
+            city=d_item.get("city"),
+            category=d_item.get("category"),
+            effort=d_item.get("effort"),
+            level=d_item.get("level"),
+            code=d_item.get("code"),
+            reason=d_item.get("reason"),
+        )
+        for d_item in gati_plan.get("deferred", [])
     ]
 
     return ItineraryPreviewResponse(
@@ -769,6 +787,8 @@ def preview_itinerary(
             "Interest matching is best-effort. This preview does not confirm "
             "live weather, bookings, transport schedules or current prices."
         ),
+        gati=gati_plan,
+        deferred=deferred_objs,
     )
 
 

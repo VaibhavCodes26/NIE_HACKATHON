@@ -2,9 +2,12 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 from google import genai
+
+from app.services import gati_service
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +57,17 @@ def _validate_and_enforce_daily_structure(
     destinations: list[str],
     attractions: list[dict],
     food_spots: list[dict],
+    gati_plan: Optional[dict] = None,
 ) -> dict:
     """
     Validate and guarantee the required itinerary structure:
     1. Every day has exactly one lunch recommendation.
     2. Every day has exactly one dinner recommendation.
-    3. Selected tourist attractions are scheduled without duplicates or silent omissions.
+    3. Gati schedule is the single authoritative source of truth:
+       - No moved attractions.
+       - No duplicated attractions.
+       - Missing scheduled attractions recovered on their assigned day.
+       - Deferred attractions strictly excluded from daily stops.
     """
     days = result.get("days", [])
     if not isinstance(days, list) or not days:
@@ -70,49 +78,146 @@ def _validate_and_enforce_daily_structure(
         warnings = [str(warnings)]
         result["warnings"] = warnings
 
+    # Food spots by city
     used_food_spot_ids = set()
-    used_attraction_ids = set()
-
-    # Track food spots by destination
     food_by_city: dict[str, list[dict]] = {}
     for spot in food_spots:
-        city = spot.get("city", "").strip().lower()
+        city = str(spot.get("city", "")).strip().lower()
         food_by_city.setdefault(city, []).append(spot)
 
-    for day_idx, day in enumerate(days):
-        day_dest = str(day.get("destination", "")).strip()
-        day_date = str(day.get("date", "")).strip()
-        stops = day.get("stops", [])
-        if not isinstance(stops, list):
-            stops = []
-            day["stops"] = stops
+    # If gati_plan is provided, establish authoritative day allocation
+    gati_days = gati_plan.get("days", []) if gati_plan else []
+    assigned_day_by_id: dict[int | str, int] = {}
+    gati_stop_by_id: dict[int | str, dict] = {}
+    scheduled_ids_by_day: dict[int, list[int | str]] = {}
+    deferred_ids: set[int | str] = set()
 
-        # Identify existing meal stops
+    if gati_plan:
+        for gd in gati_days:
+            d_num = gd.get("day") or gd.get("day_number", 1)
+            scheduled_ids_by_day[d_num] = []
+            for s in gd.get("stops", []):
+                s_id = s.get("id")
+                if s_id is not None:
+                    assigned_day_by_id[s_id] = d_num
+                    gati_stop_by_id[s_id] = s
+                    scheduled_ids_by_day[d_num].append(s_id)
+
+        for d_item in gati_plan.get("deferred", []):
+            if d_item.get("id") is not None:
+                deferred_ids.add(d_item["id"])
+
+    # Ensure result has days matching gati_days if gati_days exists
+    if gati_days and len(days) < len(gati_days):
+        for missing_idx in range(len(days), len(gati_days)):
+            gd_template = gati_days[missing_idx]
+            days.append({
+                "day_number": missing_idx + 1,
+                "date": gd_template.get("date", ""),
+                "destination": gd_template.get("destination", destinations[-1] if destinations else "Karnataka"),
+                "summary": "Flexible exploration and leisure.",
+                "stops": [],
+            })
+
+    # Track which attraction IDs have been scheduled
+    globally_placed_attractions = set()
+
+    for day_idx, day in enumerate(days):
+        d_num = day_idx + 1
+        day["day_number"] = d_num
+
+        gd = gati_days[day_idx] if day_idx < len(gati_days) else None
+        if gd:
+            day["destination"] = gd.get("destination") or day.get("destination", "")
+            if gd.get("cities"):
+                day["cities"] = gd["cities"]
+            if gd.get("date"):
+                day["date"] = gd["date"]
+            day["effort_total"] = gd.get("total", 0)
+            day["capacity"] = gd.get("capacity", gati_plan.get("summary", {}).get("capacity", 110))
+            day["status"] = gd.get("status", "ok")
+            day["notes"] = gd.get("notes", [])
+
+        day_dest = str(day.get("destination", "")).strip()
+        raw_stops = day.get("stops", [])
+        if not isinstance(raw_stops, list):
+            raw_stops = []
+
+        breakfast_stops = []
         lunch_stops = []
         dinner_stops = []
         activity_stops = []
 
-        for stop in stops:
+        day_scheduled_ids = set()
+
+        for stop in raw_stops:
             if not isinstance(stop, dict):
                 continue
 
             attr_id = stop.get("attraction_id")
-            if attr_id is not None:
-                used_attraction_ids.add(attr_id)
-
             food_id = stop.get("food_spot_id")
-            if food_id is not None:
-                used_food_spot_ids.add(food_id)
-
             meal_type = _classify_meal_type(stop)
             stop["meal_type"] = meal_type
 
+            if meal_type == "breakfast":
+                breakfast_stops.append(stop)
+                continue
             if meal_type == "lunch":
                 lunch_stops.append(stop)
-            elif meal_type == "dinner":
+                if food_id is not None:
+                    used_food_spot_ids.add(food_id)
+                continue
+            if meal_type == "dinner":
                 dinner_stops.append(stop)
-            else:
-                activity_stops.append(stop)
+                if food_id is not None:
+                    used_food_spot_ids.add(food_id)
+                continue
+
+            # It's an attraction/activity stop
+            if attr_id is not None:
+                # If Gati explicitly deferred it, do NOT include in day schedule!
+                if attr_id in deferred_ids:
+                    continue
+
+                # If Gati assigned it to a different day, omit here (will be restored on correct day)
+                if assigned_day_by_id and assigned_day_by_id.get(attr_id) != d_num:
+                    continue
+
+                # Prevent duplicates
+                if attr_id in day_scheduled_ids or attr_id in globally_placed_attractions:
+                    continue
+
+                day_scheduled_ids.add(attr_id)
+                globally_placed_attractions.add(attr_id)
+
+                if attr_id in gati_stop_by_id:
+                    stop["effort"] = gati_stop_by_id[attr_id].get("effort")
+                    stop["level"] = gati_stop_by_id[attr_id].get("level")
+                    if not stop.get("category"):
+                        stop["category"] = gati_stop_by_id[attr_id].get("category", "Tourist attraction")
+
+            activity_stops.append(stop)
+
+        # Recover missing Gati scheduled attractions for this specific day
+        if gati_plan and d_num in scheduled_ids_by_day:
+            for required_id in scheduled_ids_by_day[d_num]:
+                if required_id not in day_scheduled_ids:
+                    gstop = gati_stop_by_id.get(required_id, {})
+                    recovered = {
+                        "time": gstop.get("suggested_time") or ("Morning" if len(activity_stops) < 2 else "Afternoon"),
+                        "name": gstop.get("name", "Attraction"),
+                        "category": gstop.get("category") or "Tourist attraction",
+                        "meal_type": None,
+                        "description": gstop.get("description") or f"Explore {gstop.get('name', 'this highlight')}.",
+                        "attraction_id": required_id,
+                        "food_spot_id": None,
+                        "source_status": gstop.get("source_status", "curated_reference"),
+                        "effort": gstop.get("effort"),
+                        "level": gstop.get("level"),
+                    }
+                    activity_stops.append(recovered)
+                    day_scheduled_ids.add(required_id)
+                    globally_placed_attractions.add(required_id)
 
         # Enforce exactly one lunch
         selected_lunch = None
@@ -120,20 +225,14 @@ def _validate_and_enforce_daily_structure(
             selected_lunch = lunch_stops[0]
             selected_lunch["category"] = selected_lunch.get("category") or "Lunch"
             selected_lunch["meal_type"] = "lunch"
-            # If extra lunch stops were provided, re-label them as afternoon refreshments
             for extra in lunch_stops[1:]:
                 extra["category"] = "Afternoon refreshments"
                 extra["meal_type"] = None
                 activity_stops.append(extra)
         else:
-            # Pick an unused food spot for this destination or create a verified local lunch
             city_key = day_dest.lower()
-            available = [
-                s for s in food_by_city.get(city_key, [])
-                if s["id"] not in used_food_spot_ids
-            ]
+            available = [s for s in food_by_city.get(city_key, []) if s["id"] not in used_food_spot_ids]
             if not available:
-                # check partial match
                 for c, s_list in food_by_city.items():
                     if c in city_key or city_key in c:
                         available = [s for s in s_list if s["id"] not in used_food_spot_ids]
@@ -156,7 +255,7 @@ def _validate_and_enforce_daily_structure(
             else:
                 selected_lunch = {
                     "time": "1:00 PM - 2:15 PM",
-                    "name": f"Traditional {day_dest} Lunch & Oota",
+                    "name": f"Traditional {day_dest or 'Karnataka'} Lunch & Oota",
                     "category": "Lunch",
                     "meal_type": "lunch",
                     "description": f"Authentic regional Karnataka lunch featuring local specialities in {day_dest}.",
@@ -177,10 +276,7 @@ def _validate_and_enforce_daily_structure(
                 activity_stops.append(extra)
         else:
             city_key = day_dest.lower()
-            available = [
-                s for s in food_by_city.get(city_key, [])
-                if s["id"] not in used_food_spot_ids
-            ]
+            available = [s for s in food_by_city.get(city_key, []) if s["id"] not in used_food_spot_ids]
             if not available:
                 for c, s_list in food_by_city.items():
                     if c in city_key or city_key in c:
@@ -204,7 +300,7 @@ def _validate_and_enforce_daily_structure(
             else:
                 selected_dinner = {
                     "time": "7:45 PM - 9:15 PM",
-                    "name": f"Authentic {day_dest} Evening Dinner",
+                    "name": f"Authentic {day_dest or 'Karnataka'} Evening Dinner",
                     "category": "Dinner",
                     "meal_type": "dinner",
                     "description": f"Relaxing dinner with regional flavours in {day_dest}.",
@@ -213,8 +309,7 @@ def _validate_and_enforce_daily_structure(
                     "source_status": "needs_verification",
                 }
 
-        # Reassemble stops in chronological sequence:
-        # morning activities -> lunch -> afternoon/evening activities -> dinner
+        # Chronological sequence: morning -> lunch -> afternoon/evening -> dinner
         morning_activities = []
         afternoon_activities = []
 
@@ -222,16 +317,23 @@ def _validate_and_enforce_daily_structure(
             time_str = str(act.get("time", "")).lower()
             if any(t in time_str for t in ["morning", "8:", "9:", "10:", "11:"]):
                 morning_activities.append(act)
-            else:
+            elif any(t in time_str for t in ["afternoon", "evening", "12:", "1:", "2:", "3:", "4:", "5:", "6:"]):
                 afternoon_activities.append(act)
+            else:
+                # Distribute evenly if time slot not specified
+                if len(morning_activities) <= len(afternoon_activities):
+                    morning_activities.append(act)
+                else:
+                    afternoon_activities.append(act)
 
-        # Ensure valid time labels if missing
         if not selected_lunch.get("time"):
             selected_lunch["time"] = "1:00 PM - 2:00 PM"
         if not selected_dinner.get("time"):
             selected_dinner["time"] = "7:45 PM - 9:00 PM"
 
         final_day_stops = []
+        if breakfast_stops:
+            final_day_stops.append(breakfast_stops[0])
         final_day_stops.extend(morning_activities)
         final_day_stops.append(selected_lunch)
         final_day_stops.extend(afternoon_activities)
@@ -239,47 +341,13 @@ def _validate_and_enforce_daily_structure(
 
         day["stops"] = final_day_stops
 
-    # Verify that user-selected attractions were not silently dropped
-    all_selected_attraction_ids = {item["id"] for item in attractions if "id" in item}
-    missing_attraction_ids = all_selected_attraction_ids - used_attraction_ids
-
-    if missing_attraction_ids:
-        missing_attractions = [
-            item for item in attractions if item["id"] in missing_attraction_ids
-        ]
-        # Attempt to insert missing attraction into the corresponding destination day
-        for missing in missing_attractions:
-            target_dest = missing.get("destination_id", "").lower()
-            placed = False
-            for day in days:
-                d_name = day.get("destination", "").lower()
-                if target_dest in d_name or d_name in target_dest:
-                    # Place before lunch or after lunch
-                    new_stop = {
-                        "time": missing.get("suggested_time") or "Afternoon",
-                        "name": missing["name"],
-                        "category": missing.get("category") or "Tourist attraction",
-                        "meal_type": None,
-                        "description": missing.get("description") or "Explore this highlight",
-                        "attraction_id": missing["id"],
-                        "food_spot_id": None,
-                        "source_status": missing.get("source_status", "curated_reference"),
-                    }
-                    # Insert before dinner
-                    day["stops"].insert(max(0, len(day["stops"]) - 1), new_stop)
-                    used_attraction_ids.add(missing["id"])
-                    placed = True
-                    break
-
-            if not placed:
-                warnings.append({
-                    "code": "ATTRACTION_TIME_CONFLICT",
-                    "message": (
-                        f"Selected attraction '{missing['name']}' could not be fitted into "
-                        f"the planned dates due to duration and travel constraints."
-                    ),
-                    "severity": "warning",
-                })
+    # Attach Gati plan, deferred items, and warnings
+    if gati_plan:
+        result["gati"] = gati_plan
+        result["deferred"] = gati_plan.get("deferred", [])
+        for w in gati_plan.get("warnings", []):
+            if w not in result["warnings"]:
+                result["warnings"].append(w)
 
     return result
 
@@ -297,8 +365,9 @@ def generate_itinerary(
     food_spots: list[dict] | None = None,
     weather_data: list[dict] | None = None,
     adjustment_request: str = "",
+    gati_plan: dict | None = None,
 ) -> dict:
-    """Generate a source-grounded Karnataka itinerary using Gemini with verified schema."""
+    """Generate a source-grounded Karnataka itinerary using Gemini with verified schema and Gati pacing."""
 
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -319,17 +388,27 @@ def generate_itinerary(
         "weather": weather_data or [],
     }
 
+    gati_prompt_section = ""
+    if gati_plan:
+        gati_prompt_section = f"""
+NAMMA GATI PACING SCHEDULE (AUTHORITATIVE):
+{gati_service.to_prompt(gati_plan)}
+
+CRITICAL NAMMA GATI INSTRUCTIONS:
+1. The pacing engine has ALREADY scheduled the tourist attractions for each day.
+2. Follow this schedule strictly. Do NOT add, remove, or swap attractions between days.
+3. Every scheduled attraction MUST appear on its designated day with its exact attraction_id and name.
+4. If an attraction is marked as deferred / left out, do NOT schedule it on any day.
+5. Weave realistic timings, rest pauses, and visit descriptions around this fixed allocation.
+"""
+
     adjustment_section = (
         f"""
 USER REQUESTED PERSONALISATION
 {adjustment_request.strip()}
 
-Apply these preferences wherever feasible. Adjust activity intensity, rest
-breaks, and scheduling for the stated travel pace, senior citizens, children,
-pregnancy, accessibility needs, strenuous treks, exposed activities, and
-custom notes. Never invent facilities or accessibility claims. Do not override
-source integrity, safety, dates, selected attractions, or budget. Explain
-unmet preferences in warnings.
+Apply these preferences wherever feasible without violating the fixed Namma Gati schedule.
+Adjust activity pacing, rest breaks, and descriptions accordingly.
 """
         if adjustment_request and adjustment_request.strip()
         else "No additional personalisation requested."
@@ -346,6 +425,8 @@ Travel style: {travel_style}
 Total group budget (INR): {total_budget}
 Interests: {json.dumps(interests, ensure_ascii=False)}
 
+{gati_prompt_section}
+
 PERSONALISATION
 {adjustment_section}
 
@@ -357,10 +438,8 @@ RULES
 
 2. ATTRACTIONS & SCHEDULE
    - Every day in the trip range from {start_date} to {end_date} must be planned.
-   - Assign destinations to days in the user's requested order.
-   - Schedule ALL supplied tourist attractions into the itinerary on the appropriate days for their destination.
+   - Strictly follow the Namma Gati allocation. Keep each attraction on its designated day.
    - Provide realistic time slots, estimated visit durations, and sensible travel gaps.
-   - Do not repeat the same attraction on multiple days unless requested.
    - Preserve exact attraction names, categories, descriptions, and attraction_id values. Set food_spot_id to null for attractions.
 
 3. MANDATORY MEALS (EVERY SINGLE DAY)
@@ -475,12 +554,13 @@ RULES
         if field not in result:
             result[field] = [] if field == "warnings" else ""
 
-    # Strict post-validation and enforcement of daily lunch, dinner & attractions
+    # Strict post-validation and enforcement of daily lunch, dinner & authoritative Gati schedule
     result = _validate_and_enforce_daily_structure(
         result=result,
         destinations=destinations,
         attractions=attractions or [],
         food_spots=food_spots or [],
+        gati_plan=gati_plan,
     )
 
     logger.info(

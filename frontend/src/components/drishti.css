@@ -1,0 +1,686 @@
+/* ==========================================================================
+   Namma Drishti — See Karnataka in Your Language
+   Styling for visual Kannada OCR & Translation feature
+   ========================================================================== */
+
+.drishti-page {
+  min-height: 100vh;
+  background: #fbf7ee;
+  color: #2b241e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Kannada", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.drishti-header {
+  background: #ffffff;
+  border-bottom: 2px solid #ecd9b3;
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.drishti-header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drishti-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #dfd1b8;
+  background: #ffffff;
+  color: #4a3e35;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drishti-back-btn:hover {
+  background: #fdf2d0;
+  border-color: #d4a017;
+  color: #9b1c20;
+}
+
+.drishti-badge-kannada {
+  font-family: "Noto Sans Kannada", sans-serif;
+  background: #9b1c20;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Container */
+.drishti-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hero Title Section */
+.drishti-hero {
+  text-align: center;
+  margin-bottom: 2.25rem;
+}
+
+.drishti-kannada-lead {
+  display: inline-block;
+  font-family: "Noto Sans Kannada", sans-serif;
+  color: #9b1c20;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  background: #fcefd2;
+  padding: 0.2rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid #ebd39b;
+}
+
+.drishti-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #1f1813;
+  margin: 0.25rem 0 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+.drishti-title span {
+  color: #9b1c20;
+}
+
+.drishti-desc {
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #5c4f44;
+}
+
+/* Control Card */
+.drishti-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1.5px solid #e8dbbe;
+  box-shadow: 0 6px 24px rgba(43, 36, 30, 0.06);
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.25s ease;
+}
+
+/* Upload Dropzone */
+.drishti-dropzone {
+  border: 2px dashed #d9caa8;
+  background: #fcf9f2;
+  border-radius: 14px;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.drishti-dropzone:hover,
+.drishti-dropzone.drag-active {
+  border-color: #9b1c20;
+  background: #fff8eb;
+  box-shadow: 0 0 0 4px rgba(155, 28, 32, 0.08);
+}
+
+.drishti-drop-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #f8e5b9;
+  color: #9b1c20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.drishti-drop-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.drishti-drop-prompt {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2b241e;
+  margin: 0 0 0.35rem;
+}
+
+.drishti-drop-sub {
+  font-size: 0.85rem;
+  color: #796c5f;
+  margin: 0;
+}
+
+/* Action Buttons (Camera + Browse) */
+.drishti-upload-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.drishti-btn-browse,
+.drishti-btn-camera {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drishti-btn-browse {
+  border: 1.5px solid #d4a017;
+  background: #fff9e6;
+  color: #6d4b00;
+}
+
+.drishti-btn-browse:hover {
+  background: #fceebf;
+}
+
+.drishti-btn-camera {
+  border: 1.5px solid #9b1c20;
+  background: #fff0f1;
+  color: #9b1c20;
+}
+
+.drishti-btn-camera:hover {
+  background: #fce2e4;
+}
+
+/* Image Preview in Upload Area */
+.drishti-preview-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 340px;
+  background: #2b241e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.drishti-preview-img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  display: block;
+}
+
+.drishti-change-img-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+
+.drishti-change-img-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Language and Scan Toolbar */
+.drishti-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ebdcc1;
+  flex-wrap: wrap;
+}
+
+.drishti-lang-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.drishti-lang-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a3e35;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.drishti-lang-select {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid #d4a017;
+  background: #ffffff;
+  color: #2b241e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.drishti-lang-select:focus {
+  border-color: #9b1c20;
+  box-shadow: 0 0 0 3px rgba(155, 28, 32, 0.1);
+}
+
+.drishti-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.8rem 2rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #a91f24 0%, #87161a 100%);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(155, 28, 32, 0.3);
+  transition: all 0.2s ease;
+}
+
+.drishti-scan-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #be262c 0%, #9b1c20 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(155, 28, 32, 0.4);
+}
+
+.drishti-scan-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Spinner */
+.drishti-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: drishti-spin 0.8s linear infinite;
+}
+
+@keyframes drishti-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error Alert */
+.drishti-error-box {
+  background: #fdf0f0;
+  border: 1.5px solid #f3b6b6;
+  border-left: 5px solid #a91f24;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #8c191d;
+}
+
+.drishti-error-title {
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.drishti-error-msg {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* Loading State Card */
+.drishti-loading-box {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1.5px solid #ebd9b6;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.drishti-loading-pulse {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f7e1b5;
+  border: 3px solid #9b1c20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  animation: drishti-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes drishti-pulse {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.85; }
+}
+
+.drishti-loading-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1f1813;
+  margin: 0 0 0.5rem;
+}
+
+.drishti-loading-sub {
+  color: #796c5f;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Results Section
+   ========================================================================== */
+
+.drishti-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.drishti-res-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1.5px solid #eadfc9;
+  padding: 0.85rem 1.25rem;
+}
+
+.drishti-res-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.drishti-tag-kind {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: #f5c518;
+  color: #4a3800;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.drishti-tag-cached {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: #e6f6e8;
+  color: #1e6d2b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #c2e9c7;
+}
+
+.drishti-rescan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #d4a017;
+  background: #ffffff;
+  color: #744e00;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drishti-rescan-btn:hover {
+  background: #fff8e8;
+}
+
+/* Summary Card */
+.drishti-summary-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #eadfc9;
+  border-left: 5px solid #d4a017;
+  padding: 1.15rem 1.4rem;
+}
+
+.drishti-summary-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8c6700;
+  margin-bottom: 0.35rem;
+}
+
+.drishti-summary-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #2b241e;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Side-by-Side Dual Translation Display */
+.drishti-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 680px) {
+  .drishti-dual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.drishti-text-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1.5px solid #eadfc9;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.drishti-text-card.kannada-card {
+  border-top: 4px solid #9b1c20;
+}
+
+.drishti-text-card.target-card {
+  border-top: 4px solid #d4a017;
+}
+
+.drishti-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #f2eadc;
+}
+
+.drishti-card-heading {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #5c4f44;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.drishti-copy-btn {
+  background: transparent;
+  border: none;
+  color: #857567;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.drishti-copy-btn:hover {
+  background: #f7eedc;
+  color: #9b1c20;
+}
+
+.drishti-original-content {
+  font-family: "Noto Sans Kannada", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #1f1813;
+  white-space: pre-wrap;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+}
+
+.drishti-target-content {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #1f1813;
+  white-space: pre-wrap;
+  margin: 0;
+  flex: 1;
+}
+
+/* Structured Breakdown Items */
+.drishti-items-section {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1.5px solid #eadfc9;
+  padding: 1.5rem;
+}
+
+.drishti-items-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2b241e;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drishti-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+}
+
+.drishti-item-chip {
+  background: #fdfaf3;
+  border: 1px solid #ebdcc1;
+  border-left: 4px solid #9b1c20;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.drishti-item-chip-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #9b1c20;
+  margin-bottom: 0.25rem;
+}
+
+.drishti-item-chip-kn {
+  font-family: "Noto Sans Kannada", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f1813;
+  margin-bottom: 0.35rem;
+}
+
+.drishti-item-chip-tr {
+  font-size: 0.9rem;
+  color: #4a3e35;
+  line-height: 1.4;
+}
+
+/* Unreadable Notice */
+.drishti-unreadable-card {
+  background: #fff8e6;
+  border: 1.5px solid #edd39a;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.drishti-unreadable-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.drishti-unreadable-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #744e00;
+  margin: 0 0 0.5rem;
+}
+
+.drishti-unreadable-msg {
+  font-size: 0.95rem;
+  color: #634b17;
+  max-width: 520px;
+  margin: 0 auto 1.25rem;
+  line-height: 1.5;
+}
+
+/* Footer note */
+.drishti-disclaimer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #857567;
+  margin-top: 1.5rem;
+  line-height: 1.4;
+}
