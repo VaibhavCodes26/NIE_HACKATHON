@@ -1,6 +1,31 @@
 {
   "scenarios": [
     {
+      "id": "auto",
+      "label": "Auto / Taxi",
+      "icon": "🛺"
+    },
+    {
+      "id": "food",
+      "label": "Food",
+      "icon": "🍛"
+    },
+    {
+      "id": "temple",
+      "label": "Temple / Sights",
+      "icon": "🛕"
+    },
+    {
+      "id": "shopping",
+      "label": "Shopping / Jewellery",
+      "icon": "💍"
+    },
+    {
+      "id": "emergency",
+      "label": "Help / Emergency",
+      "icon": "🆘"
+    },
+    {
       "id": "transport",
       "label": "Bus / Train",
       "icon": "🚌"
@@ -16,21 +41,6 @@
       "icon": "🧭"
     },
     {
-      "id": "food",
-      "label": "Food & Dining",
-      "icon": "🍛"
-    },
-    {
-      "id": "shopping",
-      "label": "Shopping & Auto",
-      "icon": "🛍️"
-    },
-    {
-      "id": "temple",
-      "label": "Temples & Sights",
-      "icon": "🛕"
-    },
-    {
       "id": "outdoor",
       "label": "Nature / Trek",
       "icon": "🥾"
@@ -41,64 +51,163 @@
       "icon": "🔢"
     },
     {
-      "id": "emergency",
-      "label": "Emergency & Help",
-      "icon": "🚨"
-    },
-    {
       "id": "general",
-      "label": "General & Greetings",
-      "icon": "🙏"
+      "label": "Basics",
+      "icon": "💬"
     }
   ],
   "phrases": [
     {
-      "id": "gen_namaskara",
-      "scenario": "general",
-      "kn": "ನಮಸ್ಕಾರ",
-      "roman": "namaskaara",
-      "deva": "नमस्कार",
-      "en": "Hello / Greetings"
+      "id": "auto_meter",
+      "scenario": "auto",
+      "kn": "ಮೀಟರ್ ಹಾಕಿ",
+      "roman": "meter haaki",
+      "deva": "मीटर हाकि",
+      "en": "Please put the meter on."
     },
     {
-      "id": "gen_dhanyavada",
-      "scenario": "general",
-      "kn": "ಧನ್ಯವಾದಗಳು",
-      "roman": "dhanyavaadagalu",
-      "deva": "धन्यवाद",
-      "en": "Thank you very much"
+      "id": "auto_meter_come",
+      "scenario": "auto",
+      "kn": "ಮೀಟರ್ ಮೇಲೆ ಬರ್ತೀರಾ?",
+      "roman": "meter mele bartheera?",
+      "deva": "मीटर मेले बरतीरा?",
+      "en": "Will you come on the meter?"
     },
     {
-      "id": "gen_help",
-      "scenario": "general",
-      "kn": "ದಯವಿಟ್ಟು ಸಹಾಯ ಮಾಡಿ",
-      "roman": "dayavittu sahaaya maadi",
-      "deva": "दयविट्टु सहाय माडि",
-      "en": "Please help me"
+      "id": "auto_goto",
+      "scenario": "auto",
+      "kn": "… ಗೆ ಹೋಗಬೇಕು",
+      "roman": "… ge hogabeku",
+      "deva": "… गे होगबेकु",
+      "en": "I need to go to … (say the place name first)."
     },
     {
-      "id": "gen_kannada_gottilla",
-      "scenario": "general",
-      "kn": "ನನಗೆ ಕನ್ನಡ ಗೊತ್ತಿಲ್ಲ",
-      "roman": "nanage kannada gottilla",
-      "deva": "ननगे कन्नड गोत्तिल्ल",
-      "en": "I don't know Kannada"
+      "id": "auto_howmuch",
+      "scenario": "auto",
+      "kn": "ಅಲ್ಲಿಗೆ ಎಷ್ಟು ಆಗುತ್ತೆ?",
+      "roman": "alligge eshtu aagutte?",
+      "deva": "अल्लिगे एष्टु आगुत्ते?",
+      "en": "How much will it cost to go there?"
     },
     {
-      "id": "gen_swalpa",
-      "scenario": "general",
-      "kn": "ಸ್ವಲ್ಪ ಸ್ವಲ್ಪ ಕನ್ನಡ ಬರುತ್ತೆ",
-      "roman": "swalpa swalpa kannada barutte",
-      "deva": "स्वल्प स्वल्प कन्नड बरुत्ते",
-      "en": "I know a little Kannada"
+      "id": "auto_toomuch",
+      "scenario": "auto",
+      "kn": "ತುಂಬಾ ಜಾಸ್ತಿ",
+      "roman": "tumba jaasti",
+      "deva": "तुंबा जास्ति",
+      "en": "That's too much."
+    },
+    {
+      "id": "auto_reduce",
+      "scenario": "auto",
+      "kn": "ಸ್ವಲ್ಪ ಕಡಿಮೆ ಮಾಡಿ",
+      "roman": "swalpa kadime maadi",
+      "deva": "स्वल्प कडिमे माडि",
+      "en": "Please reduce it a little."
+    },
+    {
+      "id": "auto_nothanks",
+      "scenario": "auto",
+      "kn": "ಬೇಡ, ಧನ್ಯವಾದ",
+      "roman": "beda, dhanyavaada",
+      "deva": "बेड, धन्यवाद",
+      "en": "No, thank you. (polite way to walk away)"
+    },
+    {
+      "id": "auto_stop",
+      "scenario": "auto",
+      "kn": "ಇಲ್ಲಿ ನಿಲ್ಲಿಸಿ",
+      "roman": "illi nillisi",
+      "deva": "इल्लि निल्लिसि",
+      "en": "Stop here, please."
+    },
+    {
+      "id": "auto_wait",
+      "scenario": "auto",
+      "kn": "ಸ್ವಲ್ಪ ಕಾಯಿರಿ",
+      "roman": "swalpa kaayiri",
+      "deva": "स्वल्प कायिरि",
+      "en": "Please wait a little."
+    },
+    {
+      "id": "auto_change",
+      "scenario": "auto",
+      "kn": "ಚಿಲ್ಲರೆ ಇದೆಯಾ?",
+      "roman": "chillare ideyaa?",
+      "deva": "चिल्लरे इदेया?",
+      "en": "Do you have change?"
+    },
+    {
+      "id": "dir_straight",
+      "scenario": "auto",
+      "kn": "ನೇರವಾಗಿ ಹೋಗಿ",
+      "roman": "neravaagi hogi",
+      "deva": "नेरवागि होगि",
+      "en": "Go straight."
+    },
+    {
+      "id": "dir_left",
+      "scenario": "auto",
+      "kn": "ಎಡಕ್ಕೆ ತಿರುಗಿ",
+      "roman": "edakke tirugi",
+      "deva": "एडक्के तिरुगि",
+      "en": "Turn left."
+    },
+    {
+      "id": "dir_right",
+      "scenario": "auto",
+      "kn": "ಬಲಕ್ಕೆ ತಿರುಗಿ",
+      "roman": "balakke tirugi",
+      "deva": "बलक्के तिरुगि",
+      "en": "Turn right."
+    },
+    {
+      "id": "food_dosa",
+      "scenario": "food",
+      "kn": "ಒಂದು ಮಸಾಲೆ ದೋಸೆ ಕೊಡಿ",
+      "roman": "ondu masaale dose kodi",
+      "deva": "ओन्दु मसाले दोसे कोडि",
+      "en": "One masala dosa, please."
+    },
+    {
+      "id": "food_lessspicy",
+      "scenario": "food",
+      "kn": "ಖಾರ ಕಡಿಮೆ ಹಾಕಿ",
+      "roman": "khaara kadime haaki",
+      "deva": "खार कडिमे हाकि",
+      "en": "Please make it less spicy."
+    },
+    {
+      "id": "food_veg",
+      "scenario": "food",
+      "kn": "ಇದು ಸಸ್ಯಾಹಾರವೇ?",
+      "roman": "idu sasyaahaaravē?",
+      "deva": "इदु सस्याहारवे?",
+      "en": "Is this vegetarian?"
     },
     {
       "id": "food_water",
       "scenario": "food",
-      "kn": "ಕುಡಿಯುವ ನೀರು ಕೊಡಿ",
-      "roman": "kudiyuva neeru kodi",
-      "deva": "कुडियुव नीरु कोडि",
-      "en": "Please give drinking water"
+      "kn": "ಕುಡಿಯಲು ನೀರು ಕೊಡಿ",
+      "roman": "kudiyalu neeru kodi",
+      "deva": "कुडियलु नीरु कोडि",
+      "en": "Please give me drinking water."
+    },
+    {
+      "id": "food_special",
+      "scenario": "food",
+      "kn": "ಇಲ್ಲಿ ಏನು ಫೇಮಸ್?",
+      "roman": "illi enu famous?",
+      "deva": "इल्लि एनु फेमस्?",
+      "en": "What is famous here?"
+    },
+    {
+      "id": "food_tasty",
+      "scenario": "food",
+      "kn": "ತುಂಬಾ ರುಚಿಯಾಗಿದೆ",
+      "roman": "tumba ruchiyaagide",
+      "deva": "तुंबा रुचियागिदे",
+      "en": "It is very tasty."
     },
     {
       "id": "food_bill",
@@ -106,72 +215,7 @@
       "kn": "ಬಿಲ್ ಕೊಡಿ",
       "roman": "bill kodi",
       "deva": "बिल् कोडि",
-      "en": "Please bring the bill"
-    },
-    {
-      "id": "food_spicy",
-      "scenario": "food",
-      "kn": "ಖಾರ ಜಾಸ್ತಿ ಮಾಡಬೇಡಿ",
-      "roman": "khaara jaasti maadabedi",
-      "deva": "खार जास्ति माडबेडि",
-      "en": "Don't make it too spicy"
-    },
-    {
-      "id": "food_veg",
-      "scenario": "food",
-      "kn": "ವೆಜಿಟೇರಿಯನ್ ಊಟ ಇದೆಯಾ?",
-      "roman": "vegetarian oota ideyaa?",
-      "deva": "व्हेजिटेरियन् ऊट इदेया?",
-      "en": "Do you have vegetarian food?"
-    },
-    {
-      "id": "bar_howmuch",
-      "scenario": "shopping",
-      "kn": "ಇದು ಎಷ್ಟು ರೂಪಾಯಿ?",
-      "roman": "idu eshtu roopaayi?",
-      "deva": "इदु एष्टु रूपायि?",
-      "en": "How much is this / What is the price?"
-    },
-    {
-      "id": "bar_discount",
-      "scenario": "shopping",
-      "kn": "ಸ್ವಲ್ಪ ಕಡಿಮೆ ಮಾಡಿ",
-      "roman": "swalpa kadime maadi",
-      "deva": "स्वल्प कडिमे माडि",
-      "en": "Please reduce the price / Give a discount"
-    },
-    
-    {
-      "id": "bar_meter",
-      "scenario": "shopping",
-      "kn": "ಮೀಟರ್ ಹಾಕಿ",
-      "roman": "meter haaki",
-      "deva": "मीटर हाकि",
-      "en": "Please turn on the meter (for auto)"
-    },
-    {
-      "id": "bar_auto",
-      "scenario": "shopping",
-      "kn": "… ಗೆ ಎಷ್ಟು ತಗೊಳ್ತೀರಾ?",
-      "roman": "… ge eshtu tagolteera?",
-      "deva": "… गे एष्टु तगोळ्तीरा?",
-      "en": "How much will you charge to go to …?"
-    },
-    {
-      "id": "emg_help",
-      "scenario": "emergency",
-      "kn": "ದಯವಿಟ್ಟು ಕಾಪಾಡಿ!",
-      "roman": "dayavittu kaapaadi!",
-      "deva": "दयविट्टु कापाडि!",
-      "en": "Please help / emergency!"
-    },
-    {
-      "id": "emg_police",
-      "scenario": "emergency",
-      "kn": "ಪೊಲೀಸ್ ಸ್ಟೇಷನ್ ಎಲ್ಲಿದೆ?",
-      "roman": "police station ellide?",
-      "deva": "पोलीस् स्टेशन् एल्ಲಿदे?",
-      "en": "Where is the police station?"
+      "en": "Please bring the bill."
     },
     {
       "id": "temple_shoes",
@@ -179,7 +223,143 @@
       "kn": "ಚಪ್ಪಲಿ ಎಲ್ಲಿ ಬಿಡಬೇಕು?",
       "roman": "chappali elli bidabeku?",
       "deva": "चप्पलि एल्लि बिडबेकु?",
-      "en": "Where do I leave my footwear?"
+      "en": "Where should I leave my footwear?"
+    },
+    {
+      "id": "temple_photo",
+      "scenario": "temple",
+      "kn": "ಇಲ್ಲಿ ಫೋಟೋ ತೆಗೆಯಬಹುದಾ?",
+      "roman": "illi photo tegeyabahudaa?",
+      "deva": "इल्लि फोटो तेगेयबहुदा?",
+      "en": "Can I take photos here?"
+    },
+    {
+      "id": "temple_ticket",
+      "scenario": "temple",
+      "kn": "ಟಿಕೆಟ್ ಎಷ್ಟು?",
+      "roman": "ticket eshtu?",
+      "deva": "टिकेट् एष्टु?",
+      "en": "How much is the ticket?"
+    },
+    {
+      "id": "shop_price",
+      "scenario": "shopping",
+      "kn": "ಇದರ ಬೆಲೆ ಎಷ್ಟು?",
+      "roman": "idara bele eshtu?",
+      "deva": "इदर बेले एष्टु?",
+      "en": "How much does this cost?"
+    },
+    {
+      "id": "shop_final",
+      "scenario": "shopping",
+      "kn": "ಕೊನೆ ಬೆಲೆ ಎಷ್ಟು?",
+      "roman": "kone bele eshtu?",
+      "deva": "कोने बेले एष्टु?",
+      "en": "What is your final price?"
+    },
+    {
+      "id": "shop_discount",
+      "scenario": "shopping",
+      "kn": "ಡಿಸ್ಕೌಂಟ್ ಸಿಗುತ್ತಾ?",
+      "roman": "discount siguttaa?",
+      "deva": "डिस्काउंट् सिगुत्ता?",
+      "en": "Can I get a discount?"
+    },
+    {
+      "id": "shop_hallmark",
+      "scenario": "shopping",
+      "kn": "ಹಾಲ್‌ಮಾರ್ಕ್ ಇದೆಯಾ?",
+      "roman": "hallmark ideyaa?",
+      "deva": "हॉलमार्क् इदेया?",
+      "en": "Is it hallmarked? (for gold/silver)"
+    },
+    {
+      "id": "shop_making",
+      "scenario": "shopping",
+      "kn": "ಮೇಕಿಂಗ್ ಚಾರ್ಜ್ ಎಷ್ಟು?",
+      "roman": "making charge eshtu?",
+      "deva": "मेकिंग् चार्ज् एष्टु?",
+      "en": "How much is the making charge?"
+    },
+    {
+      "id": "shop_bill",
+      "scenario": "shopping",
+      "kn": "ಬಿಲ್ ಕೊಡ್ತೀರಾ?",
+      "roman": "bill kodtheera?",
+      "deva": "बिल् कोड्तीरा?",
+      "en": "Will you give a proper bill?"
+    },
+    {
+      "id": "emg_help",
+      "scenario": "emergency",
+      "kn": "ಸಹಾಯ ಮಾಡಿ!",
+      "roman": "sahaaya maadi!",
+      "deva": "सहाय माडि!",
+      "en": "Please help!"
+    },
+    {
+      "id": "emg_police",
+      "scenario": "emergency",
+      "kn": "ಪೊಲೀಸರನ್ನು ಕರೆಯಿರಿ",
+      "roman": "poleesarannu kareyiri",
+      "deva": "पोलीसरन्नु करेयिरि",
+      "en": "Please call the police."
+    },
+    {
+      "id": "emg_hospital",
+      "scenario": "emergency",
+      "kn": "ಆಸ್ಪತ್ರೆ ಎಲ್ಲಿದೆ?",
+      "roman": "aaspatre ellide?",
+      "deva": "आस्पत्रे एल्लिदे?",
+      "en": "Where is the hospital?"
+    },
+    {
+      "id": "emg_toilet",
+      "scenario": "emergency",
+      "kn": "ಶೌಚಾಲಯ ಎಲ್ಲಿದೆ?",
+      "roman": "shouchaalaya ellide?",
+      "deva": "शौचालय एल्लिदे?",
+      "en": "Where is the toilet?"
+    },
+    {
+      "id": "gen_nokannada",
+      "scenario": "general",
+      "kn": "ನನಗೆ ಕನ್ನಡ ಬರಲ್ಲ",
+      "roman": "nanage kannada baralla",
+      "deva": "ननगे कन्नड बरल्ला",
+      "en": "I don't know Kannada."
+    },
+    {
+      "id": "gen_hindi",
+      "scenario": "general",
+      "kn": "ಹಿಂದಿ ಬರುತ್ತಾ?",
+      "roman": "Hindi baruttaa?",
+      "deva": "हिंदी बरुत्ता?",
+      "en": "Do you know Hindi?"
+    },
+    {
+      "id": "gen_slow",
+      "scenario": "general",
+      "kn": "ಸ್ವಲ್ಪ ನಿಧಾನವಾಗಿ ಹೇಳಿ",
+      "roman": "swalpa nidhaanavaagi heli",
+      "deva": "स्वल्प निधानवागि हेलि",
+      "en": "Please speak a little slowly."
+    },
+    {
+      "id": "gen_hello",
+      "scenario": "general",
+      "kn": "ನಮಸ್ಕಾರ",
+      "roman": "namaskaara",
+      "deva": "नमस्कार",
+      "en": "Hello / Greetings."
+    },
+    {
+      "id": "gen_thanks",
+      "scenario": "general",
+      "kn": "ಧನ್ಯವಾದಗಳು",
+      "roman": "dhanyavaadagalu",
+      "deva": "धन्यवादगळु",
+      "en": "Thank you."
     },
     {
       "id": "tr_busstand",
@@ -1016,84 +1196,308 @@
   ],
   "tips": [
     {
-      "id": "tip_shop_1",
-      "scenario": "shopping",
-      "en": "For auto rickshaws, ask them to use the meter ('meter haaki') or agree on a fixed price before getting in. During peak hours or rain, 1.5x meter rate is common."
+      "id": "tip_auto_1",
+      "scenario": "auto",
+      "en": "Ask for the meter first. In Bengaluru many autos refuse it, so agree on a price BEFORE you sit. Never negotiate after the ride starts.",
+      "title": "Auto: ask for the meter"
     },
     {
-      "id": "tip_temple_1",
-      "scenario": "temple",
-      "en": "Always remove shoes before entering temple premises. Dress modestly covering shoulders and knees. Photography is often prohibited in the inner sanctum."
+      "id": "tip_auto_2",
+      "scenario": "auto",
+      "en": "Walking away politely is the strongest bargaining move. Say 'beda, dhanyavaada' and start walking; the price often drops. Check the fair fare in the app's route planner first.",
+      "title": "Auto: walk-away trick"
+    },
+    {
+      "id": "tip_auto_3",
+      "scenario": "auto",
+      "en": "Keep small change ready. Drivers often claim they have no change for large notes.",
+      "title": "Auto: keep change"
+    },
+    {
+      "id": "tip_auto_4",
+      "scenario": "auto",
+      "en": "Tourist spots and railway/bus stations usually have higher quoted prices. Walking a few streets away or using an app-booked ride is often cheaper.",
+      "title": "Auto: tourist-spot prices"
     },
     {
       "id": "tip_food_1",
       "scenario": "food",
-      "en": "Traditional South Indian meals are served on banana leaves or steel thalis. Filter coffee is traditionally served in a dabarah and tumbler."
+      "en": "In Karnataka, 'meals' usually means an unlimited thali, and darshini outlets are quick standing-eat places with cheap, good breakfast.",
+      "title": "Food: meals and darshini"
+    },
+    {
+      "id": "tip_food_2",
+      "scenario": "food",
+      "en": "Many Udupi-style restaurants are pure vegetarian. If you eat non-veg, ask 'non-veg ideyaa?' before sitting.",
+      "title": "Food: pure-veg places"
+    },
+    {
+      "id": "tip_temple_1",
+      "scenario": "temple",
+      "en": "Dress modestly at temples: shoulders and knees covered. Footwear is left outside. Some temples ask men to remove shirts in the sanctum and allow only traditional wear.",
+      "title": "Temple: dress code"
+    },
+    {
+      "id": "tip_temple_2",
+      "scenario": "temple",
+      "en": "Photography is often banned inside the sanctum. Ask first, and never photograph priests or worshippers without permission.",
+      "title": "Temple: photography"
+    },
+    {
+      "id": "tip_shop_1",
+      "scenario": "shopping",
+      "en": "For gold or silver jewellery, insist on a hallmarked piece and a proper itemised bill showing weight, rate and making charges.",
+      "title": "Jewellery: hallmark and bill"
+    },
+    {
+      "id": "tip_shop_2",
+      "scenario": "shopping",
+      "en": "Mysore silk and sandalwood are widely imitated. Prefer government-run outlets such as KSIC or Cauvery Emporium for authenticity and fixed prices.",
+      "title": "Silk and sandalwood"
+    },
+    {
+      "id": "tip_shop_3",
+      "scenario": "shopping",
+      "en": "Bargaining is normal at street markets and small shops but not in fixed-price stores or government emporiums. Start around half the first quote and settle near 60-70%.",
+      "title": "Bargaining at markets"
+    },
+    {
+      "id": "tip_general_1",
+      "scenario": "general",
+      "en": "A smile and a few Kannada words like 'namaskara' and 'dhanyavaadagalu' change the mood of almost any interaction. In tourist areas many people also understand Hindi or English.",
+      "title": "Basics: friendly Kannada"
     },
     {
       "id": "tip_emg_112",
       "scenario": "emergency",
-      "en": "India's national emergency number is 112 (police, ambulance, fire). Keep it ready, and share your live location with a trusted contact when travelling alone."
+      "en": "India's national emergency number is 112 (police, ambulance, fire). Keep it ready, and share your live location with a trusted contact when travelling alone.",
+      "title": "Emergency: dial 112"
     },
     {
       "id": "tip_emg_2",
       "scenario": "emergency",
-      "en": "If someone keeps bothering you in a crowd, move towards a shop or a group of families and say it loudly. Locals usually step in to help."
+      "en": "If someone keeps bothering you in a crowd, move towards a shop or a group of families and say it loudly. Locals usually step in to help.",
+      "title": "Safety in crowds"
     },
     {
       "id": "tip_tr_1",
       "scenario": "transport",
-      "en": "Many bus destination boards are only in Kannada. Confirm the destination with the conductor before boarding."
+      "en": "Many bus destination boards are only in Kannada. Confirm the destination with the conductor before boarding.",
+      "title": "Bus boards in Kannada"
     },
     {
       "id": "tip_tr_2",
       "scenario": "transport",
-      "en": "Karnataka's Shakti scheme gives eligible women free travel on ordinary state-run buses. Carry a valid photo ID and check current rules at the counter."
+      "en": "Karnataka's Shakti scheme gives eligible women free travel on ordinary state-run buses. Carry a valid photo ID and check current rules at the counter.",
+      "title": "Shakti scheme"
     },
     {
       "id": "tip_tr_3",
       "scenario": "transport",
-      "en": "Book long-distance buses and trains ahead for weekends and festivals. Overnight buses are common between Bengaluru and the coast or north Karnataka."
+      "en": "Book long-distance buses and trains ahead for weekends and festivals. Overnight buses are common between Bengaluru and the coast or north Karnataka.",
+      "title": "Book ahead"
     },
     {
       "id": "tip_stay_1",
       "scenario": "stay",
-      "en": "Ask to see the room before paying, confirm whether the quoted price includes taxes, and ask the check-out time. Hotels will ask for photo ID by law."
+      "en": "Ask to see the room before paying, confirm whether the quoted price includes taxes, and ask the check-out time. Hotels will ask for photo ID by law.",
+      "title": "Stay: check before paying"
     },
     {
       "id": "tip_stay_2",
       "scenario": "stay",
-      "en": "In peak season and festivals (Dasara, Hampi Utsav) prices rise sharply. Book early and confirm the booking by phone."
+      "en": "In peak season and festivals (Dasara, Hampi Utsav) prices rise sharply. Book early and confirm the booking by phone.",
+      "title": "Stay: peak season"
     },
     {
       "id": "tip_out_1",
       "scenario": "outdoor",
-      "en": "Start treks and sightseeing early in hot places like Hampi. Carry water, a hat, and sturdy footwear."
+      "en": "Start treks and sightseeing early in hot places like Hampi. Carry water, a hat, and sturdy footwear.",
+      "title": "Outdoors: start early"
     },
     {
       "id": "tip_out_2",
       "scenario": "outdoor",
-      "en": "In monsoon, trails and rocks get slippery and some waterfalls are unsafe. Follow local guides and forest-department rules; some treks need prior permission."
+      "en": "In monsoon, trails and rocks get slippery and some waterfalls are unsafe. Follow local guides and forest-department rules; some treks need prior permission.",
+      "title": "Monsoon trails"
     },
     {
       "id": "tip_num_1",
       "scenario": "numbers",
-      "en": "Saying the price in Kannada numbers while bargaining shows you know the local rate and often helps you get a fairer price."
+      "en": "Saying the price in Kannada numbers while bargaining shows you know the local rate and often helps you get a fairer price.",
+      "title": "Say prices in Kannada"
     },
     {
       "id": "tip_dir_1",
       "scenario": "directions",
-      "en": "Ask two different people before trusting directions. Locals often answer 'it's just there' even for long distances, so ask for time or kilometres."
+      "en": "Ask two different people before trusting directions. Locals often answer 'it's just there' even for long distances, so ask for time or kilometres.",
+      "title": "Directions: ask twice"
     },
     {
       "id": "tip_gen_2",
       "scenario": "general",
-      "en": "To get someone's attention politely, start with 'ree' or 'sir/madam', then ask your question slowly. Smiling goes a long way."
+      "en": "To get someone's attention politely, start with 'ree' or 'sir/madam', then ask your question slowly. Smiling goes a long way.",
+      "title": "Polite address"
     },
     {
       "id": "tip_food_3",
       "scenario": "food",
-      "en": "Small eateries and stalls increasingly accept UPI, but keep some cash for tea stalls and street vendors."
+      "en": "Small eateries and stalls increasingly accept UPI, but keep some cash for tea stalls and street vendors.",
+      "title": "Food: UPI and cash"
+    },
+    {
+      "id": "tip_hampi_1",
+      "scenario": "outdoor",
+      "city": "hampi",
+      "title": "Hampi: beat the heat",
+      "en": "Hampi is very hot and exposed at midday. Visit monuments early morning or late afternoon, carry water and a hat, and wear footwear that is easy to remove, since stone floors get hot and temples need footwear off."
+    },
+    {
+      "id": "tip_hampi_2",
+      "scenario": "auto",
+      "city": "hampi",
+      "title": "Hampi: getting around",
+      "en": "Sights in Hampi are spread out. Locals rent bicycles and two-wheelers, and autos are common. Agree the price (or the meter) before you start, and ask the driver which stops are included."
+    },
+    {
+      "id": "tip_hampi_3",
+      "scenario": "temple",
+      "city": "hampi",
+      "title": "Hampi: temples and tickets",
+      "en": "Virupaksha Temple is an active temple, so dress modestly and leave footwear outside. Major monuments such as the Vittala Temple complex are ticketed; check current ticket and timing rules at the counter."
+    },
+    {
+      "id": "tip_hampi_4",
+      "scenario": "outdoor",
+      "city": "hampi",
+      "title": "Hampi: river crossings",
+      "en": "Boats and coracles cross the Tungabhadra river. Ask about safety and agree the price before boarding, and avoid crossings when the water is high or the boatman seems unsure."
+    },
+    {
+      "id": "tip_hampi_5",
+      "scenario": "stay",
+      "city": "hampi",
+      "title": "Hampi: where to stay",
+      "en": "Stays near Hampi Bazaar are convenient for sunrise visits, while the other side of the river is a quieter cafe-and-guesthouse area. Confirm how you will reach your stay after dark."
+    },
+    {
+      "id": "tip_gokarna_1",
+      "scenario": "temple",
+      "city": "gokarna",
+      "title": "Gokarna: Mahabaleshwara temple",
+      "en": "Gokarna's Mahabaleshwara temple is an active pilgrimage site in the town. Dress modestly, follow the temple staff's instructions, and ask before taking photos."
+    },
+    {
+      "id": "tip_gokarna_2",
+      "scenario": "outdoor",
+      "city": "gokarna",
+      "title": "Gokarna: beach hopping",
+      "en": "Kudle and Om beach are easy to reach. Other beaches such as Half Moon and Paradise are reached by boat or a coastal trek, which can be steep and uneven, so wear proper shoes and carry water."
+    },
+    {
+      "id": "tip_gokarna_3",
+      "scenario": "outdoor",
+      "city": "gokarna",
+      "title": "Gokarna: swimming safety",
+      "en": "Sea currents can be strong, especially in monsoon. Follow lifeguard and local warnings, avoid swimming alone or after dark, and note that many beach shacks close during the rains."
+    },
+    {
+      "id": "tip_gokarna_4",
+      "scenario": "food",
+      "city": "gokarna",
+      "title": "Gokarna: beach shack food",
+      "en": "Confirm menu prices before ordering at beach shacks. Seafood is common; if you eat vegetarian, say so clearly when ordering."
+    },
+    {
+      "id": "tip_coorg_1",
+      "scenario": "transport",
+      "city": "coorg",
+      "title": "Coorg: ghat roads",
+      "en": "Roads around Coorg wind through hills and get misty or slippery in monsoon. Allow extra travel time and avoid driving ghat sections at night."
+    },
+    {
+      "id": "tip_coorg_2",
+      "scenario": "stay",
+      "city": "coorg",
+      "title": "Coorg: plantation homestays",
+      "en": "Many people stay in plantation homestays. Mobile signal can be weak, so save the owner's phone number and confirm the pickup point and arrival time in advance."
+    },
+    {
+      "id": "tip_coorg_3",
+      "scenario": "food",
+      "city": "coorg",
+      "title": "Coorg: local food",
+      "en": "Kodava cuisine includes pandi curry (pork) and kadambuttu (rice dumplings). Ask what is vegetarian if needed. Coorg coffee and honey are best bought as sealed packs from reputable shops."
+    },
+    {
+      "id": "tip_coorg_4",
+      "scenario": "outdoor",
+      "city": "coorg",
+      "title": "Coorg: treks and forests",
+      "en": "Some treks and forest areas need forest department permission. Check ahead, trek with a local guide, and expect leeches and slippery trails in monsoon."
+    },
+    {
+      "id": "tip_mysuru_1",
+      "scenario": "temple",
+      "city": "mysuru",
+      "title": "Mysuru: Palace rules",
+      "en": "At Mysuru Palace, footwear is left outside and photography inside the halls is usually restricted. Check the rules at the entrance. The palace is illuminated on certain evenings such as Sundays, public holidays and during Dasara; confirm timings locally."
+    },
+    {
+      "id": "tip_mysuru_2",
+      "scenario": "stay",
+      "city": "mysuru",
+      "title": "Mysuru: Dasara crowds",
+      "en": "Dasara (usually September to October) brings big crowds and higher hotel prices. Book stays and transport early."
+    },
+    {
+      "id": "tip_mysuru_3",
+      "scenario": "shopping",
+      "city": "mysuru",
+      "title": "Mysuru: markets and sweets",
+      "en": "Devaraja Market is good for flowers, spices and local goods, and bargaining is normal there. Mysore Pak is the famous local sweet. For silk and sandalwood, prefer government emporiums for authenticity."
+    },
+    {
+      "id": "tip_mysuru_4",
+      "scenario": "temple",
+      "city": "mysuru",
+      "title": "Mysuru: Chamundi Hills",
+      "en": "Chamundi Hills has a temple at the top, reached by road or by the long stair climb. Go early in the morning when it is cooler, and dress modestly for the temple."
+    },
+    {
+      "id": "tip_belagavi_1",
+      "scenario": "general",
+      "city": "belagavi",
+      "title": "Belagavi: languages",
+      "en": "Belagavi is a border city where both Kannada and Marathi are widely spoken, and Hindi works in many places. Marathi speakers can usually manage, but a greeting in Kannada is appreciated."
+    },
+    {
+      "id": "tip_belagavi_2",
+      "scenario": "temple",
+      "city": "belagavi",
+      "title": "Belagavi: fort and Kamal Basadi",
+      "en": "Belagavi Fort has the Kamal Basadi, a Jain temple, inside. Dress modestly and check visiting hours locally."
+    },
+    {
+      "id": "tip_belagavi_3",
+      "scenario": "food",
+      "city": "belagavi",
+      "title": "Belagavi: kunda",
+      "en": "Kunda is the sweet Belagavi is known for. Buy from busy, well-known sweet shops and check freshness."
+    },
+    {
+      "id": "tip_belagavi_4",
+      "scenario": "outdoor",
+      "city": "belagavi",
+      "title": "Belagavi: waterfalls",
+      "en": "Waterfalls near Belagavi, such as Gokak Falls, are best after the monsoon. Rocks are slippery and water levels can rise suddenly, so stay behind safety barriers and follow local warnings."
+    },
+    {
+      "id": "tip_belagavi_5",
+      "scenario": "shopping",
+      "city": "belagavi",
+      "title": "Belagavi: shopping",
+      "en": "Khade Bazaar is the traditional market area for local shopping. Bargaining is normal at small shops but not in fixed-price stores."
     }
   ]
 }

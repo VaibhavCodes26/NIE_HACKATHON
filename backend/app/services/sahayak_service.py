@@ -24,7 +24,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 KB_PATH = DATA_DIR / "sahayak_kb.json"
 EMB_CACHE = DATA_DIR / "sahayak_kb.emb.npz"
 
-GEN_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+GEN_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 EMB_MODEL = os.getenv("GEMINI_EMBED_MODEL", "gemini-embedding-001")
 
 _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -42,9 +42,29 @@ DOCS = [
     {"id": p["id"], "kind": "phrase", "scenario": p["scenario"], "text": f'{p["scenario"]}: {p["en"]}'}
     for p in _KB["phrases"]
 ] + [
-    {"id": t["id"], "kind": "tip", "scenario": t["scenario"], "text": f'{t["scenario"]}: {t["en"]}'}
+    {
+        "id": t["id"], "kind": "tip", "scenario": t["scenario"], "city": t.get("city"),
+        "text": (f'{t["city"]} ' if t.get("city") else "") + f'{t["scenario"]}: {t["en"]}',
+    }
     for t in _KB["tips"]
 ]
+
+# ---------- city detection (for city-specific tips) ----------
+CITY_ALIASES = {
+    "hampi": ["hampi", "hosapete", "hospet", "vijayanagara", "हंपी", "हम्पी"],
+    "gokarna": ["gokarna", "gokarn", "गोकर्ण"],
+    "coorg": ["coorg", "kodagu", "madikeri", "कूर्ग", "कोडगु"],
+    "mysuru": ["mysuru", "mysore", "मैसूर", "म्हैसूर", "मैसूरु"],
+    "belagavi": ["belagavi", "belgaum", "बेळगाव", "बेलगाम", "बेळगावी", "बेलगावी"],
+}
+
+
+def city_key(text):
+    t = (text or "").lower()
+    for key, names in CITY_ALIASES.items():
+        if any(n in t for n in names):
+            return key
+    return None
 
 # ---------- embeddings ----------
 def _embed(texts: list[str]) -> np.ndarray:
@@ -74,21 +94,42 @@ def _load_doc_vectors() -> Optional[np.ndarray]:
 _DOC_VECS = _load_doc_vectors()
 
 
+_STOP = {"the", "a", "an", "to", "at", "in", "on", "of", "and", "or", "is", "are", "i", "my", "me", "do", "how",
+         "what", "for", "it", "this", "that", "with", "you", "can", "should", "too", "much"}
+
+
+def _tokens(text: str) -> set:
+    return {w for w in re.findall(r"\w+", text.lower()) if w not in _STOP}
+
+
 def _keyword_scores(query: str) -> np.ndarray:
-    q = set(re.findall(r"\w+", query.lower()))
-    return np.array([len(q & set(re.findall(r"\w+", d["text"].lower()))) for d in DOCS], dtype="float32")
+    q = _tokens(query)
+    return np.array([len(q & _tokens(d["text"])) for d in DOCS], dtype="float32")
 
 
-def retrieve(query: str, scenario: Optional[str], k_phrases=6, k_tips=3):
+def retrieve(query: str, scenario: Optional[str], city: Optional[str] = None, k_phrases=6, k_tips=3):
+    mode = "embeddings"
     try:
         if _DOC_VECS is None:
             raise RuntimeError("no vectors")
         qv = _embed([query])[0]
         scores = _DOC_VECS @ qv
     except Exception:
+        mode = "keyword"  # demo still works if embeddings/network fail
         scores = _keyword_scores(query)
     if scenario:  # soft boost if the user tapped a scenario card
         scores = scores + np.array([0.15 if d["scenario"] == scenario else 0 for d in DOCS], dtype="float32")
+    # favour tips for the traveller's city; demote tips for other cities
+    # (and city tips in general when no city is known, so generic tips win)
+    boost, penalty = (0.2, 0.2) if mode == "embeddings" else (0.75, 0.75)
+    scores = scores + np.array(
+        [
+            (boost if city and d["city"] == city else -(penalty if city else penalty * 2) if d.get("city") else 0)
+            if d["kind"] == "tip" else 0
+            for d in DOCS
+        ],
+        dtype="float32",
+    )
     order = np.argsort(-scores)
     phrases, tips = [], []
     for i in order:
@@ -99,7 +140,7 @@ def retrieve(query: str, scenario: Optional[str], k_phrases=6, k_tips=3):
             tips.append(TIPS[d["id"]])
         if len(phrases) >= k_phrases and len(tips) >= k_tips:
             break
-    return phrases, tips
+    return phrases, tips, mode
 
 
 # ---------- generation ----------
@@ -120,6 +161,17 @@ def _cache_key(*parts) -> str:
 _CACHE: dict[str, dict] = {}
 
 
+def _sources(used_phrases, tips):
+    """What the answer was grounded on: shown as the 'Sources' line in the UI."""
+    src = [
+        {"kind": "tip", "id": t["id"], "label": t.get("title") or f'{t["scenario"].title()} tip'}
+        for t in tips
+    ]
+    if used_phrases:
+        src.append({"kind": "phrasebook", "id": "phrasebook", "label": f"Phrasebook ({len(used_phrases)} phrases)"})
+    return src
+
+
 def _hydrate(ids_meanings, language):
     out = []
     for item in ids_meanings:
@@ -137,7 +189,8 @@ def ask(query: str, language: str = "en", scenario: Optional[str] = None, contex
     if key in _CACHE:
         return _CACHE[key]
 
-    phrases, tips = retrieve(query, scenario)
+    city = city_key(query) or city_key((context or {}).get("city"))
+    phrases, tips, mode = retrieve(query, scenario, city)
 
     # --- fallback result if Gemini fails (demo-proof) ---
     fallback = {
@@ -148,6 +201,8 @@ def ask(query: str, language: str = "en", scenario: Optional[str] = None, contex
         "show_to_local_id": phrases[0]["id"] if phrases else None,
         "source": "fallback",
     }
+    fallback["sources"] = _sources(fallback["phrases"], tips[:2])
+    fallback["retrieval"] = mode
 
     prompt = {
         "USER LANGUAGE": LANG_NAME.get(language, "English"),
@@ -164,6 +219,7 @@ def ask(query: str, language: str = "en", scenario: Optional[str] = None, contex
                 system_instruction=SYSTEM,
                 response_mime_type="application/json",
                 temperature=0.3,
+                max_output_tokens =600,
             ),
         )
         data = json.loads(res.text)
@@ -173,9 +229,11 @@ def ask(query: str, language: str = "en", scenario: Optional[str] = None, contex
             "tips": [str(t) for t in data.get("tips", [])][:3],
             "show_to_local_id": data.get("show_to_local_id") if data.get("show_to_local_id") in PHRASES else None,
             "source": "gemini",
+            "retrieval": mode,
         }
         if not result["phrases"] and phrases:  # model returned nothing usable
             result["phrases"] = fallback["phrases"]
+        result["sources"] = _sources(result["phrases"], tips)
         _CACHE[key] = result
         return result
     except Exception as e:

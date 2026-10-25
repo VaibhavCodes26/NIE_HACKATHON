@@ -732,3 +732,6 @@
     transition-duration: 0.01ms !important;
   }
 }
+   .sh-src { margin: 0; font-size: 0.78rem; line-height: 1.5; color: var(--muted, #6b6258); }
+   .sh-src strong { font-weight: 600; }
+   .sh-src em { font-style: normal; opacity: 0.8; }

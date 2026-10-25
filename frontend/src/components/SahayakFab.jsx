@@ -1,85 +1,98 @@
+
 import { useEffect, useState } from "react";
 import SahayakPage from "../SahayakPage.jsx";
 import "./sahayak-fab.css";
 
-const HINT_KEY = "sahayak_hint_seen";
-
-// localStorage can be blocked (private mode etc.), so every access is guarded.
-// Demo tip: add ?hint to any page URL (e.g. localhost:5173/?hint) to see the tooltip + pulse again.
-function hintSeen() {
-  try {
-    if (new URLSearchParams(window.location.search).has("hint")) return false;
-    return localStorage.getItem(HINT_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markHintSeen() {
-  try {
-    localStorage.setItem(HINT_KEY, "1");
-  } catch {
-    /* ignore */
-  }
-}
-
 /**
  * Floating Namma Sahayak button.
- * Works without react-router-dom. Mount once, outside <Routes>.
+ * Tooltip and pulse restart on every page reload.
+ * No react-router-dom required.
  */
 export default function SahayakFab({ journeyConfig }) {
   const [open, setOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const [pulse, setPulse] = useState(() => !hintSeen());
+  const [pulse, setPulse] = useState(true);
 
-  // First-visit hint: appears after 2s, hides itself after 10s.
+  // Show tooltip 2 seconds after every page load.
+  // Hide it 10 seconds after it appears.
   useEffect(() => {
-    if (hintSeen()) return;
-    const show = setTimeout(() => setShowHint(true), 2000);
-    const hide = setTimeout(() => setShowHint(false), 10000);
+    const showTimer = setTimeout(() => {
+      setShowHint(true);
+    }, 2000);
+
+    const hideTimer = setTimeout(() => {
+      setShowHint(false);
+    }, 12000);
+
     return () => {
-      clearTimeout(show);
-      clearTimeout(hide);
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
     };
   }, []);
 
-  // Close chatbot when Escape is pressed.
+  // Respect the user's reduced-motion preference.
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") {
+    const mediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    if (mediaQuery.matches) {
+      setPulse(false);
+    }
+
+    const handleMotionChange = (event) => {
+      setPulse(!event.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleMotionChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleMotionChange);
+    };
+  }, []);
+
+  // Close the popup when Escape is pressed.
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
         setOpen(false);
       }
     };
 
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   function toggle() {
     setOpen((previous) => !previous);
     setShowHint(false);
     setPulse(false);
-    markHintSeen();
   }
 
   function dismissHint() {
     setShowHint(false);
     setPulse(false);
-    markHintSeen();
   }
 
   return (
     <>
+      {/* Tooltip: visible only when the popup is closed */}
       {showHint && !open && (
         <div className="sfab-hint" role="status">
           <button
+            type="button"
             className="sfab-hint-x"
             onClick={dismissHint}
             aria-label="Dismiss tip"
           >
             ×
           </button>
+
           <strong>Speak Kannada in one tap</strong>
+
           <span>
             Phrases for autos, food, temples and more. Show them or play them
             aloud.
@@ -87,14 +100,23 @@ export default function SahayakFab({ journeyConfig }) {
         </div>
       )}
 
+      {/* Floating action button */}
       <button
-        className={`sfab ${open ? "is-open" : ""} ${pulse && !open ? "pulse" : ""}`}
+        type="button"
+        className={`sfab ${open ? "is-open" : ""} ${
+          pulse && !open ? "pulse" : ""
+        }`}
         onClick={toggle}
         aria-label={open ? "Close Namma Sahayak" : "Open Namma Sahayak"}
         aria-expanded={open}
       >
         {open ? (
-          <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="26"
+            height="26"
+            aria-hidden="true"
+          >
             <path
               d="M6 6l12 12M18 6L6 18"
               stroke="currentColor"
@@ -110,7 +132,7 @@ export default function SahayakFab({ journeyConfig }) {
         )}
       </button>
 
-      {/* Always mounted (just hidden) so the conversation survives open/close and page changes */}
+      {/* Keep the panel mounted to preserve the conversation */}
       <div
         className={`sfab-panel ${open ? "open" : ""}`}
         role="dialog"
@@ -118,9 +140,11 @@ export default function SahayakFab({ journeyConfig }) {
         aria-hidden={!open}
       >
         <button
+          type="button"
           className="sfab-close"
           onClick={() => setOpen(false)}
           aria-label="Close"
+          tabIndex={open ? 0 : -1}
         >
           ×
         </button>

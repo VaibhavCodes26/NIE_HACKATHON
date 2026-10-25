@@ -181,7 +181,7 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
           {suggested && (
             <button className="sh-hero" onClick={() => setShowPhrase(suggested)}>
               <span className="kn">{suggested.kn}</span>
-              <span className="hint">Tap to show this to the driver / shopkeeper</span>
+              <span className="hint">Tap to show this to the person you're talking to </span>
             </button>
           )}
 
@@ -209,6 +209,15 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
             </div>
           )}
           <p className="sh-foot">Phrases come from a curated phrasebook. Ask a local to confirm anything important.</p>
+
+          {result.sources?.length > 0 && (
+            <p className="sh-src">
+              <strong>Sources:</strong> {result.sources.map((x) => x.label).join(" · ")}
+              {result.retrieval && (
+                <em> · {result.retrieval === "embeddings" ? "semantic search" : "keyword search"}</em>
+              )}
+            </p>
+          )}
         </section>
       )}
 
