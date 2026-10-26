@@ -83,5 +83,4 @@ def scan_base64(req: ScanRequest):
     except drishti_service.ScanError as e:
         raise HTTPException(status_code=e.status, detail=e.message)
     except Exception as e:
-        print(f"[DRISHTI SCAN ERROR] {type(e).__name__}: {e}")
-        raise HTTPException(status_code=500, detail="Internal scanning error. Please try again.")
+        raise HTTPException(status_code=500, detail=f"Scan error: {str(e)}")

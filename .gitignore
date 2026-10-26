@@ -1,31 +1,5 @@
-# Secrets and environment files
-*.env
-*.env.*
-!.env.example
 backend/.env
-frontend/.env.local
-frontend/.env
-
-# Databases & local persistent storage
-*.db
-*.sqlite3
-backend/app/nammaprayana.db
-
-# Build artifacts & package manager outputs
-dist/
-frontend/dist/
 node_modules/
-frontend/node_modules/
-
-# Python caches and virtual environments
+.vscode/
 __pycache__/
 *.pyc
-*.pyo
-venv/
-.venv/
-NIE/
-
-# IDE and OS files
-.vscode/
-.DS_Store
-Thumbs.db

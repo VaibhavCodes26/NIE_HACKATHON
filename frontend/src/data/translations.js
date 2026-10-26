@@ -26,11 +26,10 @@ export const T = {
     'cat.coastal.t': 'Coastal Karnataka', 'cat.coastal.s': 'Where the sea meets serenity',
     'cat.historical.t': 'Historical Sites', 'cat.historical.s': 'Walk through time',
     'food.title': 'A Taste of Karnataka', 'food.intro': "Karnataka's cuisine shifts from region to region. These are a few examples, not a complete list.",
-    'food.soon': 'BhojanaRoute — food recommendations connected to your travel route — is planned for a later phase. Nothing here is live restaurant data.',
-    'food.nophoto': 'Photo to be added',
+    
     'about.title': 'About NammaPrayana',
     'about.body': 'NammaPrayana means “our journey”. We want Karnataka to be easier to explore through travel, food and cultural discovery — from the monuments everyone knows to the plates and places people often miss.',
-    'about.ai': 'YatriAI (personalised trip planning) and BhojanaRoute (food along your route) are the next features. They are not live yet.',
+
     'plan.title': 'Plan Your Journey', 'plan.intro': 'YatriAI will help travellers personalise trips across Karnataka. It is not live yet — this form only previews the kind of preferences it will ask for.',
     'plan.interests': 'What draws you to Karnataka?', 'plan.days': 'Trip length', 'plan.d1': '2–3 days', 'plan.d2': '4–6 days', 'plan.d3': '7+ days',
     'plan.submit': 'Save my preferences', 'plan.saved': 'Preferences noted for this visit only. No itinerary is generated and nothing is sent anywhere.',
@@ -42,8 +41,7 @@ export const T = {
     'help.l5': 'Planning and food recommendation tools are coming in later phases and are labelled as such.',
     'dest.facts': 'Good to know', 'dest.learn': 'Learn more on Wikipedia',
     'cat.places': 'Places to start with',
-    'footer.note': 'Phase 1 preview — brand, landing page and cultural discovery. No backend or AI features yet.',
-    'footer.credits': 'Credits',
+    
   },
   hi: {
     tagline: 'खोजिए। चखिए। घूमिए।',
