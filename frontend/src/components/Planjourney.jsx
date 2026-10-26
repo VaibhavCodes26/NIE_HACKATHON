@@ -285,9 +285,14 @@ try {
 
             <div className="journey-container">
                 {!landingSection && onBack && (
-                    <button className="journey-back" type="button" onClick={onBack}>
-                        <ArrowLeft size={17} /> {previewOnly ? "Back to trip setup" : "Home page"}
-                    </button>
+                     <button
+    className={`journey-back ${!previewOnly ? "journey-home-button" : ""}`}
+    type="button"
+    onClick={onBack}
+  >
+    <ArrowLeft size={17} />
+    {previewOnly ? "Back to trip setup" : "Home page"}
+  </button>
                 )}
 
                 {!previewOnly && <>

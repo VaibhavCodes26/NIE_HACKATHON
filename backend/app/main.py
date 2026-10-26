@@ -1363,6 +1363,12 @@ def get_food_spots(city: str, db: Session = Depends(get_db)):
                 "is_must_try": (
                     rating_value is not None and rating_value >= 4.4
                 ),
+                  "image_url": getattr(spot, "image_url", None),
+        "image_source": getattr(spot, "image_source", None),
+        "image_source_url": getattr(spot, "image_source_url", None),
+        "image_credit": getattr(spot, "image_credit", None),
+        "image_license": getattr(spot, "image_license", None),
+        "image_alt": getattr(spot, "image_alt", None),
             }
         )
 

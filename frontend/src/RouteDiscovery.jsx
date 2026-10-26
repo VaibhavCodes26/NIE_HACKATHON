@@ -1,6 +1,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ArrowLeft,
+  House,
   CalendarDays,
   CloudSun,
   Loader2,
@@ -240,6 +242,8 @@ export default function RouteDiscoveryPage({
   initialTo = null,
   onOpenItinerary,
   onOpenSahayak,
+  onBack,
+  onGoHome
 
 }) {
   const effectiveConfig = useMemo(() => {
@@ -252,68 +256,68 @@ export default function RouteDiscoveryPage({
     }
   }, [journeyConfig]);
 
-  const [from, setFrom] = useState( () => getSavedRouteDiscoveryState().from ?? initialFrom);
-  const [to, setTo] = useState( () => getSavedRouteDiscoveryState().to ?? initialTo);
+  const [from, setFrom] = useState(() => getSavedRouteDiscoveryState().from ?? initialFrom);
+  const [to, setTo] = useState(() => getSavedRouteDiscoveryState().to ?? initialTo);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [routes, setRoutes] = useState(() => getSavedRouteDiscoveryState().routes ?? null);
   const [selected, setSelected] = useState(() => getSavedRouteDiscoveryState().selected ?? null);
 
-  
-const [startDate, setStartDate] = useState(
-  () =>
-    getSavedRouteDiscoveryState().startDate ||
-    initialStartDate ||
-    getLocalDateString()
-);
 
-const [tripDays, setTripDays] = useState(() => {
-  const saved = getSavedRouteDiscoveryState();
-
-  if (saved.tripDays) return saved.tripDays;
-
-  if (!initialStartDate || !initialEndDate) return 1;
-
-  const start = new Date(`${initialStartDate}T12:00:00`);
-  const end = new Date(`${initialEndDate}T12:00:00`);
-
-  return Math.max(
-    1,
-    Math.min(7, Math.floor((end - start) / 86400000) + 1)
+  const [startDate, setStartDate] = useState(
+    () =>
+      getSavedRouteDiscoveryState().startDate ||
+      initialStartDate ||
+      getLocalDateString()
   );
-});
+
+  const [tripDays, setTripDays] = useState(() => {
+    const saved = getSavedRouteDiscoveryState();
+
+    if (saved.tripDays) return saved.tripDays;
+
+    if (!initialStartDate || !initialEndDate) return 1;
+
+    const start = new Date(`${initialStartDate}T12:00:00`);
+    const end = new Date(`${initialEndDate}T12:00:00`);
+
+    return Math.max(
+      1,
+      Math.min(7, Math.floor((end - start) / 86400000) + 1)
+    );
+  });
   // Resolve all selected destinations while keeping their order.
   // Restore the cities selected in Plan Your Journey.
-const tourismDestinations = useMemo(() => {
-  const savedDestinations =
-    getSavedRouteDiscoveryState().destinations ?? [];
+  const tourismDestinations = useMemo(() => {
+    const savedDestinations =
+      getSavedRouteDiscoveryState().destinations ?? [];
 
-  const incoming =
-    Array.isArray(initialDestinations) &&
-    initialDestinations.length > 0
-      ? initialDestinations
-      : savedDestinations;
+    const incoming =
+      Array.isArray(initialDestinations) &&
+        initialDestinations.length > 0
+        ? initialDestinations
+        : savedDestinations;
 
-  const resolved = incoming
-    .map(resolveTourismDestination)
-    .filter(Boolean);
+    const resolved = incoming
+      .map(resolveTourismDestination)
+      .filter(Boolean);
 
-  return resolved.filter(
-    (destination, index, all) =>
-      all.findIndex((item) => item.id === destination.id) === index
-  );
-}, [initialDestinations]);
-const [activeDestinationId, setActiveDestinationId] = useState(() => {
-  const saved = getSavedRouteDiscoveryState();
+    return resolved.filter(
+      (destination, index, all) =>
+        all.findIndex((item) => item.id === destination.id) === index
+    );
+  }, [initialDestinations]);
+  const [activeDestinationId, setActiveDestinationId] = useState(() => {
+    const saved = getSavedRouteDiscoveryState();
 
-  return (
-    saved.activeDestinationId ||
-    initialDestinations?.[0]?.id ||
-    initialDestinations?.[0] ||
-    saved.destinations?.[0] ||
-    null
-  );
-});
+    return (
+      saved.activeDestinationId ||
+      initialDestinations?.[0]?.id ||
+      initialDestinations?.[0] ||
+      saved.destinations?.[0] ||
+      null
+    );
+  });
 
   const [attractionsByDestination, setAttractionsByDestination] =
     useState({});
@@ -325,7 +329,7 @@ const [activeDestinationId, setActiveDestinationId] = useState(() => {
     useState({});
 
   const [selectedAttractionIds, setSelectedAttractionIds] = useState(
-  
+
     () => getSavedRouteDiscoveryState().selectedAttractionIds ?? []);
 
   const [weatherByDay, setWeatherByDay] = useState({});
@@ -373,41 +377,41 @@ const [activeDestinationId, setActiveDestinationId] = useState(() => {
 
     return getLocalDateString(end);
   }, [startDate, tripDays]);
-  
-useEffect(() => {
-  try {
-    sessionStorage.setItem(
-      'np_route_discovery_state',
-      JSON.stringify({
-        from,
-        to,
-        routes,
-        selected,
-        startDate,
-        tripDays,
-        activeDestinationId,
-        selectedAttractionIds,
-        weatherByDay,
-        destinations: tourismDestinations.map(
-  (destination) => destination.id
-),
-tourismDestinations,
-      })
-    );
-  } catch (error) {
-    console.error('Unable to save route discovery state:', error);
-  }
-}, [
-  from,
-  to,
-  routes,
-  selected,
-  startDate,
-  tripDays,
-  activeDestinationId,
-  selectedAttractionIds,
-  weatherByDay,
-]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        'np_route_discovery_state',
+        JSON.stringify({
+          from,
+          to,
+          routes,
+          selected,
+          startDate,
+          tripDays,
+          activeDestinationId,
+          selectedAttractionIds,
+          weatherByDay,
+          destinations: tourismDestinations.map(
+            (destination) => destination.id
+          ),
+          tourismDestinations,
+        })
+      );
+    } catch (error) {
+      console.error('Unable to save route discovery state:', error);
+    }
+  }, [
+    from,
+    to,
+    routes,
+    selected,
+    startDate,
+    tripDays,
+    activeDestinationId,
+    selectedAttractionIds,
+    weatherByDay,
+  ]);
 
 
   const resetResults = () => {
@@ -574,9 +578,9 @@ tourismDestinations,
             const sorted = [...data].sort(
               (a, b) =>
                 Number(Boolean(b.is_must_visit)) -
-                  Number(Boolean(a.is_must_visit)) ||
+                Number(Boolean(a.is_must_visit)) ||
                 Number(a.visit_order || 0) -
-                  Number(b.visit_order || 0)
+                Number(b.visit_order || 0)
             );
 
             return {
@@ -704,81 +708,102 @@ tourismDestinations,
     }
   };
 
-// Save selected attractions and open the itinerary page.
-const saveItinerarySelection = () => {
-  if (selectedAttractionIds.length === 0) {
-    window.alert('Please select at least one tourist spot first.');
-    return;
-  }
-
-  const payload = {
-    destinations: tourismDestinations.map(
-      (destination) => destination.id
-    ),
-    selected_attraction_ids: Array.from(new Set(selectedAttractionIds.map(Number))),
-    start_date: startDate,
-    end_date: endDate,
-    trip_days: tripDays,
-    traveller_count: Number(
-      effectiveConfig?.travellerCount ??
-      effectiveConfig?.traveller_count ??
-      3
-    ),
-    travel_style:
-      effectiveConfig?.travelStyle ??
-      effectiveConfig?.travel_style ??
-      'premium',
-    total_budget: Number(
-      effectiveConfig?.totalBudget ??
-      effectiveConfig?.total_budget ??
-      10000
-    ),
-    interests:
-      effectiveConfig?.interests ?? [
-        'Heritage & culture',
-        'Local food',
-      ],
-    selected_places: selectedAttractions.map((place) => ({
-      id: Number(place.id),
-      destination_id: place.destination_id,
-      name: place.name,
-    })),
-  };
-
-  try {
-    sessionStorage.setItem(
-      'np_selected_itinerary',
-      JSON.stringify(payload)
-    );
-    sessionStorage.setItem(
-      'np_journey_config',
-      JSON.stringify({
-        ...effectiveConfig,
-        destinations: payload.destinations,
-        startDate: payload.start_date,
-        endDate: payload.end_date,
-        travellerCount: payload.traveller_count,
-        travelStyle: payload.travel_style,
-        totalBudget: payload.total_budget,
-        interests: payload.interests,
-      })
-    );
-
-    if (typeof onOpenItinerary === 'function') {
-      onOpenItinerary(payload.selected_attraction_ids);
-    } else {
-      console.error('onOpenItinerary callback was not provided.');
-      window.alert('Itinerary navigation is not configured yet.');
+  // Save selected attractions and open the itinerary page.
+  const saveItinerarySelection = () => {
+    if (selectedAttractionIds.length === 0) {
+      window.alert('Please select at least one tourist spot first.');
+      return;
     }
-  } catch (error) {
-    console.error('Unable to save itinerary selection:', error);
-    window.alert('Unable to save your selections. Please try again.');
-  }
-};
+
+    const payload = {
+      destinations: tourismDestinations.map(
+        (destination) => destination.id
+      ),
+      selected_attraction_ids: Array.from(new Set(selectedAttractionIds.map(Number))),
+      start_date: startDate,
+      end_date: endDate,
+      trip_days: tripDays,
+      traveller_count: Number(
+        effectiveConfig?.travellerCount ??
+        effectiveConfig?.traveller_count ??
+        3
+      ),
+      travel_style:
+        effectiveConfig?.travelStyle ??
+        effectiveConfig?.travel_style ??
+        'premium',
+      total_budget: Number(
+        effectiveConfig?.totalBudget ??
+        effectiveConfig?.total_budget ??
+        10000
+      ),
+      interests:
+        effectiveConfig?.interests ?? [
+          'Heritage & culture',
+          'Local food',
+        ],
+      selected_places: selectedAttractions.map((place) => ({
+        id: Number(place.id),
+        destination_id: place.destination_id,
+        name: place.name,
+      })),
+    };
+
+    try {
+      sessionStorage.setItem(
+        'np_selected_itinerary',
+        JSON.stringify(payload)
+      );
+      sessionStorage.setItem(
+        'np_journey_config',
+        JSON.stringify({
+          ...effectiveConfig,
+          destinations: payload.destinations,
+          startDate: payload.start_date,
+          endDate: payload.end_date,
+          travellerCount: payload.traveller_count,
+          travelStyle: payload.travel_style,
+          totalBudget: payload.total_budget,
+          interests: payload.interests,
+        })
+      );
+
+      if (typeof onOpenItinerary === 'function') {
+        onOpenItinerary(payload.selected_attraction_ids);
+      } else {
+        console.error('onOpenItinerary callback was not provided.');
+        window.alert('Itinerary navigation is not configured yet.');
+      }
+    } catch (error) {
+      console.error('Unable to save itinerary selection:', error);
+      window.alert('Unable to save your selections. Please try again.');
+    }
+  };
 
 
   return (
     <div className="rd-page">
+      <div className="rd-top-navigation">
+        <button
+          type="button"
+          className="rd-nav-button"
+          onClick={onBack}
+        >
+          <ArrowLeft size={17} />
+          <span>Back</span>
+        </button>
+
+        <button
+          type="button"
+          className="rd-nav-button"
+          onClick={onGoHome}
+        >
+          <House size={17} />
+          <span>Home</span>
+        </button>
+      </div>
+
+
       <HeroSection />
       <HeritageBorder className="rd-divider" />
 
@@ -811,23 +836,23 @@ const saveItinerarySelection = () => {
             />
           </div>
 
-{selected === 'train' && (
-  <div ref={detailsRef} className="rd-reveal">
-    <TrainSearchPanel />
-  </div>
-)}
+          {selected === 'train' && (
+            <div ref={detailsRef} className="rd-reveal">
+              <TrainSearchPanel />
+            </div>
+          )}
 
-{selected && selected !== 'train' && (
-  <div ref={detailsRef} className="rd-reveal">
-    <RouteDetailsPanel
-      modeId={selected}
-      routes={routes}
-      from={from}
-      to={to}
-      onContinue={onContinue}
-    />
-  </div>
-)}
+          {selected && selected !== 'train' && (
+            <div ref={detailsRef} className="rd-reveal">
+              <RouteDetailsPanel
+                modeId={selected}
+                routes={routes}
+                from={from}
+                to={to}
+                onContinue={onContinue}
+              />
+            </div>
+          )}
         </>
       )}
 
@@ -927,9 +952,8 @@ const saveItinerarySelection = () => {
                   type="button"
                   role="tab"
                   aria-selected={active}
-                  className={`rd-city-tab${
-                    active ? ' is-active' : ''
-                  }`}
+                  className={`rd-city-tab${active ? ' is-active' : ''
+                    }`}
                   onClick={() =>
                     setActiveDestinationId(destination.id)
                   }
@@ -993,9 +1017,8 @@ const saveItinerarySelection = () => {
                     return (
                       <label
                         key={place.id}
-                        className={`rd-attraction-card${
-                          isChecked ? ' is-selected' : ''
-                        }`}
+                        className={`rd-attraction-card${isChecked ? ' is-selected' : ''
+                          }`}
                       >
                         <input
                           type="checkbox"
@@ -1036,14 +1059,12 @@ const saveItinerarySelection = () => {
 
                                 {place.estimated_duration_minutes >= 60
                                   ? `${Math.floor(
-                                      place.estimated_duration_minutes / 60
-                                    )}h${
-                                      place.estimated_duration_minutes % 60
-                                        ? ` ${
-                                            place.estimated_duration_minutes % 60
-                                          }m`
-                                        : ''
-                                    }`
+                                    place.estimated_duration_minutes / 60
+                                  )}h${place.estimated_duration_minutes % 60
+                                    ? ` ${place.estimated_duration_minutes % 60
+                                    }m`
+                                    : ''
+                                  }`
                                   : `${place.estimated_duration_minutes} min`}
                               </span>
                             )}
@@ -1111,7 +1132,7 @@ const saveItinerarySelection = () => {
             type="button"
             className="rd-quick-nav__item rd-quick-nav__item--primary"
             onClick={saveItinerarySelection}
-            
+
           >
             <span className="rd-quick-nav__icon">
               <Map size={23} />
@@ -1121,7 +1142,7 @@ const saveItinerarySelection = () => {
               <strong>Get Your Itinerary</strong>
               <small>Build your Karnataka journey</small>
             </span>
-            
+
             <ArrowRight
               className="rd-quick-nav__arrow"
               size={19}

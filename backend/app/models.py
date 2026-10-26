@@ -5,16 +5,16 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
+    Column,
     DateTime,
     ForeignKey,
     Index,
     Integer,
+    JSON,
     String,
     Text,
-    Column,
     UniqueConstraint,
 )
-from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -66,15 +66,13 @@ class Attraction(Base):
     category: Mapped[str] = mapped_column(String(80), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # Example: "09:00–11:00". This is a suggested visit window,
-    # not a verified opening-hours claim.
+    # Suggested visit window, not verified opening hours.
     suggested_time: Mapped[str] = mapped_column(
         String(60),
         default="Time to be planned",
         nullable=False,
     )
 
-    # Example: ["Heritage & culture", "Tourist attractions"]
     interest_tags: Mapped[list[str]] = mapped_column(
         JSON,
         default=list,
@@ -98,8 +96,6 @@ class Attraction(Base):
         nullable=False,
     )
 
-    # Use "curated_reference" only for reviewed reference data.
-    # Unverified information must be labelled accordingly.
     source_status: Mapped[str] = mapped_column(
         String(40),
         default="needs_verification",
@@ -130,29 +126,108 @@ class Attraction(Base):
             f"destination_id={self.destination_id!r})"
         )
 
+
 class FoodSpot(Base):
+    """A local food spot with optional image and attribution metadata."""
+
     __tablename__ = "food_spots"
+
     __table_args__ = (
-        # Each city reuses spot_ids 1-8, so we need a composite unique key.
-        UniqueConstraint("city", "spot_id", name="uq_food_spots_city_spot"),
+        # Spot IDs can repeat across cities.
+        UniqueConstraint(
+            "city",
+            "spot_id",
+            name="uq_food_spots_city_spot",
+        ),
     )
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    spot_id = Column(Integer, nullable=False, index=True)
-    city = Column(String(100), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
 
-    tourist_attraction = Column(String(200), nullable=False)
-    famous_food_spot = Column(String(200), nullable=False)
-    speciality_dish = Column(String(300), nullable=False)
+    spot_id: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        index=True,
+    )
 
-    rating_as_per_google = Column(String(30), nullable=True)
-    description = Column(Text, nullable=True)
-    google_maps_link = Column(Text, nullable=True)
+    city: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+        index=True,
+    )
 
+    tourist_attraction: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
 
-# ---------------------------------------------------------------------------
-# Authentication models
-# ---------------------------------------------------------------------------
+    famous_food_spot: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
+
+    speciality_dish: Mapped[str] = mapped_column(
+        String(300),
+        nullable=False,
+    )
+
+    rating_as_per_google: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    google_maps_link: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    # Optional food photography.
+    image_url: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    # Image source and licensing attribution.
+    image_source: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    image_source_url: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    image_credit: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    image_license: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    image_alt: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"FoodSpot(id={self.id!r}, "
+            f"city={self.city!r}, "
+            f"name={self.famous_food_spot!r})"
+        )
+
 
 class User(Base):
     """Authenticated NammaPrayana user account."""
@@ -171,7 +246,7 @@ class User(Base):
     # Nullable for Google-only accounts.
     password_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    # Stable Google subject identifier (sub claim). Nullable for password accounts.
+    # Stable Google subject identifier.
     google_sub: Mapped[str | None] = mapped_column(
         String(200),
         unique=True,
@@ -179,8 +254,10 @@ class User(Base):
         index=True,
     )
 
-    # Optional email — stored only when provided by Google; never used as identity key.
-    email: Mapped[str | None] = mapped_column(String(254), nullable=True)
+    email: Mapped[str | None] = mapped_column(
+        String(254),
+        nullable=True,
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -216,7 +293,7 @@ class UserSession(Base):
         index=True,
     )
 
-    # Opaque, cryptographically random token stored in the HttpOnly cookie.
+    # Opaque, cryptographically random token stored in an HttpOnly cookie.
     token: Mapped[str] = mapped_column(
         String(100),
         unique=True,
@@ -239,8 +316,10 @@ class UserSession(Base):
 
     def is_expired(self) -> bool:
         expires = self.expires_at
+
         if expires.tzinfo is None:
             expires = expires.replace(tzinfo=timezone.utc)
+
         return datetime.now(timezone.utc) >= expires
 
     def __repr__(self) -> str:
@@ -261,32 +340,53 @@ class SavedItinerary(Base):
         index=True,
     )
 
-    # Human-readable trip title (e.g. "Your Karnataka Journey: Bengaluru → Mysuru")
     title: Mapped[str] = mapped_column(String(400), nullable=False)
 
-    # Original Plan Your Journey configuration as JSON
     trip_config: Mapped[dict] = mapped_column(JSON, nullable=False)
 
-    # Complete AI-generated itinerary payload (days, warnings, gati, etc.)
     itinerary_payload: Mapped[dict] = mapped_column(JSON, nullable=False)
 
-    # Ordered list of destination names for quick display
-    destinations: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-
-    # Selected attraction IDs
-    selected_attraction_ids: Mapped[list] = mapped_column(
-        JSON, nullable=False, default=list
+    destinations: Mapped[list] = mapped_column(
+        JSON,
+        nullable=False,
+        default=list,
     )
 
-    start_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    end_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    selected_attraction_ids: Mapped[list] = mapped_column(
+        JSON,
+        nullable=False,
+        default=list,
+    )
 
-    traveller_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    total_budget: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    travel_style: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    start_date: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
 
-    # ISO-format number of trip days for quick display
-    duration_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    end_date: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    traveller_count: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    total_budget: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    travel_style: Mapped[str | None] = mapped_column(
+        String(40),
+        nullable=True,
+    )
+
+    duration_days: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -304,8 +404,16 @@ class SavedItinerary(Base):
     user: Mapped["User"] = relationship(back_populates="saved_itineraries")
 
     __table_args__ = (
-        Index("ix_saved_itineraries_user_id_created_at", "user_id", "created_at"),
+        Index(
+            "ix_saved_itineraries_user_id_created_at",
+            "user_id",
+            "created_at",
+        ),
     )
 
     def __repr__(self) -> str:
-        return f"SavedItinerary(id={self.id!r}, user_id={self.user_id!r}, title={self.title!r})"
+        return (
+            f"SavedItinerary(id={self.id!r}, "
+            f"user_id={self.user_id!r}, "
+            f"title={self.title!r})"
+        )

@@ -9,6 +9,7 @@ Pure Python. No external API calls, no tokens. Runs BEFORE Gemini:
 The effort numbers are editorial ratings (our own estimates), not measurements.
 Tune RULES / EFFORT_OVERRIDES freely, or store an `effort` (0-100) column in your DB.
 """
+import math
 import re
 from datetime import date, timedelta
 from typing import Any, Optional
@@ -16,6 +17,118 @@ from typing import Any, Optional
 BASE_CAPACITY = 150      # effort points a healthy adult group can handle per day
 CITY_CHANGE_COST = 40    # extra effort if a day covers two cities (travel between them)
 STRETCH = 1.15           # a day may go 15% over capacity before a stop is deferred
+
+# Canonical coordinates for major Karnataka cities
+KARNATAKA_CITY_COORDS = {
+    "bengaluru": (12.9716, 77.5946),
+    "bangalore": (12.9716, 77.5946),
+    "mysuru": (12.2958, 76.6394),
+    "mysore": (12.2958, 76.6394),
+    "hubballi": (15.3647, 75.1240),
+    "hubli": (15.3647, 75.1240),
+    "belagavi": (15.8497, 74.4977),
+    "belgaum": (15.8497, 74.4977),
+    "mangaluru": (12.9141, 74.8560),
+    "mangalore": (12.9141, 74.8560),
+    "udupi": (13.3409, 74.7421),
+    "gokarna": (14.5479, 74.3188),
+    "hampi": (15.3350, 76.4600),
+    "hospet": (15.3350, 76.4600),
+    "badami": (15.9149, 75.6768),
+    "coorg": (12.4244, 75.7382),
+    "madikeri": (12.4244, 75.7382),
+    "chikkamagaluru": (13.3161, 75.7720),
+    "chikmagalur": (13.3161, 75.7720),
+    "shivamogga": (13.9299, 75.5681),
+    "shimoga": (13.9299, 75.5681),
+    "vijayapura": (16.8302, 75.7100),
+    "kalaburagi": (17.3297, 76.8343),
+    "bidar": (17.9133, 77.5301),
+    "ballari": (15.1394, 76.9214),
+    "hassan": (13.0033, 76.1004),
+    "davanagere": (14.4644, 75.9218),
+    "tumakuru": (13.3379, 77.1173),
+    "karwar": (14.8136, 74.1297),
+    "dandeli": (15.2427, 74.6190),
+}
+
+# Pre-calibrated road corridors (distance_km, duration_minutes, highway)
+KNOWN_INTERCITY_ROUTES = {
+    ("hubballi", "belagavi"): (102, 115, "NH 48"),
+    ("belagavi", "hubballi"): (102, 115, "NH 48"),
+    ("bengaluru", "mysuru"): (145, 135, "Mysuru-Bengaluru Exp / NH 275"),
+    ("mysuru", "bengaluru"): (145, 135, "Mysuru-Bengaluru Exp / NH 275"),
+    ("mysuru", "coorg"): (120, 165, "NH 275"),
+    ("coorg", "mysuru"): (120, 165, "NH 275"),
+    ("mangaluru", "udupi"): (55, 75, "NH 66"),
+    ("udupi", "mangaluru"): (55, 75, "NH 66"),
+    ("udupi", "gokarna"): (178, 210, "NH 66"),
+    ("gokarna", "udupi"): (178, 210, "NH 66"),
+    ("hubballi", "hampi"): (145, 180, "NH 67"),
+    ("hampi", "hubballi"): (145, 180, "NH 67"),
+    ("hubballi", "badami"): (105, 135, "SH 34"),
+    ("badami", "hubballi"): (105, 135, "SH 34"),
+    ("badami", "hampi"): (140, 180, "State Highway"),
+    ("hampi", "badami"): (140, 180, "State Highway"),
+    ("badami", "belagavi"): (148, 195, "SH 20"),
+    ("belagavi", "badami"): (148, 195, "SH 20"),
+    ("bengaluru", "chikkamagaluru"): (245, 270, "NH 75 / SH 57"),
+    ("chikkamagaluru", "bengaluru"): (245, 270, "NH 75 / SH 57"),
+    ("bengaluru", "shivamogga"): (295, 330, "NH 69"),
+    ("shivamogga", "bengaluru"): (295, 330, "NH 69"),
+    ("shivamogga", "chikkamagaluru"): (95, 120, "NH 173"),
+    ("chikkamagaluru", "shivamogga"): (95, 120, "NH 173"),
+    ("kalaburagi", "vijayapura"): (165, 195, "NH 50"),
+    ("vijayapura", "kalaburagi"): (165, 195, "NH 50"),
+}
+
+def _calc_intercity_travel(from_city: str, to_city: str) -> Optional[dict]:
+    if not from_city or not to_city:
+        return None
+    k1 = re.sub(r"[^a-z0-9]", "", from_city.lower())
+    k2 = re.sub(r"[^a-z0-9]", "", to_city.lower())
+    if not k1 or not k2 or k1 == k2:
+        return None
+    if (k1, k2) in KNOWN_INTERCITY_ROUTES:
+        km, mins, hwy = KNOWN_INTERCITY_ROUTES[(k1, k2)]
+        hrs, rem = divmod(mins, 60)
+        dur_text = f"{hrs} hr {rem} min" if rem else f"{hrs} hr"
+        return {
+            "from_city": from_city.strip().title(),
+            "to_city": to_city.strip().title(),
+            "distance_km": km,
+            "duration_minutes": mins,
+            "duration_text": dur_text,
+            "highway": hwy,
+            "hint": "Need more route details, transport options, or fare estimates? Explore Route Discovery.",
+        }
+    c1 = KARNATAKA_CITY_COORDS.get(k1)
+    c2 = KARNATAKA_CITY_COORDS.get(k2)
+    if c1 and c2:
+        lat1, lon1 = c1
+        lat2, lon2 = c2
+        r_lat1, r_lat2 = math.radians(lat1), math.radians(lat2)
+        dlat = math.radians(lat2 - lat1)
+        dlon = math.radians(lon2 - lon1)
+        a = math.sin(dlat / 2)**2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        crow_km = 6371 * c
+        if crow_km < 15:
+            return None
+        est_km = round(crow_km * 1.25)
+        mins = round((est_km / 55.0) * 60) + 20
+        hrs, rem = divmod(mins, 60)
+        dur_text = f"{hrs} hr {rem} min" if rem else f"{hrs} hr"
+        return {
+            "from_city": from_city.strip().title(),
+            "to_city": to_city.strip().title(),
+            "distance_km": est_km,
+            "duration_minutes": mins,
+            "duration_text": dur_text,
+            "highway": "National / State Highway",
+            "hint": "Need more route details, transport options, or fare estimates? Explore Route Discovery.",
+        }
+    return None
 
 # (regex, points). The highest matching rule wins.
 RULES = [
@@ -506,6 +619,7 @@ def plan(
             if dest and d_str:
                 weather_by_city_date[(dest, d_str)] = entry
 
+    prev_primary_city = None
     for i, b in enumerate(day_buckets[:n_days], start=1):
         ordered = _order_day(b["stops"])
 
@@ -523,6 +637,17 @@ def plan(
         day_dest = " + ".join(actual_cities) if actual_cities else "Flexible"
         city_change = len(actual_cities) > 1
         total = sum(s["effort"] for s in ordered) + (CITY_CHANGE_COST if city_change else 0)
+
+        current_primary_city = actual_cities[0] if actual_cities else b.get("assigned_city")
+        intercity_leg = None
+        if prev_primary_city and current_primary_city and prev_primary_city.lower() != current_primary_city.lower():
+            intercity_leg = _calc_intercity_travel(prev_primary_city, current_primary_city)
+            if intercity_leg:
+                transit_effort = min(30, max(15, round(intercity_leg["distance_km"] * 0.15)))
+                total += transit_effort
+
+        if current_primary_city and current_primary_city != "Trip":
+            prev_primary_city = current_primary_city
 
         day_date_str = (base_date + timedelta(days=i - 1)).isoformat() if base_date else None
 
@@ -583,6 +708,12 @@ def plan(
                 elif rain_friendly:
                     s["weather_note"] = "Sheltered indoor venue ideal for rainy conditions."
 
+        if intercity_leg:
+            notes.append(
+                f"Intercity travel from {intercity_leg['from_city']} to {intercity_leg['to_city']} "
+                f"({intercity_leg['distance_km']} km, ~{intercity_leg['duration_text']}): schedule paced around transit."
+            )
+
         days.append({
             "day": i,
             "day_number": i,
@@ -594,6 +725,7 @@ def plan(
             "capacity": cap,
             "status": status,
             "notes": notes,
+            "intercity_travel": intercity_leg,
         })
 
     warnings = []

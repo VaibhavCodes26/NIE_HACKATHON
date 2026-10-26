@@ -61,9 +61,8 @@ export default function TransportOptions({ routes, selected, onSelect, from, to 
               return (
                 <li key={id}>
                   <article
-                    className={`rd-mode rd-mode--${id} ${isSel ? 'is-selected' : ''} ${
-                      m.available || id === 'train' ? '' : 'is-unavailable'
-                    }`}
+                    className={`rd-mode rd-mode--${id} ${isSel ? 'is-selected' : ''} ${m.available || id === 'train' ? '' : 'is-unavailable'
+                      }`}
                   >
                     {isSel && (
                       <span className="rd-mode__check" aria-hidden="true">
@@ -76,27 +75,43 @@ export default function TransportOptions({ routes, selected, onSelect, from, to 
                     <h3>{title}</h3>
                     <p className="rd-mode__blurb">{blurb}</p>
 
-                    <dl className="rd-mode__stats">
-                      <div>
-                        <dt>Duration</dt>
-                        <dd>{id === 'train' ? 'Search trains' : m.available ? formatDuration(m.durationMin) : '—'}</dd>
-                      </div>
-                      <div>
-                        <dt>Distance</dt>
-                        <dd>{id === 'train' ? 'Search trains' : formattedDist}</dd>
-                      </div>
-                      <div>
-                        <dt>Est. fare</dt>
-                        <dd>{id === 'train' ? 'Search trains' : m.available ? m.fare : '—'}</dd>
-                      </div>
-                      {m.available &&
-                        extras.map((x) => (
-                          <div key={x.label}>
-                            <dt>{x.label}</dt>
-                            <dd>{x.value}</dd>
-                          </div>
-                        ))}
-                    </dl>
+                   
+<dl className="rd-mode__stats">
+  {id === 'train' || id === 'bus' ? (
+    <div className="rd-mode__more-info">
+      <dt>Travel Information</dt>
+      <dd>
+        For schedules, routes, and fare details,
+        click the button below.
+      </dd>
+    </div>
+  ) : (
+    <>
+      <div>
+        <dt>Duration</dt>
+        <dd>
+          {m.available ? formatDuration(m.durationMin) : '—'}
+        </dd>
+      </div>
+      <div>
+        <dt>Distance</dt>
+        <dd>{formattedDist}</dd>
+      </div>
+      <div>
+        <dt>Est. fare</dt>
+        <dd>{m.available ? m.fare : '—'}</dd>
+      </div>
+      {m.available &&
+        extras.map((x) => (
+          <div key={x.label}>
+            <dt>{x.label}</dt>
+            <dd>{x.value}</dd>
+          </div>
+        ))}
+    </>
+  )}
+</dl>
+
 
                     {id === 'walking' && m.warning && (
                       <p className="rd-mode__warn">

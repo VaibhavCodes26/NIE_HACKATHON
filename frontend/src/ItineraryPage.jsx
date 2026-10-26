@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
+  Car,
   Check,
   ChevronDown,
   Cloud,
@@ -11,7 +12,6 @@ import {
   Compass,
   Hotel,
   MapPin,
-  Moon,
   RefreshCw,
   Sparkles,
   Sun,
@@ -31,6 +31,7 @@ import {
   BookmarkCheck,
   Loader2,
 } from "lucide-react";
+import { getIntercityTravelLeg } from "./utils/intercityRoutes";
 import "./ItineraryPage.css";
 import "./auth.css";
 import { KaMark, Wordmark } from "./components/Logo.jsx";
@@ -186,6 +187,7 @@ export default function ItineraryPage({
   onRequireLogin,
   onBack,
   onModifyJourney,
+  onNavigateRouteDiscovery,
 }) {
  console.log("ITINERARY PAGE IS RUNNING");
 const config = journeyConfig ?? {};
@@ -804,6 +806,37 @@ const submitAdjustment = async () => {
   }
 };
 
+// Compute intercity travel leg for the currently active day
+const activeIntercityLeg = useMemo(() => {
+  // Prefer backend-supplied intercity_travel on the day object
+  const backendLeg = selectedDay?.intercity_travel;
+  if (backendLeg && backendLeg.from_city && backendLeg.to_city) {
+    const fromName = String(backendLeg.from_city).replace(/[_-]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    const toName   = String(backendLeg.to_city  ).replace(/[_-]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    if (fromName.toLowerCase() !== toName.toLowerCase()) {
+      return {
+        isIntercity: true,
+        fromCity: fromName,
+        toCity:   toName,
+        distanceKm:      backendLeg.distance_km      ?? null,
+        durationMinutes: backendLeg.duration_minutes ?? null,
+        durationText:    backendLeg.duration_text    ?? (backendLeg.duration_minutes ? `${Math.floor(backendLeg.duration_minutes/60)} hr ${backendLeg.duration_minutes%60} min` : 'Approx. 2–4 hr drive'),
+        highway:         backendLeg.highway          ?? 'Karnataka Road Network',
+        recommendedDeparture: backendLeg.recommended_departure ?? 'Early morning departure recommended',
+        sightseeingAdjustment: backendLeg.sightseeing_note   ?? 'Sightseeing hours adjusted for travel between cities.',
+        hintText: 'Need more route details, transport options, or fare estimates? Explore Route Discovery.',
+      };
+    }
+  }
+  // Fall back to deterministic utility using consecutive destinations
+  if (destinations.length >= 2 && activeDay < destinations.length) {
+    const from = destinations[activeDay - 1] ?? null;
+    const to   = destinations[activeDay]     ?? null;
+    if (from && to) return getIntercityTravelLeg(from, to);
+  }
+  return null;
+}, [selectedDay, destinations, activeDay]);
+
 return (
   <main className="itinerary-page">
     <div className="itinerary-page__texture" aria-hidden="true" />
@@ -1383,6 +1416,50 @@ return (
                 <p className="itinerary-day-summary">
                   {selectedDay.summary}
                 </p>
+              )}
+
+              {/* Intercity travel card */}
+              {activeIntercityLeg && (
+                <div className="itinerary-intercity-card">
+                  <div className="itinerary-intercity-card__header">
+                    <Car size={18} aria-hidden="true" />
+                    <strong>
+                      {activeIntercityLeg.fromCity} → {activeIntercityLeg.toCity}
+                    </strong>
+                    <span className="itinerary-intercity-card__duration">
+                      {activeIntercityLeg.durationText}
+                    </span>
+                    {activeIntercityLeg.distanceKm && (
+                      <span className="itinerary-intercity-card__distance">
+                        ~{activeIntercityLeg.distanceKm} km
+                      </span>
+                    )}
+                    {!activeIntercityLeg.distanceKm && (
+                      <span className="itinerary-intercity-card__estimate-label">Estimate</span>
+                    )}
+                  </div>
+                  {activeIntercityLeg.highway && (
+                    <p className="itinerary-intercity-card__highway">
+                      via {activeIntercityLeg.highway}
+                    </p>
+                  )}
+                  <p className="itinerary-intercity-card__advice">
+                    <strong>Departure:</strong> {activeIntercityLeg.recommendedDeparture}
+                  </p>
+                  <p className="itinerary-intercity-card__note">
+                    {activeIntercityLeg.sightseeingAdjustment}
+                  </p>
+                  <p className="itinerary-intercity-card__hint">
+                    Need more route details, transport options, or fare estimates?{' '}
+                    <button
+                      type="button"
+                      className="itinerary-intercity-card__hint-link"
+                      onClick={() => onNavigateRouteDiscovery?.()}
+                    >
+                      Explore Route Discovery.
+                    </button>
+                  </p>
+                </div>
               )}
 
               {selectedDayItems.length > 0 ? (

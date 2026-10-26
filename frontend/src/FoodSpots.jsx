@@ -229,7 +229,7 @@ export default function FoodSpots() {
               <p>{error}</p>
               <button
                 type="button"
-                onClick={() => setSelectedCity((city) => `${city} ` .trim())}
+                onClick={() => setSelectedCity((city) => `${city} `.trim())}
               >
                 Try again
               </button>
@@ -299,7 +299,7 @@ export default function FoodSpots() {
                     food.speciality_dish || food.dish || '';
 
                   const attraction =
-                    food.tourist_attraction || food.category || '';
+                    food.tourist_attraction || food.category || 'Local food';
 
                   const description =
                     food.description ||
@@ -307,6 +307,12 @@ export default function FoodSpots() {
 
                   const imageUrl =
                     food.image_url || food.image || '';
+                  console.log('FOOD IMAGE DEBUG:', {
+                    restaurant,
+                    image_url: food.image_url,
+                    image: food.image,
+                    imageUrl,
+                  });
 
                   const mapsUrl =
                     food.google_maps_link ||
@@ -320,36 +326,48 @@ export default function FoodSpots() {
                       className="fs-food-card"
                       key={food.spot_id ?? food.id ?? `${restaurant}-${index}`}
                     >
+
                       <div className="fs-food-card__image-wrap">
-                        {imageUrl ? (
+                        {/* Fallback stays underneath the image */}
+                        <div className="fs-food-card__image-placeholder">
+                          <Utensils size={34} />
+                          <span>{dish || 'Karnataka Cuisine'}</span>
+                        </div>
+
+                        {imageUrl && (
                           <img
                             className="fs-food-card__image"
                             src={imageUrl}
-                            alt={dish || restaurant}
+                            alt={`${dish || 'Local Karnataka food'} at ${restaurant}`}
                             loading="lazy"
                             onError={(event) => {
                               event.currentTarget.style.display = 'none';
                             }}
                           />
-                        ) : (
-                          <div className="fs-food-card__image-placeholder">
-                            <Utensils size={34} />
-                            <span>{dish || 'Karnataka Cuisine'}</span>
-                          </div>
                         )}
 
-                        {attraction && (
-                          <span className="fs-food-card__category">
-                            {attraction}
-                          </span>
-                        )}
+                        <div
+                          className="fs-food-card__image-overlay"
+                          aria-hidden="true"
+                        />
+
+                        <span className="fs-food-card__category">
+                          {attraction || 'Local food'}
+                        </span>
 
                         {food.is_must_try && (
                           <span className="fs-food-card__must">
                             Must try
                           </span>
                         )}
+
+                        {dish && (
+                          <h3 className="fs-food-card__image-title">
+                            {dish}
+                          </h3>
+                        )}
                       </div>
+
 
                       <div className="fs-food-card__body">
                         <span className="fs-food-card__city">

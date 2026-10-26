@@ -1174,3 +1174,42 @@
   }
 }
 
+.stays-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stays-brand-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stays-brand .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  line-height: 1.2;
+}
+
+.stays-brand .wordmark .w-red {
+  color: var(--red);
+}
+
+.stays-brand .wordmark .w-gold {
+  color: var(--gold);
+}
+
+.stays-brand-content small {
+  color: var(--gold);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}

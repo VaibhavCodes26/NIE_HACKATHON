@@ -9,7 +9,15 @@
                 "speciality_dish": "Rava Idli and Filter Coffee",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "An iconic culinary landmark established in 1924, legendary among tourists and locals alike for inventing the Rava Idli and serving pristine traditional South Indian tiffins.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=MTR+Lalbagh+Road+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=MTR+Lalbagh+Road+Bangalore",
+                "category": "Local food",
+                "is_must_try": true,
+                "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/MTR_Rava_Idli.jpg",
+                "image_source": "Wikimedia Commons",
+                "image_source_url": "https://commons.wikimedia.org/wiki/File:MTR_Rava_Idli.jpg",
+                "image_credit": "Maharana7573",
+                "image_license": "CC BY-SA 4.0",
+                "image_alt": "Rava idli served at MTR Bengaluru"
             },
             {
                 "spot_id": 2,
@@ -18,7 +26,8 @@
                 "speciality_dish": "South Indian Filter Coffee and Mirchi Bajji / Bonda",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An open-air, drive-in heritage restaurant nestled under large shade trees near Cubbon Park, serving classic hot snacks like crunchy mirchi bajjis and filter coffee in a unique natural ambiance.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Airlines+Hotel+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Airlines+Hotel+Bangalore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxKwzJGmIQ8ySE9Cd-o9R0syqSwL3g_40RviUaBRean7o7Ee1pYTN2HvE&s=10"
             },
             {
                 "spot_id": 3,
@@ -27,7 +36,8 @@
                 "speciality_dish": "Khali Dosa with Chutney",
                 "rating_as_per_google": "4.6 / 5",
                 "description": "A world-famous street-side stall near Malleshwaram known for drawing massive tourist crowds for its legendary, buttery khali dosas served right on the pavement.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Raghavendra+Stores+Malleshwaram+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Raghavendra+Stores+Malleshwaram+Bangalore",
+                "image_url": "https://static.wixstatic.com/media/f257ed_392ec840174d415094e8d796f4278890~mv2.jpg/v1/fill/w_568,h_758,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/f257ed_392ec840174d415094e8d796f4278890~mv2.jpg"
             },
             {
                 "spot_id": 4,
@@ -36,7 +46,8 @@
                 "speciality_dish": "Bisi Bele Bath and Mangalore Buns",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Located in Malleshwaram, this heritage eatery is a must-visit for tourists seeking authentic Karnataka breakfast and tiffin items like comforting Bisi Bele Bath and sweet-crispy Mangalore buns.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Janatha+Hotel+Malleshwaram+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Janatha+Hotel+Malleshwaram+Bangalore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWF9nMVcVL4teR4Vs0yqFPxRivV2SySCU4gLzZD5qmIuRtUiMKl2TPGOQ&s=10"
             },
             {
                 "spot_id": 5,
@@ -45,7 +56,8 @@
                 "speciality_dish": "Ragi Dosa, Set Dosa, and Bonda Soup",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A historic vegetarian haven near the city center famous for offering wholesome Karnataka staples, including nutritious ragi-based dosas and piping hot bonda soup.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Krishna+Bhavan+Sampige+Road+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Krishna+Bhavan+Sampige+Road+Bangalore",
+                "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/New_Krishna_Bhavan.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original"
             },
             {
                 "spot_id": 6,
@@ -54,7 +66,8 @@
                 "speciality_dish": "Andhra Meals and Nati Style Chicken Biryani",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A well-known regional dining spot popular with visitors heading towards Bannerghatta, famous for rich spice-infused southern meals and flavorful local non-vegetarian preparations.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nandana+Palace+Bannerghatta+Road+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nandana+Palace+Bannerghatta+Road+Bangalore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuPtgvRS_hjwJpL16N0Snqh1H03u8T2rlY4ycC3rkk71puL7Phev00slxr&s=10"
             },
             {
                 "spot_id": 7,
@@ -63,7 +76,8 @@
                 "speciality_dish": "Ragi Mudde with Nati Mutton Curry and Girmit",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "The quintessential destination for food explorers wanting to experience authentic rural Karnataka comfort food, serving hot Ragi Mudde paired with robust country-style mutton and spicy snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kaveri+Mess+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kaveri+Mess+Bangalore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZymhgknMpCctAWdSEG5S9P-ClUgn9MfAKE82WqyWvwCrbUy0Q9a00Jsfe&s=10"
             },
             {
                 "spot_id": 8,
@@ -72,7 +86,8 @@
                 "speciality_dish": "Masale Dosa and Filter Coffee",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "An absolute pilgrimage site for every food tourist visiting Bengaluru, operating since 1943 in Gandhi Bazaar and famous for its legendary, ghee-drenched, golden-crisp Masale Dosa.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Vidyarthi+Bhavan+Gandhi+Bazaar+Bangalore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Vidyarthi+Bhavan+Gandhi+Bazaar+Bangalore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_tJwfhqBBi3HoXoSPurf7Mzv_ekCXoPp5jSP3Fn7zN2gWs7pOlDeh6tGl&s=10"
             }
         ]
     },
@@ -86,7 +101,8 @@
                 "speciality_dish": "Original Mysore Pak",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "Located near the historic Devaraja Market right next to the Palace, this legendary heritage shop is run by descendants of the royal kitchen chefs who invented the authentic ghee-laden Mysore Pak.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Guru+Sweets+Devaraja+Market+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Guru+Sweets+Devaraja+Market+Mysore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLSTqikAqQwDZQMSwpM0dVbRscgqh8g37aHe-iyWaDKPoJLCJZfJx8QTyu&s=10"
             },
             {
                 "spot_id": 2,
@@ -95,7 +111,8 @@
                 "speciality_dish": "Mylari Butter Dosa with Coconut Chutney",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "An absolute must-visit tourist institution a short drive from the cathedral, famous for serving pillow-soft, butter-soaked dosas on banana leaves with freshly ground paste-like coconut chutney.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Original+Vinayaka+Mylari+Nazarbad+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Original+Vinayaka+Mylari+Nazarbad+Mysore",
+                "image_url": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/32/0f/32/7c/caption.jpg?w=1100&h=1100&s=1"
             },
             {
                 "spot_id": 3,
@@ -104,7 +121,8 @@
                 "speciality_dish": "Soft Idli, Kesari Bath, and Traditional Kashaya Tea",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "Situated near the foothills of Chamundi Hill with rustic village-hut decor, heavily frequented by tourists and locals for authentic traditional Karnataka breakfast items.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Halli+Hatti+KC+Layout+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Halli+Hatti+KC+Layout+Mysore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBTmE7rkDstjdv0wc0B049PUUSWkeBdItK_-i4XUl1gqcIDFeA1AYmrygB&s=10"
             },
             {
                 "spot_id": 4,
@@ -113,7 +131,8 @@
                 "speciality_dish": "Nati-style Chicken Biryani and Pepper Chicken",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A legendary tourist landmark near Gandhi Square renowned for authentic Karnataka non-vegetarian meals and spicy local-style biryanis served on banana leaves.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+RRR+Gandhi+Square+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+RRR+Gandhi+Square+Mysore",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2X30Lugy-lfOLFImrNFl9dPC6iIOlx_x_GP-jLw5jiyTrtWvgfMA6YE&s=10"
             },
             {
                 "spot_id": 5,
@@ -122,7 +141,8 @@
                 "speciality_dish": "Mutton Pulav and Kheema Balls",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A mandatory stop for food tourists near Mandi Mohalla, serving legendary aromatic spice-infused mutton pulao and local delicacies since 1930.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hanumanthu+Mutton+Pulav+Mandi+Mohalla+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hanumanthu+Mutton+Pulav+Mandi+Mohalla+Mysore",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chennuru_Mutton_Pulao.jpg"
             },
             {
                 "spot_id": 6,
@@ -131,7 +151,8 @@
                 "speciality_dish": "Traditional Karnataka Thali & Bisi Bele Bath",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A prominent family restaurant on the transit route towards Brindavan Gardens offering extensive traditional South Indian thalis and Karnataka comfort meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=SPR+Veg+Gokulam+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=SPR+Veg+Gokulam+Mysore",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mysore_style_bisibele_bath.jpg"
             },
             {
                 "spot_id": 7,
@@ -140,7 +161,8 @@
                 "speciality_dish": "Ragi Mudde with Nati Mutton Saaru / Chicken Curry",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "The quintessential destination for tourists seeking authentic rural Karnataka cuisine, famous for its piping hot Ragi Mudde paired with spicy country-style mutton and chicken gravies.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tegu+Mess+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tegu+Mess+Mysore",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 8,
@@ -149,7 +171,8 @@
                 "speciality_dish": "Badam Milk, Dharwad Pedha, and Savories",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A premier heritage sweet house across the city trusted by tourists to sample regional Karnataka sweets, rich milk beverages, and traditional snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shree+Mahalakshmi+Sweets+Ashoka+Road+Mysore"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shree+Mahalakshmi+Sweets+Ashoka+Road+Mysore",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             }
         ]
     },
@@ -163,7 +186,8 @@
                 "speciality_dish": "Traditional South Indian Meals and Crispy Vada",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located right near the famous Hasanamba Temple circle, this revered local canteen is a mandatory stop for pilgrims and tourists looking for authentic and comforting temple-town tiffins.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ayyappa+Swami+Canteen+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ayyappa+Swami+Canteen+Hassan",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQorGVCEiOIonO-jasRuRO-kMTkve63YGjYQ0YlRSZd6g&s=10"
             },
             {
                 "spot_id": 2,
@@ -172,7 +196,8 @@
                 "speciality_dish": "Masale Dosa and Sambar Idli",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "Situated conveniently near the main bus stand, this landmark vegetarian spot has been serving tourists heading out to the Hoysala architectural sites with classic Karnataka breakfast favorites for years.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Municipal+Office+Rd+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Municipal+Office+Rd+Hassan",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRL8ihMfyoPRd7aHVmW6wyfq1dzCUIa6yFIXB4PCmCcyg&s=10"
             },
             {
                 "spot_id": 3,
@@ -181,7 +206,8 @@
                 "speciality_dish": "Unlimited Bale Yele Oota (Banana Leaf Meals) with Ragi Mudde",
                 "rating_as_per_google": "4.6 / 5",
                 "description": "A celebrated hidden gem in Krishnaraja Pura serving wholesome, traditional home-style banana leaf meals featuring piping hot Ragi Mudde paired with regional gravies and palyas.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharada+Mess+Krishnaraja+Pura+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharada+Mess+Krishnaraja+Pura+Hassan",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwXHmVbtDWGl1D17NjqCd6afrvrLK8smtf-Q0q_CAoQ&s=10"
             },
             {
                 "spot_id": 4,
@@ -190,7 +216,8 @@
                 "speciality_dish": "Nati-style Koli Saaru (Chicken Curry) with Ragi Mudde",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A legendary culinary haven capturing true Malnad and local non-vegetarian flavors, famous for serving fiery country-style chicken and mutton gravies paired with nutritious ragi balls.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mamatha+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mamatha+Hassan",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 5,
@@ -199,7 +226,8 @@
                 "speciality_dish": "Benne Khali Dosa, Open Pudi Masala Dosa, and Uddina Vade",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "An exceptionally popular spot among locals and food tourists alike, famous for its buttery soft khali dosas loaded with gunpowder (pudi) and crispy lentil vadas.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=HVR+Veg+Basettikoppal+Main+Rd+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=HVR+Veg+Basettikoppal+Main+Rd+Hassan",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Davanagere_Benne_Dosa.jpg"
             },
             {
                 "spot_id": 6,
@@ -208,7 +236,8 @@
                 "speciality_dish": "Filter Coffee, Mangalore Buns, and Akki Rotti",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A classic refreshment spot in the heart of the city serving iconic Malnad breakfast items like soft rice flour akki rottis and sweet-fermented fried buns.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Gajanana+Refreshments+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Gajanana+Refreshments+Hassan",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mangalore_Buns.jpg"
             },
             {
                 "spot_id": 7,
@@ -217,7 +246,8 @@
                 "speciality_dish": "Special Gulab Jamun and Champakali Sweets",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "A legendary sweet institution in Gandhi Bazaar where fresh, piping-hot jamuns and traditional pastries generate massive daily queues and sell out within the hour.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Harsha+Sweets+Gandhi+Bazar+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Harsha+Sweets+Gandhi+Bazar+Hassan",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI8sJv8_Go96Hn3rFD6JiVIElf8mCd1i2bg2uu2E2CA&s=10"
             },
             {
                 "spot_id": 8,
@@ -226,7 +256,8 @@
                 "speciality_dish": "Malnad Special Thali and Local Spice-Infused Delicacies",
                 "rating_as_per_google": "3.6 / 5",
                 "description": "An upscale heritage dining environment reflecting Malnad architectural themes, offering travelers authentic regional vegetarian and non-vegetarian thalis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road+Hassan"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road+Hassan",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/South_Indian_Thali.jpg"
             }
         ]
     },
@@ -240,7 +271,8 @@
                 "speciality_dish": "Paddu, Soft Idli, and Masala Dosa",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Located in a quaint local alley right next to the historic Virupaksha Temple, this beloved family-run home eatery is legendary among tourists for fresh, traditional South Indian breakfast items.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taste+of+Brahmins+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taste+of+Brahmins+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kuzhi_paniyaram.jpg"
             },
             {
                 "spot_id": 2,
@@ -249,7 +281,8 @@
                 "speciality_dish": "South Indian Thali, Fresh Fruit Juices, and Egg Bhurji",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An iconic traveler institution situated near Hampi Bazaar, famous for its relaxed ambiance, traditional seating mats, and comforting vegetarian and continental fare.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mango+Tree+Restaurant+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mango+Tree+Restaurant+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/South_Indian_Thali.jpg"
             },
             {
                 "spot_id": 3,
@@ -258,7 +291,8 @@
                 "speciality_dish": "Wood-fired Pizza, Banana Pancakes, and Thalis",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A popular riverside café spot across the boulder landscape, widely frequented by backpackers and tourists exploring the eastern ruins for relaxed meals and scenic views.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Laughing+Buddha+Restaurant+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Laughing+Buddha+Restaurant+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Pizza-3007395.jpg"
             },
             {
                 "spot_id": 4,
@@ -267,7 +301,8 @@
                 "speciality_dish": "Authentic Karnataka Thali and Bisi Bele Bath",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "Operated by the state tourism board near Kamalapura, this is a dependable, spacious restaurant offering traditional regional vegetarian meals right near the royal complex.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Bhuvaneswari+Kamalapura+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Bhuvaneswari+Kamalapura+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mysore_style_bisibele_bath.jpg"
             },
             {
                 "spot_id": 5,
@@ -276,7 +311,8 @@
                 "speciality_dish": "Akki Rotti, Masala Chai, and South Indian Breakfast",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A classic rooftop dining option near the base of Matanga Hill where tourists gather to refuel with hot tea and local flatbreads after an early morning trek.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gopi+Guest+House+Rooftop+Restaurant+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gopi+Guest+House+Rooftop+Restaurant+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 6,
@@ -285,7 +321,8 @@
                 "speciality_dish": "Fresh Lemon Soda, Apple Pie, and Shakes",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located across the Tungabhadra river near the foothills of Anjanadri Hill, this laid-back tourist hotspot is famous for refreshing beverages and baked treats.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=German+Bakery+Virupapur+Gaddi+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=German+Bakery+Virupapur+Gaddi+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Apple_pie.jpg"
             },
             {
                 "spot_id": 7,
@@ -294,7 +331,8 @@
                 "speciality_dish": "Local Country-Style Chicken Curry and Jolada Rotti",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Situated in the historic village of Anegundi, this rustic spot offers travelers a rare chance to sample authentic rural North Karnataka cuisine, including jowar rotis and regional curries.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoova+Cafe+Anegundi+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoova+Cafe+Anegundi+Hampi",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuMHgvrxwM-32esXXtHMnk5QebtivlLfUJJhAc9oxUkg&s=10"
             },
             {
                 "spot_id": 8,
@@ -303,7 +341,8 @@
                 "speciality_dish": "Idli Sambar, Vada, and Filter Coffee",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A straightforward, highly convenient local eatery near the central ruins zone popular among sightseers for quick, filling, and authentic South Indian tiffins.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Hampi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Hampi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             }
         ]
     },
@@ -317,7 +356,8 @@
                 "speciality_dish": "Authentic Pandi Curry with Akki Roti and Kadambuttu",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located right in the heart of Madikeri near Raja's Seat, this rustic Kodava-themed restaurant is a mandatory food stop for tourists wanting to try authentic spiced pork curry with rice flour dumplings.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Coorg+Cuisine+Restaurant+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Coorg+Cuisine+Restaurant+Madikeri",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 2,
@@ -326,7 +366,8 @@
                 "speciality_dish": "Mutton Sagwala with Appam and Elaneer Payasam",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "Nestled inside a scenic coffee plantation atmosphere close to Abbey Falls, offering travelers traditional local delicacies and rich regional curries in a serene environment.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Raintree+Restaurant+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Raintree+Restaurant+Madikeri",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQI1wlaf7KM2UBI7U3kUys7511DJ4NlXKHxu9x_PmTwKw&s=10"
             },
             {
                 "spot_id": 3,
@@ -335,7 +376,8 @@
                 "speciality_dish": "Buff Thukpa, Steamed/Fried Momos, and Thukpa Soup",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "Located just outside the famous Tibetan Golden Temple complex, this popular spot offers tourists a unique taste of authentic Himalayan cuisine right in the heart of Karnataka.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tibet+Kitchen+Namdroling+Monastery+Bylakuppe"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Tibet+Kitchen+Namdroling+Monastery+Bylakuppe",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKVtlN7IWU8uGdnpgHCVZCGgdilQnQoSI3E3OQjoGIPQ&s=10"
             },
             {
                 "spot_id": 4,
@@ -344,7 +386,8 @@
                 "speciality_dish": "Akki Roti with Tomato Curry, Aloo Curry, and Coconut Chutney",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A popular breakfast haven near Kushalnagar and Dubare camp, serving traditional banana-leaf breakfast items featuring freshly flattened rice flatbreads and comforting local curries.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Atithi+Comforts+Kushalnagar+Coorg"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Atithi+Comforts+Kushalnagar+Coorg",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8skH9Uu7pJ5SJ2o4opIDdOJ2DjdMgbX4HbssejD0Bsg&s=10"
             },
             {
                 "spot_id": 5,
@@ -353,7 +396,8 @@
                 "speciality_dish": "Traditional South Indian Meals and Kerala-style Fish Curry",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A dependable dining stop for pilgrims and tourists visiting the birthplace of River Cauvery, known for comforting hot meals and regional spice-infused dishes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Green+Land+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Green+Land+Madikeri",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFDHFaVDGmhRjSp8MroAtgQySO3TRGiLLEMhJ2f_Cf8Q&s=10"
             },
             {
                 "spot_id": 6,
@@ -362,7 +406,8 @@
                 "speciality_dish": "Mutton Chops with Nool Puttu (String Hoppers) and Passion Fruit Soda",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Situated a short distance from the historic temple in Madikeri, famous for serving tender, melt-in-the-mouth mutton chops paired with light rice string hoppers.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taalaya+Restaurant+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Taalaya+Restaurant+Madikeri",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idiyappam.jpg"
             },
             {
                 "spot_id": 7,
@@ -371,7 +416,8 @@
                 "speciality_dish": "Coorg Specialty Coffee, Wood-fired Pizzas, and Burgers",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A vibrant cafe in Madikeri town popular with tourists looking to unwind with authentic locally grown estate coffee blends and continental comfort snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Beans+n+Brews+Cafe+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Beans+n+Brews+Cafe+Madikeri",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOeTJcOCTRE6U1okvmNxRweQkPeRk--CXGZgpPa4C4sg&s=10"
             },
             {
                 "spot_id": 8,
@@ -380,7 +426,8 @@
                 "speciality_dish": "Pure Veg South Indian Thali, Bisi Bele Bath, and Filter Coffee",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A premier pure vegetarian dining destination in Madikeri town, heavily frequented by travelers returning from the rugged Mandalpatti jeep trails for wholesome vegetarian comfort food.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paksala+Restaurant+Madikeri"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paksala+Restaurant+Madikeri",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPwGsFk4A-lG8h0q0PN3wNYAD8JTogPePgodCMreMPpA&s=10"
             }
         ]
     },
@@ -394,7 +441,8 @@
                 "speciality_dish": "South Indian Thali, Akki Rotti, and Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A dependable state-run restaurant stop conveniently positioned for travelers descending from the highest peak in Karnataka, offering hot traditional meals and local estate coffee.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Chikkamagaluru",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROKHIjUJeeQGGnhSyLqWJMU70gKsRA9jaFmzRckxQWQA&s=10"
             },
             {
                 "spot_id": 2,
@@ -403,7 +451,8 @@
                 "speciality_dish": "Malnad Special Non-Veg Meals, Chicken Biryani, and Pepper Fry",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "An absolute legendary landmark in Chikkamagaluru town famous for serving robust, spice-packed Malnad-style non-vegetarian dishes that tourists flock to after mountain trails.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Olympia+Restaurant+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Olympia+Restaurant+Chikkamagaluru",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken-biriyani.jpg"
             },
             {
                 "spot_id": 3,
@@ -412,7 +461,8 @@
                 "speciality_dish": "Authentic Chikmagalur Filter Coffee and Banana Fritters",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Located near the coffee plantation belts, this cafe experience offers tourists aromatic brews made directly from local beans paired with light regional snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Planters+Court+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Planters+Court+Chikkamagaluru",
+                "image_url": "https://static.toiimg.com/thumb/59982493.cms?imgsize=148193&width=800&height=800g"
             },
             {
                 "spot_id": 4,
@@ -421,7 +471,8 @@
                 "speciality_dish": "Benne Masala Dosa and Filter Coffee",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "A historic culinary institution in Chikkamagaluru town operating for decades, legendary for its golden, crispy, butter-drenched dosas that draw food lovers from all over the state.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Town+Canteen+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Town+Canteen+Chikkamagaluru",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Davanagere_Benne_Dosa.jpg"
             },
             {
                 "spot_id": 5,
@@ -430,7 +481,8 @@
                 "speciality_dish": "Ragi Mudde with Nati Chicken Curry and Akki Rotti",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A popular rustic dining spot serving authentic Malnad home-style comfort food, highly recommended for trekkers wanting wholesome ragi balls and fiery country curries.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Annapoorna+Hotel+Kudremukh+Road+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Annapoorna+Hotel+Kudremukh+Road+Chikkamagaluru",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 6,
@@ -439,7 +491,8 @@
                 "speciality_dish": "Malnad Thali, Bamboo Shoot Curry (Kilikrutha), and Coffee Infused Desserts",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "An upscale estate dining experience offering tourists a curated taste of traditional Malnad gourmet preparations amidst picturesque coffee plantations.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=The+Serai+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=The+Serai+Chikkamagaluru",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/South_Indian_Thali.jpg"
             },
             {
                 "spot_id": 7,
@@ -448,7 +501,8 @@
                 "speciality_dish": "Mirchi Bajji, Hot Bonda, and Spiced Ginger Tea",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A bustling cluster of snack shacks near the waterfall paths where tourists enjoy piping hot, crunchy street-style mirchi bajjis paired with steaming tea in the cool mountain mist.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Manikyadhara+Falls+Snacks+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Manikyadhara+Falls+Snacks+Chikkamagaluru",
+                "image_url": "https://www.indianhealthyrecipes.com/wp-content/uploads/2016/04/mysore-bonda-1.jpg"
             },
             {
                 "spot_id": 8,
@@ -457,7 +511,8 @@
                 "speciality_dish": "Espresso, Cold Coffee Blends, and Continental Pastries",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Situated right near the coffee museum hub, this contemporary cafe provides visitors with an aromatic conclusion to their coffee trail journey through the district.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+Agape+Chikkamagaluru"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+Agape+Chikkamagaluru",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9G3FPUbaoeAFB-HEn4AsthF_3E3qrE8pfWgq64MI3FFRJ4B-mmS6iKHaU&s=10"
             }
         ]
     },
@@ -471,7 +526,8 @@
                 "speciality_dish": "Traditional Sattvic Banana Leaf Meal (Prasadam)",
                 "rating_as_per_google": "4.8 / 5",
                 "description": "A sacred 700-year-old culinary tradition where thousands of pilgrims and tourists are served free, wholesome, onion-and-garlic-free South Indian meals off fresh banana leaves.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Krishna+Matha+Annadana+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Krishna+Matha+Annadana+Udupi",
+                "image_url": "https://farm8.staticflickr.com/7121/7452962954_33b9202e79_o.jpg"
             },
             {
                 "spot_id": 2,
@@ -480,7 +536,8 @@
                 "speciality_dish": "Bullet Idli, Goli Baje, Mangalore Buns, and Filter Coffee",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "An absolute historic tiffin institution operating since 1947 right on Car Street, famous for authentic local evening snacks like sweet banana buns and fluffy fried dough balls.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mitra+Samaj+Car+Street+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mitra+Samaj+Car+Street+Udupi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mangalore_Buns.jpg"
             },
             {
                 "spot_id": 3,
@@ -489,7 +546,8 @@
                 "speciality_dish": "Rava-crusted Kane Fry (Lady Fish) and Fish Curry Meals",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A legendary coastal seafood haven near the main highway and beach routes, heavily frequented by tourists wanting to experience authentic Udupi-style coastal fish preparations.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thimmappa+Fish+Hotel+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thimmappa+Fish+Hotel+Udupi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kerala_Fish_Curry.jpg"
             },
             {
                 "spot_id": 4,
@@ -498,7 +556,8 @@
                 "speciality_dish": "Gadbad Ice Cream, Veg Cutlets, and Dahi Vada",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "A legendary family restaurant in Udupi town famous for inventing the multi-layered iconic 'Gadbad' ice cream sundae in the 1960s alongside classic crispy vegetarian cutlets.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Diana+Restaurant+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Diana+Restaurant+Udupi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Ice_cream_sundae.jpg"
             },
             {
                 "spot_id": 5,
@@ -507,7 +566,8 @@
                 "speciality_dish": "Ghee Podi Thatte Idli, South Indian Thali, and Kumbakonam Filter Coffee",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "Located on the prime temple highway trail in Brahmavara just north of Udupi, popular with pilgrims for authentic cloud-like idlis drenched in ghee and spice podi.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mathuram+Cafe+Brahmavara+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mathuram+Cafe+Brahmavara+Udupi",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCMb7T3qjA-5HSyNqdUKgE-jTMrf7i4_NpVPaCcNDu2vUXKsphitYeYYE&s=10"
             },
             {
                 "spot_id": 6,
@@ -516,7 +576,8 @@
                 "speciality_dish": "Crispy Masala Dosa and Filter Coffee",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A heritage pure-vegetarian dining landmark right by the temple zone, widely credited for perfecting the benchmark crispy Udupi masala dosa served with fresh coconut chutney.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Woodlands+Restaurant+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Woodlands+Restaurant+Udupi",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjQey-6xlEO17EAt5iWS3fcHe7MVoFxm130hjZ-_A7Hg&s=10"
             },
             {
                 "spot_id": 7,
@@ -525,7 +586,8 @@
                 "speciality_dish": "Kori Rotti (Crisp Rice Wafers with Spicy Chicken Curry) and Donne Biryani",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "An elegant setting on Maruthi Veethika showcasing authentic coastal non-vegetarian delicacies, particularly famous for crunchy rice wafers drenched in fiery local chicken curry.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thamboolam+Maruthi+Veethika+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Thamboolam+Maruthi+Veethika+Udupi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kori_Rotti.jpg"
             },
             {
                 "spot_id": 8,
@@ -534,7 +596,8 @@
                 "speciality_dish": "Chicken Ghee Roast, Prawn Ghee Roast, and Rava Fry Kane",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A legendary culinary pilgrimage destination near Kundapura known across the state for inventing and serving world-renowned spicy ghee roast delicacies.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shetty+Lunch+Home+Kundapura+Udupi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shetty+Lunch+Home+Kundapura+Udupi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken_Ghee_Roast.jpg"
             }
         ]
     },
@@ -548,7 +611,8 @@
                 "speciality_dish": "Wood-Fired Pizzas, Shakshuka, and Fresh Fruit Smoothies",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "An iconic traveler hub overlooking the coastline near the main beach trails, famous for relaxed beachside dining, continental comfort foods, and backpacker vibes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mantra+Cafe+Zostel+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mantra+Cafe+Zostel+Gokarna",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Pizza-3007395.jpg"
             },
             {
                 "spot_id": 2,
@@ -557,7 +621,8 @@
                 "speciality_dish": "Seafood Platter, Prawn Fried Rice, and Cold Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "The quintessential beachside dining landmark right on Kudle Beach where tourists gather to enjoy ocean views, coastal seafood, and relaxed evening snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Namaste+Cafe+Kudle+Beach+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Namaste+Cafe+Kudle+Beach+Gokarna",
+                "image_url": "https://simply-delicious-food.com/wp-content/uploads/2024/12/Seafood-Platter1.jpg"
             },
             {
                 "spot_id": 3,
@@ -566,7 +631,8 @@
                 "speciality_dish": "Authentic French Crepes, Croissants, and Continental Breakfast",
                 "rating_as_per_google": "4.6 / 5",
                 "description": "A charming, highly-rated hidden culinary gem near the coastal paths of Om Beach run by European expats, offering incredible baked goods and artisanal treats.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Chez+Christophe+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Chez+Christophe+Gokarna",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf0mvpbNrihwQeIG2vNA_QPwPMJ-zxUFszh5pb_udv6w&s=10"
             },
             {
                 "spot_id": 4,
@@ -575,7 +641,8 @@
                 "speciality_dish": "Akki Rotti, South Indian Filter Coffee, and North Karnataka Meals",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Situated close to the main temple bazaar lanes, offering travelers an authentic taste of local regional breakfast items and traditional Karnataka flavors.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+1973+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Cafe+1973+Gokarna",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBfuhFcM-D2iOuJj4-xtw0x137g1LXGIZdivemBlNuwQ&s=10"
             },
             {
                 "spot_id": 5,
@@ -584,7 +651,8 @@
                 "speciality_dish": "Catch-of-the-day Fish Fry, Prawn Curry, and Rice",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A secluded cliffside dining spot tucked along the famous beach-trek route, popular with hikers looking for freshly prepared local coastal seafood and cold beverages.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paradise+Beach+Shack+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Paradise+Beach+Shack+Gokarna",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa7yax1QmG9XV7V9Q8i5ioshaGD5sZOZM1O-aQxSdqFQ&s=10"
             },
             {
                 "spot_id": 6,
@@ -593,7 +661,8 @@
                 "speciality_dish": "Fish Thali, Kane Rava Fry, and Prawn Masala",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A dependable dining stop near the town center heavily frequented by tourists exploring the region, serving hearty coastal Karnataka fish meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Gokarna+International+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Gokarna+International+Gokarna",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Goan_Fish_Thali.jpg"
             },
             {
                 "spot_id": 7,
@@ -602,7 +671,8 @@
                 "speciality_dish": "Karavali Style Chicken Sukka, Ragi Mudde, and Fish Curry Meals",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A prominent highway and town junction eatery serving authentic coastal Karnataka non-vegetarian and vegetarian specialties for travelers returning from forest excursions.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Durgamba+Restaurant+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Durgamba+Restaurant+Gokarna",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken_Sukka.jpg"
             },
             {
                 "spot_id": 8,
@@ -611,7 +681,8 @@
                 "speciality_dish": "Crispy Masala Dosa, Idli Vada, and Mangalore Buns",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A classic local vegetarian haven in Gokarna town known for authentic Udupi-style tiffins and quick snacks before heading out to pristine northern beaches.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pai+Hotel+Gokarna"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pai+Hotel+Gokarna",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM5hTo-rSaewzmKc_y4SzKFvcUiLElI67YuDNAbkMGyb7jqGF6Pu9IB50b&s=10"
             }
         ]
     },
@@ -625,7 +696,8 @@
                 "speciality_dish": "Karavali Fish Curry, Prawn Fry, and North Karnataka Thali",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A premier dining spot located near the river adventure hubs, highly popular among tourists for enjoying fresh coastal fish preparations and wholesome local thalis after water sports.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Oyster+Serai+Restaurant+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Oyster+Serai+Restaurant+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kerala_Fish_Curry.jpg"
             },
             {
                 "spot_id": 2,
@@ -634,7 +706,8 @@
                 "speciality_dish": "Chicken Biryani, Tandoori Platters, and North Indian Curries",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A bustling and reliable dining stop right in Dandeli town, heavily frequented by jungle safari tourists looking for hearty, flavorful meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Shere+Punjab+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Shere+Punjab+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken-biriyani.jpg"
             },
             {
                 "spot_id": 3,
@@ -643,7 +716,8 @@
                 "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Chicken Sukka",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A local favorite serving authentic North Karnataka jowar rotis and spicy regional curries, giving tourists a true taste of local rustic cuisine near the forest trails.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Ganesh+Hotel+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Ganesh+Hotel+Dandeli",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsJCDeCAOmZgoERHEVx35EqvOh8pBbJc6yfW2vIbTSAg&s=10"
             },
             {
                 "spot_id": 4,
@@ -652,7 +726,8 @@
                 "speciality_dish": "Mutton Biryani, Fried Chicken, and Kebabs",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A popular roadside eatery visited by tourists returning from Syntheri Rocks canyon excursions for quick, flavorful, and filling non-vegetarian meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Al-Ameen+Restaurant+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Al-Ameen+Restaurant+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chennuru_Mutton_Pulao.jpg"
             },
             {
                 "spot_id": 5,
@@ -661,7 +736,8 @@
                 "speciality_dish": "Idli Vada, Masala Dosa, and South Indian Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A trusted highway-style vegetarian haven on the routes towards Supa Dam, offering clean, quick, and authentic South Indian breakfast and tiffin favorites.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 6,
@@ -670,7 +746,8 @@
                 "speciality_dish": "Malnad Style Fish Curry, Bamboo Shoot Delicacies, and Local Forest Thali",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Nestled deep in the forest near the riverbanks, offering tourists an immersive dining experience featuring authentic regional recipes and local specialties.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hornbill+River+Resort+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hornbill+River+Resort+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kerala_Fish_Curry.jpg"
             },
             {
                 "spot_id": 7,
@@ -679,7 +756,8 @@
                 "speciality_dish": "Akki Rotti, Egg Curry, and Local Chai",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A scenic dining stop appreciated by trekkers and road-trippers for piping hot home-style rice flatbreads and comforting beverages in the cool canopy breeze.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Green+View+Restaurant+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Green+View+Restaurant+Dandeli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 8,
@@ -688,7 +766,8 @@
                 "speciality_dish": "Crispy Mirchi Bajji, Girmit, and South Indian Meals",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A classic local haunt near the town center where tourists stop to sample popular street-side North Karnataka snacks like crunchy girmit and spicy mirchi bajjis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Chandrakant+Dandeli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Chandrakant+Dandeli",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ4PVhlr3hxbZrL35UND-2Dre13aFM9ok3r-XIrSgDyQ&s=10"
             }
         ]
     },
@@ -702,7 +781,8 @@
                 "speciality_dish": "Akki Rotti with Spicy Chutney, Bisi Bele Bath, and Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A popular tourist dining spot located near the majestic Jog Falls, offering travelers comforting hot rice rotis and regional vegetarian tiffins overlooking the valley.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharavathi+Hotel+Jog+Falls"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sharavathi+Hotel+Jog+Falls",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbJMjNg6mHj1wDwc07LVpx2CcAPGyzMUZJI96q7FT5EA&s=10"
             },
             {
                 "spot_id": 2,
@@ -711,7 +791,8 @@
                 "speciality_dish": "Malnad Style Fish Curry, Ragi Mudde, and Chicken Sukka",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A well-known dining destination near the highway routes towards Sakrebyle camp, heavily frequented by tourists wanting to sample authentic Malnad non-vegetarian preparations.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mandara+Restaurant+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mandara+Restaurant+Shimoga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 3,
@@ -720,7 +801,8 @@
                 "speciality_dish": "Prawn Ghee Roast, Chicken Biryani, and Coastal Seafood Thali",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An iconic multi-cuisine institution in Shivamogga town popular with tourists exploring historical temple routes for rich, spice-infused regional dishes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jewel+Rock+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jewel+Rock+Shimoga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken_Ghee_Roast.jpg"
             },
             {
                 "spot_id": 4,
@@ -729,7 +811,8 @@
                 "speciality_dish": "Ghee Thattte Idli, Khali Dosa, and Maddur Vada",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Located centrally in Shivamogga town close to the palace museum, heavily visited by tourists for soft butter-soaked idlis and crispy traditional snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Idli+House+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Idli+House+Shimoga",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPzJiS9wbqL08unQDw3KaUjkVgdm1K6XugW7fzAc1pzg&s=10"
             },
             {
                 "spot_id": 5,
@@ -738,7 +821,8 @@
                 "speciality_dish": "Sambar Idli, Rava Dosa, and Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A reliable and clean establishment favored by families and road-trippers for classic Karnataka tiffins and pure vegetarian meals near the river banks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Tunga+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Tunga+Shimoga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 6,
@@ -747,7 +831,8 @@
                 "speciality_dish": "Authentic Malnad Brahmin Home-Style Rice Meals, Patrode, and Kasthuri Tea",
                 "rating_as_per_google": "4.6 / 5",
                 "description": "A legendary 150-year-old heritage home in Agumbe made famous by Malgudi Days, offering tourists simple, organic, and traditional forest-region vegetarian meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Doddamane+Agumbe"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Doddamane+Agumbe",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeK_QETE5qBWwVbkuYzAwhtqVOesmdgRacE73nTqTX7A&s=10"
             },
             {
                 "spot_id": 7,
@@ -756,7 +841,8 @@
                 "speciality_dish": "Jackfruit Kadubu, Akki Rotti, and Local Style Chicken Curry",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A rustic pitstop along the winding roads toward Kundadri and Thirthahalli, serving seasonal Malnad specialties and authentic home-style rural delicacies.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sneha+Hotel+Thirthahalli+Road+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sneha+Hotel+Thirthahalli+Road+Shimoga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 8,
@@ -765,7 +851,8 @@
                 "speciality_dish": "Masala Dosa, Mangalore Buns, and Filter Coffee",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A classic city-center landmark serving generations of tourists quick, reliable, and authentic Karnataka tiffin items before heading out to wildlife reserves.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Shimoga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sagar+Hotel+Shimoga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mangalore_Buns.jpg"
             }
         ]
     },
@@ -779,7 +866,8 @@
                 "speciality_dish": "Traditional South Indian Thali, Akki Rotti, and Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "Located right near the monumental Hoysala temple complex in Belur, offering tourists clean, reliable regional vegetarian meals and refreshing filter coffee right by the heritage site.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Belur"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Velapuri+Belur",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/South_Indian_Thali.jpg"
             },
             {
                 "spot_id": 2,
@@ -788,7 +876,8 @@
                 "speciality_dish": "Idli Vada, Masala Dosa, and Bisi Bele Bath",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Situated conveniently close to the famous temple ruins in Halebidu, heavily frequented by tourists for classic, reliable highway-style Karnataka breakfast and tiffin favorites.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Halebidu"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Halebidu",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 3,
@@ -797,7 +886,8 @@
                 "speciality_dish": "Crispy Benne Masala Dosa, Mangalore Buns, and Uddina Vade",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A popular local eatery near the Belur temple lanes beloved by sightseers for serving piping-hot, butter-laden dosas and sweet-fermented traditional fried buns.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Raghavendra+Prasanna+Hotel+Belur"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Raghavendra+Prasanna+Hotel+Belur",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Davanagere_Benne_Dosa.jpg"
             },
             {
                 "spot_id": 4,
@@ -806,7 +896,8 @@
                 "speciality_dish": "Fish Curry Meals, Chicken Sukka, and Fried Rice",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A scenic dining stop located right along the backwaters near the Yagachi water sports center, offering visitors hearty local meals and refreshing beverages overlooking the reservoir.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Yagachi+View+Restaurant+Belur"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Yagachi+View+Restaurant+Belur",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Kerala_Fish_Curry.jpg"
             },
             {
                 "spot_id": 5,
@@ -815,7 +906,8 @@
                 "speciality_dish": "Ragi Mudde with Nati Chicken Curry and Jolada Rotti",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A rustic local dining establishment near the heritage trails of Halebidu, providing tourists with an authentic taste of rural Malnad and Karnataka non-vegetarian comfort food.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Hoysala+Halebidu"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Hoysala+Halebidu",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 6,
@@ -824,7 +916,8 @@
                 "speciality_dish": "Akki Rotti, Lemon Rice, and Spiced Ginger Tea",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "A charming pitstop along the rural temple trail between Belur and Halebidu, famous for serving freshly pressed rice flatbreads and hot local tea to heritage explorers.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Vinayaka+Refreshments+Belavadi"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Vinayaka+Refreshments+Belavadi",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 7,
@@ -833,7 +926,8 @@
                 "speciality_dish": "Malnad Special Thali and Bamboo Shoot Delicacies",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An upscale resort dining option on the arterial highway connecting Belur and Hassan, offering travelers an authentic and hygienic exploration of regional Malnad recipes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hoysala+Village+Resort+Belur+Road",
+                "image_url": "https://assets.simplotel.com/simplotel/image/upload/x_0,y_0,w_3024,h_3024,r_0,c_crop,q_90,fl_progressive/w_500,f_auto,c_fit/the-serai-chikmagalur/sandhya-meal"
             },
             {
                 "spot_id": 8,
@@ -842,7 +936,8 @@
                 "speciality_dish": "Bisi Bele Bath, Idli Sambar, and Uppittu",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A trusty, unpretentious local staple near the architectural monuments of Halebidu providing quick, authentic, and satisfying South Indian tiffins for travelers.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Canteen+Halebidu"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Canteen+Halebidu",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mysore_style_bisibele_bath.jpg"
             }
         ]
     },
@@ -856,7 +951,8 @@
                 "speciality_dish": "Jolada Rotti Oota with Ennegayi, Pulao, and North Karnataka Thali",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located conveniently close to the historic Gol Gumbaz complex, this popular family restaurant offers tourists authentic North Karnataka meals featuring traditional jowar rotis and regional curries.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pearl+Hotel+Restaurant+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Pearl+Hotel+Restaurant+Vijayapura",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSHWO4OYHCeqneg6b0JSGhomsaSwtQ44Bm-M7a4xeiRA&s=10"
             },
             {
                 "spot_id": 2,
@@ -865,7 +961,8 @@
                 "speciality_dish": "Mutton Biryani, Chicken Kababs, and Shahi Haleem",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A legendary dining spot in Vijayapura renowned for its rich Deccani and Mughlai non-vegetarian preparations, heavily frequented by heritage tourists exploring the city's Sultanate architecture.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jam+Jam+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Jam+Jam+Vijayapura",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chennuru_Mutton_Pulao.jpg"
             },
             {
                 "spot_id": 3,
@@ -874,7 +971,8 @@
                 "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A classic local establishment in the heart of the town near the monuments, famous for traditional North Karnataka evening snacks like spicy puffed rice girmit and crispy mirchi bajjis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ashoka+Restaurant+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Ashoka+Restaurant+Vijayapura",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhsBh3GTlQ1ZJaYWixsprTEcxKy-FbbHzd_CpD8IbJag&s=10"
             },
             {
                 "spot_id": 4,
@@ -883,7 +981,8 @@
                 "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A trusted, clean, and popular highway-style vegetarian haven offering tourists quick and authentic South Indian tiffin items right near the main sightseeing circuits.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Vijayapura",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 5,
@@ -892,7 +991,8 @@
                 "speciality_dish": "Authentic Hyderabadi Biryani and Chicken Fry",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "A bustling culinary favorite among travelers looking for flavorful, spice-rich Deccani non-vegetarian dishes after touring historical bastions.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Restaurant+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Restaurant+Vijayapura",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken-biriyani.jpg"
             },
             {
                 "spot_id": 6,
@@ -901,7 +1001,8 @@
                 "speciality_dish": "Jolada Rotti, Shenga Chutney (Peanut Chutney), and Pallya",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "An authentic local eatery praised by food tourists for serving genuine home-style North Karnataka village meals complete with spicy dry peanut chutney and millet bread.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Canteen+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Canteen+Vijayapura",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgnsMfuHelDVRVwTFH9kGqKR3nNEv_uBaADpFbetNSTA&s=10"
             },
             {
                 "spot_id": 7,
@@ -910,7 +1011,8 @@
                 "speciality_dish": "Dharwad Pedha, Badam Milk, and Traditional Sweets",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A landmark sweet house near the old town center where tourists stop to enjoy rich regional milk sweets and refreshing warm beverages.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Meenakshi+Sweets+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Meenakshi+Sweets+Vijayapura",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             },
             {
                 "spot_id": 8,
@@ -919,7 +1021,8 @@
                 "speciality_dish": "North Karnataka Thali, Bisi Bele Bath, and North Indian Curries",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A well-known upscale multi-cuisine dining spot in Vijayapura providing comfortable seating, hygienic regional meals, and excellent service for families and travelers.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Madhuvan+International+Vijayapura"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Madhuvan+International+Vijayapura",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Mysore_style_bisibele_bath.jpg"
             }
         ]
     },
@@ -933,7 +1036,8 @@
                 "speciality_dish": "Hyderabadi Chicken Biryani, Tandoori Chicken, and Rumali Roti",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located close to the historic fort gates, this popular local eatery serves flavorful Deccani and Mughlai non-vegetarian dishes loved by history explorers and food tourists.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Al+Baik+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Al+Baik+Bidar",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken-biriyani.jpg"
             },
             {
                 "spot_id": 2,
@@ -942,7 +1046,8 @@
                 "speciality_dish": "Mutton Haleem, Shahi Paneer, and Butter Naan",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "Situated within walking distance of the magnificent medieval ruins of Mahmud Gawan Madrassa, offering rich regional gravies and traditional festive delicacies.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shahi+Darbar+Restaurant+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shahi+Darbar+Restaurant+Bidar",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCzhPdYNOr0cNXo9xBzO1M6uXa90P5IGeIs7fl4K5cEy-E-bBPiBLKcIXN&s=10"
             },
             {
                 "spot_id": 3,
@@ -951,7 +1056,8 @@
                 "speciality_dish": "Divine Dal Makhani, Kadha Prasad, and Hot Roti (Langar Prasadam)",
                 "rating_as_per_google": "4.9 / 5",
                 "description": "A sacred and deeply revered pilgrimage stop where thousands of visitors partake in the community langar serving pure, wholesome, and comforting vegetarian meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gurudwara+Nanak+Jhira+Sahib+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gurudwara+Nanak+Jhira+Sahib+Bidar",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dal_makhani.jpg"
             },
             {
                 "spot_id": 4,
@@ -960,7 +1066,8 @@
                 "speciality_dish": "Osmania Biscuits, Irani Chai, and Maska Bun",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A classic Bidar heritage bakery spot where tourists stop to enjoy traditional Hyderabadi-style sweet-salty biscuits dipped in piping hot Irani tea.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Bakery+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=New+Taj+Bakery+Bidar",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAgVK_O3C_O0FG2YJf9XpFfIMWGSVhW53zmPiDKi9jow&s=10"
             },
             {
                 "spot_id": 5,
@@ -969,7 +1076,8 @@
                 "speciality_dish": "North Karnataka Thali, Jolada Rotti, and South Indian Meals",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "Operated by the state tourism board near the fort complex, offering travelers hygienic regional thalis and comforting local vegetarian dishes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Haritha+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Haritha+Bidar",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGPlJeEXqdU-zNfuxvRRpOKouiWOERPchEk7tYPdbsdw&s=10"
             },
             {
                 "spot_id": 6,
@@ -978,7 +1086,8 @@
                 "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A popular local vegetarian haven near the temple valley known for authentic North Karnataka village meals featuring millet rotis and spicy peanut condiments.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Raghavendra+Veg+Hotel+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Raghavendra+Veg+Hotel+Bidar",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Jx7pX6ZtLAvUnql8qJQFsG_cr0ShNrApo6m7t-9P1Q&s=10"
             },
             {
                 "spot_id": 7,
@@ -987,7 +1096,8 @@
                 "speciality_dish": "Chicken Biryani, Fried Fish, and Special Thali",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A trusted dining establishment near the main city center popular with sightseers for flavorful multi-cuisine preparations and hearty meals.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Royal+Palace+Restaurant+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Royal+Palace+Restaurant+Bidar",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQi1QjEjTXKv9tc8Q0Zw5IqSKeB5PoCuX4IzgQe3k7u8HczkoGGG5P4Gx_U&s=10"
             },
             {
                 "spot_id": 8,
@@ -996,7 +1106,8 @@
                 "speciality_dish": "Dharwad Pedha, Holige (Obbattu), and Mixture Savories",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "A well-known sweet house in the bustling local shopping lanes where tourists buy authentic regional sweets and traditional festival delicacies.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Bidar"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Bidar",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             }
         ]
     },
@@ -1010,7 +1121,8 @@
                 "speciality_dish": "Jolada Rotti Oota with Ennegayi, Shenga Chutney, and Spicy Chicken Sukka",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located near the city center close to the historic fort pathways, this popular restaurant serves authentic North Karnataka meals featuring millet rotis and robust regional curries.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Kamyab+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Kamyab+Chitradurga",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgnsMfuHelDVRVwTFH9kGqKR3nNEv_uBaADpFbetNSTA&s=10"
             },
             {
                 "spot_id": 2,
@@ -1019,7 +1131,8 @@
                 "speciality_dish": "Nati Mutton Biryani, Mutton Chops, and Ragi Mudde",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "A legendary local non-vegetarian military hotel in Chitradurga famous for serving authentic country-style mutton dishes paired with piping hot ragi balls.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Kottureshwara+Military+Hotel+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Guru+Kottureshwara+Military+Hotel+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/RAGI_MUDDE.JPG"
             },
             {
                 "spot_id": 3,
@@ -1028,7 +1141,8 @@
                 "speciality_dish": "Benne Khali Dosa, Idli Sambar, and Filter Coffee",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A classic, long-standing breakfast establishment in the town center heavily frequented by tourists for crispy, buttery dosas and traditional South Indian tiffins.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gayathri+Tiffin+Room+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Gayathri+Tiffin+Room+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Davanagere_Benne_Dosa.jpg"
             },
             {
                 "spot_id": 4,
@@ -1037,7 +1151,8 @@
                 "speciality_dish": "Idli Vada, Masala Dosa, and Bisi Bele Bath",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A reliable and clean highway-style vegetarian haven popular with tourists driving towards the historic Vani Vilasa Sagara dam reservoir.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Hiriyur+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Hiriyur+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 5,
@@ -1046,7 +1161,8 @@
                 "speciality_dish": "North Karnataka Thali, Akki Rotti, and South Indian Meals",
                 "rating_as_per_google": "4.0 / 5",
                 "description": "Operated by the state tourism board near the foothills of Jogimatti, offering travelers hygienic regional thalis and comforting local meals in a serene environment.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Durgama+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Mayura+Durgama+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Akki_rotti.JPG"
             },
             {
                 "spot_id": 6,
@@ -1055,7 +1171,8 @@
                 "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A popular local snack stop near the fort boundaries where tourists enjoy classic North Karnataka evening snacks like spicy puffed rice girmit and hot mirchi bajjis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Durgamba+Refreshments+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Durgamba+Refreshments+Chitradurga",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUCWiKKPKuXgk1Kq4fwajImO88cuzptYJg4Yf6GVHbPA&s=10"
             },
             {
                 "spot_id": 7,
@@ -1064,7 +1181,8 @@
                 "speciality_dish": "Chicken Biryani, Pepper Dry, and North Indian Curries",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A prominent multi-cuisine dining spot in Chitradurga town favored by tourists and road-trippers for hearty lunch and dinner spreads.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Naveen+Palace+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Naveen+Palace+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chicken-biriyani.jpg"
             },
             {
                 "spot_id": 8,
@@ -1073,7 +1191,8 @@
                 "speciality_dish": "Dharwad Pedha, Badam Milk, and Traditional Sweets",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A well-known sweet house in the bustling town lanes where tourists stop to purchase regional sweets and refreshing milk beverages before heading out to the windmill hills.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Chitradurga"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Mahalaxmi+Sweets+Chitradurga",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             }
         ]
     },
@@ -1087,7 +1206,8 @@
                 "speciality_dish": "Belagavi Kunda, North Karnataka Thali, and Jolada Rotti Oota",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "Located centrally in the city near the fort routes, this popular spot is ideal for tourists wanting to sample authentic local meals and the world-famous sweet Kunda.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Milan+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Milan+Belgaum",
+                "image_url": "https://indiasweethouse.in/cdn/shop/files/BelgaumKunda.png?v=1718864466"
             },
             {
                 "spot_id": 2,
@@ -1096,7 +1216,8 @@
                 "speciality_dish": "Authentic Traditional Belagavi Kunda and Dharwad Pedha",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "A legendary sweet house in Belagavi where every tourist stops to purchase fresh, rich, milk-based Kunda prepared using traditional heritage recipes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Belgaum",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             },
             {
                 "spot_id": 3,
@@ -1105,7 +1226,8 @@
                 "speciality_dish": "Jolada Rotti with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A favored highway and town stop serving genuine North Karnataka village meals featuring millet breads and spicy dry peanut accompaniments.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+New+Royal+Palace+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+New+Royal+Palace+Belgaum",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXRq-lUfwY0UpipqIsRgWz1NJIgK4PEoI4H3d1R4hAynwC3bYNf6MQIX52&s=10"
             },
             {
                 "spot_id": 4,
@@ -1114,7 +1236,8 @@
                 "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "A reliable and clean vegetarian haven heavily frequented by sightseers heading out towards the magnificent waterfalls around Gokak and surrounding districts.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Upachar+Belgaum",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 5,
@@ -1123,7 +1246,8 @@
                 "speciality_dish": "Mutton Biryani, Chicken Sukka, and North Indian Curries",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A prominent dining establishment near the city center popular with tourists returning from historical hilltop fort excursions for hearty lunches and dinners.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nartaki+Restaurant+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Nartaki+Restaurant+Belgaum",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Chennuru_Mutton_Pulao.jpg"
             },
             {
                 "spot_id": 6,
@@ -1132,7 +1256,8 @@
                 "speciality_dish": "Girmit with Mirchi Bajji, Holige (Obbattu), and Masala Chai",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "A favorite local street-food style halt where tourists enjoy popular regional evening snacks like spicy puffed rice girmit and hot, crispy mirchi bajjis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Refreshments+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Shri+Guru+Sainath+Refreshments+Belgaum",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3v7d8WGCjCVs-AuU60i-O1zb48YSyiIn1tm69nnOFeNb383_yByEVc2Q&s=10"
             },
             {
                 "spot_id": 7,
@@ -1141,7 +1266,8 @@
                 "speciality_dish": "Masala Dosa, Bisi Bele Bath, and Mangalore Buns",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A classic vegetarian tiffin institution in Belagavi town known for serving quick, delicious, and traditional South Indian breakfast favorites.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Deluxe+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Sanman+Deluxe+Belgaum",
+                "image_url": "https://www.ruchikrandhap.com/wp-content/uploads/2010/03/IMG_5080-scaled.jpg"
             },
             {
                 "spot_id": 8,
@@ -1150,7 +1276,8 @@
                 "speciality_dish": "Multi-cuisine Platters, Seafood Specials, and Mocktails",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An upscale multi-cuisine dining destination in Belagavi offering a comfortable ambiance and diverse menu choices for travelers looking for a refined dining experience.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Eefa+Restaurant+Belgaum"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Eefa+Restaurant+Belgaum",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTP4F4u5IpLbmFwlSpbSgDe0l7iPnuwrKn5-1ELa4WWhCl0h2oddHy6E6I&s=10"
             }
         ]
     },
@@ -1163,9 +1290,9 @@
                 "famous_food_spot": "Padmashree Hotel",
                 "speciality_dish": "Jolada Rotti Oota with Ennegayi (Stuffed Brinjal) and Shenga Chutney",
                 "rating_as_per_google": "4.3 / 5",
-                "image_url": "./images/food/Jollada_Rotti_Oota_HUBLI.jpg",
                 "description": "Located near the city center, this iconic regional restaurant is a mandatory food stop for travelers wanting to experience authentic North Karnataka millet bread meals and spicy peanut condiments.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Padmashree+Hotel+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Padmashree+Hotel+Hubli",
+                "image_url": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSOWWsvKw3mo_4L076N4UcuITHabYM-XtuWjseUxFR8pBw62RPH8ITjFz-3_Y7exIsUXiOkVb6OnMi68c7j64MojMAzD_YGmubdUyCB2f4BZCdLs2RyShlixtKhuxRrfi39KDfYQjoqHkJ/s1600/Jollada_Rotti_Oota_2.jpg"
             },
             {
                 "spot_id": 2,
@@ -1174,7 +1301,8 @@
                 "speciality_dish": "Spicy Puffed Rice Girmit with Mirchi Bajji and Khara Mandakki",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Situated right along the breezy lakeside promenade where tourists gather in the evening to enjoy North Karnataka's quintessential street-side snack, girmit paired with hot chili bajjis.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Unkal+Lake+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Unkal+Lake+Hubli",
+                "image_url": "https://girm.it/oxvxv3v8yss.webp"
             },
             {
                 "spot_id": 3,
@@ -1183,7 +1311,8 @@
                 "speciality_dish": "Unlimited Jolada Rotti Meals with Menthe Pallya and Kosambari",
                 "rating_as_per_google": "4.5 / 5",
                 "description": "A traditional, legendary Khanavali in the heritage town area renowned for serving authentic, wholesome home-style North Karnataka vegetarian meals on banana leaves.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Khanavali+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Basaveshwara+Khanavali+Hubli",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcHP_mT0-Z107rQUnYzrKxl2-6lvtxfrkgKTmLtC7RWbnyv4H7Wtms9Jc&s=10"
             },
             {
                 "spot_id": 4,
@@ -1192,7 +1321,8 @@
                 "speciality_dish": "Idli Vada, Khali Dosa, and South Indian Filter Coffee",
                 "rating_as_per_google": "4.1 / 5",
                 "description": "A trusted landmark dining spot near the historic 900-year-old Chalukyan temple, heavily frequented by tourists for clean, delicious South Indian tiffins.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Restaurant+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Kamat+Restaurant+Hubli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Idli_Sambar.JPG"
             },
             {
                 "spot_id": 5,
@@ -1201,7 +1331,8 @@
                 "speciality_dish": "North Karnataka Thali, Jolada Rotti, and Mutton Sukka",
                 "rating_as_per_google": "4.2 / 5",
                 "description": "An upscale dining option centrally located near the garden complex, offering travelers a comfortable and hygienic environment to sample both regional specialties and multi-cuisine dishes.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Clarks+Inn+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Clarks+Inn+Hubli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/South_Indian_Thali.jpg"
             },
             {
                 "spot_id": 6,
@@ -1210,7 +1341,8 @@
                 "speciality_dish": "Holige (Obbattu) with Ghee, Girmit, and Mirchi Bajji",
                 "rating_as_per_google": "4.3 / 5",
                 "description": "A popular local haunt near the railway heritage zones where sightseers stop to relish sweet lentil flatbreads (holige) drenched in warm ghee alongside spicy evening snacks.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Durga+Hotel+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Sri+Durga+Hotel+Hubli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Puran_poli.jpg"
             },
             {
                 "spot_id": 7,
@@ -1219,7 +1351,8 @@
                 "speciality_dish": "Sacred Community Prasadam Meals (South Indian Thali)",
                 "rating_as_per_google": "4.8 / 5",
                 "description": "A deeply revered spiritual center where thousands of pilgrims and visitors are served daily free, wholesome, and comforting vegetarian meals as part of the temple's service tradition.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Siddharoodha+Math+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Siddharoodha+Math+Hubli",
+                "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd46ZVLcP_K6VavSZ2hOvD-PPwAe6X47xsGTNUTRwxzSxor2d81vczVqE&s=10"
             },
             {
                 "spot_id": 8,
@@ -1228,7 +1361,8 @@
                 "speciality_dish": "Dharwad Pedha, Badam Milk, and Special Sweets",
                 "rating_as_per_google": "4.4 / 5",
                 "description": "Located in the bustling central shopping lanes near the historic temple, serving iconic regional milk sweets that every food tourist makes sure to pack home.",
-                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Hubli"
+                "google_maps_link": "https://www.google.com/maps/search/?api=1&query=Purohit+Sweets+Hubli",
+                "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Dharwad_peda.jpg"
             }
         ]
     }

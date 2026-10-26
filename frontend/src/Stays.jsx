@@ -13,6 +13,7 @@ import {
   Compass,
 } from 'lucide-react';
 import './Stays.css';
+import { KaMark, Wordmark } from './components/Logo';
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
@@ -144,15 +145,15 @@ export default function Stays({ journeyConfig, onBack }) {
           <ArrowLeft size={18} />
           <span>Back to journey</span>
         </button>
+<a className="stays-brand" href="/" aria-label="NammaPrayana home">
+  <KaMark size={30} />
 
-        <a className="stays-brand" href="/" aria-label="NammaPrayana home">
-          <span className="stays-brand-emblem"><Compass size={22} /></span>
-          <span className="stays-brand-words">
-            NAMMA<span>PRAYANA</span>
-            <small>EXPLORE KARNATAKA</small>
-          </span>
-        </a>
-
+  <span className="stays-brand-content">
+    <Wordmark />
+    <small>EXPLORE KARNATAKA</small>
+  </span>
+</a>
+        
         <div className="stays-top-label">
           <span /> AI STAY FINDER
         </div>

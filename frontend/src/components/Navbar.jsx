@@ -15,7 +15,6 @@ export default function Navbar({ active, onNav, user, onLogin, onSignup, onLogou
     ['plan', 'nav.plan'],
     ['food', 'nav.food'],
     ['drishti', 'nav.drishti'],
-    ['help', 'nav.help'],
     ['about', 'nav.about'],
   ];
   const go = (id) => { setOpen(false); onNav(id); };

@@ -298,25 +298,14 @@ export default function App() {
       return (
         <RouteDiscoveryPage
           journeyConfig={journeyConfig}
+          onBack={() => navigate('/plan-journey')}
+          onGoHome={() => navigate('/')}
           initialDestinations={journeyConfig?.destinations ?? []}
           initialStartDate={journeyConfig?.startDate}
           initialEndDate={journeyConfig?.endDate}
           onContinue={() => navigate('/plan-journey')}
           onOpenStays={() => navigate('/stays')}
-          onOpenItinerary={(newIds) => {
-            if (Array.isArray(newIds)) {
-              setSelectedAttractionIds(newIds);
-            } else {
-              try {
-                const saved = sessionStorage.getItem('np_selected_itinerary');
-                if (saved) {
-                  const parsed = JSON.parse(saved);
-                  if (Array.isArray(parsed.selected_attraction_ids)) {
-                    setSelectedAttractionIds(parsed.selected_attraction_ids);
-                  }
-                }
-              } catch {}
-            }
+          onOpenItinerary={() => {
             setViewingSavedItineraryId(null);
             navigate('/itinerary');
           }}

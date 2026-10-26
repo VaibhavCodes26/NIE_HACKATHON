@@ -509,6 +509,7 @@ RULES
    - Every day in the trip range from {start_date} to {end_date} must be planned.
    - Strictly follow the Namma Gati allocation. Keep each attraction on its designated day.
    - Provide realistic time slots, estimated visit durations, and sensible travel gaps.
+   - For days involving intercity travel between consecutive cities, account for departure, transit time, arrival, and rest buffer; pace sightseeing around travel time so travellers are not rushed.
    - Preserve exact attraction names, categories, descriptions, and attraction_id values. Set food_spot_id to null for attractions.
 
 3. MANDATORY MEALS (EVERY SINGLE DAY)
