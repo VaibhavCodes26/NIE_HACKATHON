@@ -103,14 +103,32 @@ app.include_router(drishti_router)
 app.include_router(auth_router)
 app.include_router(saved_itineraries_router)
 
+cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    clean_frontend_url = frontend_url.strip().rstrip("/")
+    if clean_frontend_url and clean_frontend_url != "*":
+        cors_origins.append(clean_frontend_url)
+
+cors_origins_env = os.getenv("CORS_ORIGINS")
+if cors_origins_env:
+    for origin in cors_origins_env.split(","):
+        cleaned = origin.strip().rstrip("/")
+        if cleaned and cleaned != "*":
+            cors_origins.append(cleaned)
+
+# Deduplicate while preserving order
+allowed_origins = list(dict.fromkeys(cors_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
