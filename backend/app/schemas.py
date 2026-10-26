@@ -85,6 +85,12 @@ class ItineraryStop(BaseModel):
     effort: int | None = None
     level: str | None = None
     city: str | None = None
+    safety_flag: str | None = None
+    safety_note: str | None = None
+    accessibility_flag: str | None = None
+    accessibility_note: str | None = None
+    weather_note: str | None = None
+    is_mandatory: bool | None = None
 
 
 class ItineraryDay(BaseModel):
@@ -111,6 +117,7 @@ class DeferredAttraction(BaseModel):
     level: str | None = None
     code: str | None = None
     reason: str | None = None
+    is_mandatory: bool | None = None
 
 
 class ItineraryPreviewResponse(BaseModel):

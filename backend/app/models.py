@@ -148,3 +148,164 @@ class FoodSpot(Base):
     rating_as_per_google = Column(String(30), nullable=True)
     description = Column(Text, nullable=True)
     google_maps_link = Column(Text, nullable=True)
+
+
+# ---------------------------------------------------------------------------
+# Authentication models
+# ---------------------------------------------------------------------------
+
+class User(Base):
+    """Authenticated NammaPrayana user account."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    username: Mapped[str] = mapped_column(
+        String(80),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    # Nullable for Google-only accounts.
+    password_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Stable Google subject identifier (sub claim). Nullable for password accounts.
+    google_sub: Mapped[str | None] = mapped_column(
+        String(200),
+        unique=True,
+        nullable=True,
+        index=True,
+    )
+
+    # Optional email — stored only when provided by Google; never used as identity key.
+    email: Mapped[str | None] = mapped_column(String(254), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    sessions: Mapped[list["UserSession"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    saved_itineraries: Mapped[list["SavedItinerary"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self) -> str:
+        return f"User(id={self.id!r}, username={self.username!r})"
+
+
+class UserSession(Base):
+    """Server-side session record for an authenticated user."""
+
+    __tablename__ = "user_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    # Opaque, cryptographically random token stored in the HttpOnly cookie.
+    token: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+    user: Mapped["User"] = relationship(back_populates="sessions")
+
+    def is_expired(self) -> bool:
+        expires = self.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        return datetime.now(timezone.utc) >= expires
+
+    def __repr__(self) -> str:
+        return f"UserSession(id={self.id!r}, user_id={self.user_id!r})"
+
+
+class SavedItinerary(Base):
+    """A complete generated itinerary saved by an authenticated user."""
+
+    __tablename__ = "saved_itineraries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    # Human-readable trip title (e.g. "Your Karnataka Journey: Bengaluru → Mysuru")
+    title: Mapped[str] = mapped_column(String(400), nullable=False)
+
+    # Original Plan Your Journey configuration as JSON
+    trip_config: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+    # Complete AI-generated itinerary payload (days, warnings, gati, etc.)
+    itinerary_payload: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+    # Ordered list of destination names for quick display
+    destinations: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+
+    # Selected attraction IDs
+    selected_attraction_ids: Mapped[list] = mapped_column(
+        JSON, nullable=False, default=list
+    )
+
+    start_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    end_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    traveller_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    total_budget: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    travel_style: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+    # ISO-format number of trip days for quick display
+    duration_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    user: Mapped["User"] = relationship(back_populates="saved_itineraries")
+
+    __table_args__ = (
+        Index("ix_saved_itineraries_user_id_created_at", "user_id", "created_at"),
+    )
+
+    def __repr__(self) -> str:
+        return f"SavedItinerary(id={self.id!r}, user_id={self.user_id!r}, title={self.title!r})"

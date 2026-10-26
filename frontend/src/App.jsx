@@ -19,6 +19,13 @@ import ItineraryPage from "./ItineraryPage.jsx";
 import SahayakPage from "./SahayakPage.jsx";
 import DrishtiPage from "./DrishtiPage.jsx";
 import SahayakFab from "./components/SahayakFab";
+import LoginPage from './LoginPage.jsx';
+import SignupPage from './SignupPage.jsx';
+import YourItinerariesPage from './YourItinerariesPage.jsx';
+import LoginRequiredModal from './components/LoginRequiredModal.jsx';
+import { useAuth } from './AuthContext.jsx';
+import { Loader2 } from 'lucide-react';
+import './auth.css';
 
 const reduced = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -32,8 +39,24 @@ const isLandingPageReload = () => {
   );
 };
 
+/** Protected pages — require authentication */
+const PROTECTED_PATHS = new Set([
+  '/plan-journey',
+  '/route-discovery',
+  '/itinerary',
+  '/food-spots',
+  '/sahayak',
+  '/drishti',
+  '/stays',
+  '/your-itineraries',
+]);
+
+/** Protected nav IDs — the modal fires when these are clicked while logged out */
+const PROTECTED_NAV_IDS = new Set(['plan', 'food', 'drishti', 'sahayak', 'itineraries']);
 
 export default function App() {
+  const { user, authLoading, logout } = useAuth();
+
   const [journeyConfig, setJourneyConfig] = useState(() => {
     try {
       const saved = sessionStorage.getItem('np_journey_config');
@@ -57,10 +80,9 @@ export default function App() {
     }
   });
 
-
-const [intro, setIntro] = useState(
-  () => isLandingPageReload() && !reduced()
-);
+  const [intro, setIntro] = useState(
+    () => isLandingPageReload() && !reduced()
+  );
 
   const [panel, setPanel] = useState(null);
   const [active, setActive] = useState('home');
@@ -69,16 +91,22 @@ const [intro, setIntro] = useState(
     () => window.location.pathname
   );
   const [selectedAttractionIds, setSelectedAttractionIds] = useState(() => {
-  try {
-    const saved = sessionStorage.getItem('np_selected_itinerary');
-    return saved
-      ? JSON.parse(saved).selected_attraction_ids ?? []
-      : [];
-  } catch (error) {
-    console.error('Unable to read saved itinerary:', error);
-    return [];
-  }
-});
+    try {
+      const saved = sessionStorage.getItem('np_selected_itinerary');
+      return saved
+        ? JSON.parse(saved).selected_attraction_ids ?? []
+        : [];
+    } catch (error) {
+      console.error('Unable to read saved itinerary:', error);
+      return [];
+    }
+  });
+
+  // ID of a saved itinerary to view (bypasses regeneration)
+  const [viewingSavedItineraryId, setViewingSavedItineraryId] = useState(null);
+
+  // Login-required modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Support browser Back and Forward navigation.
   useEffect(() => {
@@ -94,6 +122,15 @@ const [intro, setIntro] = useState(
     };
   }, []);
 
+  // Redirect to landing page if user navigates to a protected path while logged out
+  // after the auth check completes.
+  useEffect(() => {
+    if (!authLoading && !user && PROTECTED_PATHS.has(currentPage)) {
+      navigate('/');
+      setShowLoginModal(true);
+    }
+  }, [authLoading, user, currentPage]);
+
   // Navigate between pages without reloading the application.
   const navigate = useCallback((path) => {
     if (window.location.pathname !== path) {
@@ -104,15 +141,14 @@ const [intro, setIntro] = useState(
     setPanel(null);
     window.scrollTo(0, 0);
   }, []);
+
   const handleOpenItinerary = () => {
-  navigate("/itinerary");
-};
+    navigate("/itinerary");
+  };
 
-  
-const finishIntro = useCallback(() => {
-  setIntro(false);
-}, []);
-
+  const finishIntro = useCallback(() => {
+    setIntro(false);
+  }, []);
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({
@@ -121,52 +157,66 @@ const finishIntro = useCallback(() => {
     });
   };
 
-  
-const onNav = (id) => {
-  setActive(id);
+  /** Guard: attempt to navigate to protected page. Show modal if logged out. */
+  const guardedNavigate = useCallback((path, navId) => {
+    if (!user) {
+      setShowLoginModal(true);
+      return false;
+    }
+    if (path) navigate(path);
+    return true;
+  }, [user, navigate]);
 
-  if (id === 'plan') {
-    navigate('/plan-journey');
-    return;
-  }
+  const onNav = (id) => {
+    setActive(id);
 
-  if (id === 'food') {
-    navigate('/food-spots');
-    return;
-  }
-
-  if (id === 'drishti') {
-    navigate('/drishti');
-    return;
-  }
-
-  if (id === 'sahayak') {
-    navigate('/sahayak');
-    return;
-  }
-
-  if (id === 'help') {
-    setPanel({ type: id });
-    return;
-  }
-
-  if (currentPage !== '/') {
-    navigate('/');
-
-    if (id !== 'home') {
-      requestAnimationFrame(() => scrollTo(id));
+    if (id === 'plan') {
+      if (!guardedNavigate('/plan-journey', 'plan')) return;
+      return;
     }
 
-    return;
-  }
+    if (id === 'food') {
+      if (!guardedNavigate('/food-spots', 'food')) return;
+      return;
+    }
 
-  scrollTo(id);
-};
+    if (id === 'drishti') {
+      if (!guardedNavigate('/drishti', 'drishti')) return;
+      return;
+    }
+
+    if (id === 'sahayak') {
+      if (!guardedNavigate('/sahayak', 'sahayak')) return;
+      return;
+    }
+
+    if (id === 'itineraries') {
+      if (!guardedNavigate('/your-itineraries', 'itineraries')) return;
+      return;
+    }
+
+    if (id === 'help') {
+      setPanel({ type: id });
+      return;
+    }
+
+    if (currentPage !== '/') {
+      navigate('/');
+
+      if (id !== 'home') {
+        requestAnimationFrame(() => scrollTo(id));
+      }
+
+      return;
+    }
+
+    scrollTo(id);
+  };
 
   // Open the dedicated Food Spots page.
   const openFood = () => {
+    if (!guardedNavigate('/food-spots', 'food')) return;
     setActive('food');
-    navigate('/food-spots');
   };
 
   const onCategory = (id) =>
@@ -179,14 +229,64 @@ const onNav = (id) => {
   const onDestination = (id) =>
     setPanel({ type: 'destination', id });
 
+  // ------------------------------------------------------------------
+  // Auth loading screen — prevents protected content flashing
+  // ------------------------------------------------------------------
+  if (authLoading) {
+    return (
+      <div className="auth-loading-screen">
+        <Loader2 size={36} />
+        <p>Loading NammaPrayana…</p>
+      </div>
+    );
+  }
+
   const renderContent = () => {
+    // Auth pages (no protection needed)
+    if (currentPage === '/login') {
+      return (
+        <LoginPage
+          onBack={() => navigate('/')}
+          onSignup={() => navigate('/signup')}
+          onSuccess={() => navigate('/')}
+        />
+      );
+    }
+
+    if (currentPage === '/signup') {
+      return (
+        <SignupPage
+          onBack={() => navigate('/')}
+          onLogin={() => navigate('/login')}
+          onSuccess={() => navigate('/')}
+        />
+      );
+    }
+
+    // ------------------------------------------------------------------
+    // Protected pages
+    // ------------------------------------------------------------------
+    if (currentPage === '/your-itineraries' && user) {
+      return (
+        <YourItinerariesPage
+          onBack={() => navigate('/')}
+          onPlanJourney={() => navigate('/plan-journey')}
+          onViewItinerary={(id) => {
+            setViewingSavedItineraryId(id);
+            navigate('/itinerary');
+          }}
+        />
+      );
+    }
+
     // Page 1: Journey preferences.
-    if (currentPage === '/plan-journey') {
+    if (currentPage === '/plan-journey' && user) {
       return (
         <PlanJourney
           onBack={() => navigate('/')}
           onDiveIntoJourney={(preferences) => {
             setJourneyConfig(preferences);
+            setViewingSavedItineraryId(null);
             navigate('/route-discovery');
           }}
         />
@@ -194,7 +294,7 @@ const onNav = (id) => {
     }
 
     // Page 2: Route discovery, transport and tourism itinerary.
-    if (currentPage === '/route-discovery') {
+    if (currentPage === '/route-discovery' && user) {
       return (
         <RouteDiscoveryPage
           journeyConfig={journeyConfig}
@@ -203,14 +303,30 @@ const onNav = (id) => {
           initialEndDate={journeyConfig?.endDate}
           onContinue={() => navigate('/plan-journey')}
           onOpenStays={() => navigate('/stays')}
-          onOpenItinerary={() => navigate('/itinerary')}
+          onOpenItinerary={(newIds) => {
+            if (Array.isArray(newIds)) {
+              setSelectedAttractionIds(newIds);
+            } else {
+              try {
+                const saved = sessionStorage.getItem('np_selected_itinerary');
+                if (saved) {
+                  const parsed = JSON.parse(saved);
+                  if (Array.isArray(parsed.selected_attraction_ids)) {
+                    setSelectedAttractionIds(parsed.selected_attraction_ids);
+                  }
+                }
+              } catch {}
+            }
+            setViewingSavedItineraryId(null);
+            navigate('/itinerary');
+          }}
           onOpenSahayak={() => navigate('/sahayak')}
         />
       );
     }
 
     // Stay page
-    if (currentPage === '/stays') {
+    if (currentPage === '/stays' && user) {
       return (
         <Stays
           journeyConfig={journeyConfig}
@@ -220,7 +336,7 @@ const onNav = (id) => {
     }
 
     // Page 3: Dedicated Food Spots page.
-    if (currentPage === '/food-spots') {
+    if (currentPage === '/food-spots' && user) {
       return (
         <FoodSpots
           onBack={() => navigate('/route-discovery')}
@@ -228,19 +344,28 @@ const onNav = (id) => {
       );
     }
 
-    // Page 4: Itinerary page
-    if (currentPage === '/itinerary') {
+    // Page 4: Itinerary page — supports both new generation and saved view
+    if (currentPage === '/itinerary' && user) {
       return (
         <ItineraryPage
           journeyConfig={journeyConfig}
           selectedAttractionIds={selectedAttractionIds}
-          onBack={() => navigate('/route-discovery')}
+          savedItineraryId={viewingSavedItineraryId}
+          onRequireLogin={() => setShowLoginModal(true)}
+          onBack={() => {
+            if (viewingSavedItineraryId) {
+              setViewingSavedItineraryId(null);
+              navigate('/your-itineraries');
+            } else {
+              navigate('/route-discovery');
+            }
+          }}
         />
       );
     }
 
     // Page 5: Travel Sahayak page
-    if (currentPage === '/sahayak') {
+    if (currentPage === '/sahayak' && user) {
       return (
         <SahayakPage
           journeyConfig={journeyConfig}
@@ -250,7 +375,7 @@ const onNav = (id) => {
     }
 
     // Page 6: Namma Drishti page
-    if (currentPage === '/drishti') {
+    if (currentPage === '/drishti' && user) {
       return (
         <DrishtiPage
           onBack={() => navigate('/')}
@@ -265,7 +390,15 @@ const onNav = (id) => {
           Skip to content
         </a>
 
-        <Navbar active={active} onNav={onNav} />
+        <Navbar
+          active={active}
+          onNav={onNav}
+          user={user}
+          onLogin={() => navigate('/login')}
+          onSignup={() => navigate('/signup')}
+          onLogout={async () => { await logout(); navigate('/'); }}
+          onYourItineraries={() => onNav('itineraries')}
+        />
 
         <main>
           <Hero
@@ -295,7 +428,18 @@ const onNav = (id) => {
     <>
       {renderContent()}
       {currentPage !== '/sahayak' && (
-        <SahayakFab journeyConfig={journeyConfig} />
+        <SahayakFab
+          journeyConfig={journeyConfig}
+          user={user}
+          onRequireLogin={() => setShowLoginModal(true)}
+        />
+      )}
+      {showLoginModal && (
+        <LoginRequiredModal
+          onLogin={() => { setShowLoginModal(false); navigate('/login'); }}
+          onSignup={() => { setShowLoginModal(false); navigate('/signup'); }}
+          onClose={() => setShowLoginModal(false)}
+        />
       )}
     </>
   );

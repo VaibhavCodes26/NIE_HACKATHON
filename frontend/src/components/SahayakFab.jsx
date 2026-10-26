@@ -8,7 +8,7 @@ import "./sahayak-fab.css";
  * Tooltip and pulse restart on every page reload.
  * No react-router-dom required.
  */
-export default function SahayakFab({ journeyConfig }) {
+export default function SahayakFab({ journeyConfig, user, onRequireLogin }) {
   const [open, setOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [pulse, setPulse] = useState(true);
@@ -67,6 +67,10 @@ export default function SahayakFab({ journeyConfig }) {
   }, []);
 
   function toggle() {
+    if (!user && onRequireLogin) {
+      onRequireLogin();
+      return;
+    }
     setOpen((previous) => !previous);
     setShowHint(false);
     setPulse(false);

@@ -21,6 +21,8 @@ from app.routes.trains import router as trains_router
 from app.routes.sahayak import router as sahayak_router
 from app.routes.gati import router as gati_router
 from app.routes.drishti import router as drishti_router
+from app.routes.auth import router as auth_router
+from app.routes.saved_itineraries import router as saved_itineraries_router
 from app.schemas import (
     DeferredAttraction,
     ItineraryDay,
@@ -41,6 +43,10 @@ def _extract_pacing_profile(request: ItineraryRequest) -> tuple[str, dict[str, b
     pace = str(getattr(request, "pace", "balanced") or "balanced").strip().lower()
     profile = dict(getattr(request, "profile", {}) or {})
 
+    # Normalize existing profile boolean flags
+    for k in list(profile.keys()):
+        profile[k] = bool(profile[k])
+
     adj = str(getattr(request, "adjustment_request", "") or "")
     if adj:
         adj_lower = adj.lower()
@@ -52,10 +58,30 @@ def _extract_pacing_profile(request: ItineraryRequest) -> tuple[str, dict[str, b
             profile["child"] = True
         if "mobility" in adj_lower or "accessibility" in adj_lower or "wheelchair" in adj_lower:
             profile["mobility"] = True
-        if "relaxed" in adj_lower or "easy pace" in adj_lower or "less walking" in adj_lower or "easy-pace" in adj_lower or "less-walking" in adj_lower:
+        if "avoid strenuous" in adj_lower or "strenuous trek" in adj_lower or "avoid trek" in adj_lower or "no trek" in adj_lower:
+            profile["avoid_strenuous"] = True
+        if "less walking" in adj_lower or "less-walking" in adj_lower:
+            profile["less_walking"] = True
             pace = "relaxed"
-        elif "packed" in adj_lower or "fast" in adj_lower:
+        if "easy pace" in adj_lower or "easy-pace" in adj_lower or "relaxed" in adj_lower:
+            profile["easy_pace"] = True
+            pace = "relaxed"
+        if "rain-friendly" in adj_lower or "rain friendly" in adj_lower or "less rainy" in adj_lower:
+            profile["rain_friendly"] = True
+        if "cooler" in adj_lower or "less exposed" in adj_lower:
+            profile["less_exposed"] = True
+        if "packed" in adj_lower or "fast" in adj_lower:
             pace = "packed"
+
+    if pace in {"less-walking", "less_walking"}:
+        profile["less_walking"] = True
+        pace = "relaxed"
+    elif pace in {"easy-pace", "easy_pace"}:
+        profile["easy_pace"] = True
+        pace = "relaxed"
+    elif pace in {"rain-friendly", "rain_friendly"}:
+        profile["rain_friendly"] = True
+        pace = "balanced"
 
     return pace, profile
 
@@ -74,6 +100,8 @@ app.include_router(trains_router)
 app.include_router(sahayak_router)
 app.include_router(gati_router)
 app.include_router(drishti_router)
+app.include_router(auth_router)
+app.include_router(saved_itineraries_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -399,17 +427,6 @@ def generate_ai_itinerary(
         for item in attractions
     ]
 
-    # Calculate authoritative Namma Gati pacing schedule before Gemini
-    pace_choice, profile_choice = _extract_pacing_profile(request)
-    gati_plan = gati_service.plan(
-        stops=attraction_records,
-        n_days=duration_days,
-        profile=profile_choice,
-        cities=[item.name for item in selected_destinations],
-        pace=pace_choice,
-        start_date=request.start_date,
-    )
-
     food_rows = db.scalars(
         select(FoodSpot).order_by(FoodSpot.city, FoodSpot.spot_id)
     ).all()
@@ -486,6 +503,19 @@ def generate_ai_itinerary(
                 f"({first_date} to {last_date}): {exc}."
             )
 
+    # Calculate authoritative Namma Gati pacing schedule before Gemini
+    pace_choice, profile_choice = _extract_pacing_profile(request)
+    gati_plan = gati_service.plan(
+        stops=attraction_records,
+        n_days=duration_days,
+        profile=profile_choice,
+        cities=[item.name for item in selected_destinations],
+        pace=pace_choice,
+        start_date=request.start_date,
+        selected_attraction_ids=request.selected_attraction_ids,
+        weather_data=weather_records,
+    )
+
     try:
         result = generate_itinerary(
             destinations=[item.name for item in selected_destinations],
@@ -500,6 +530,7 @@ def generate_ai_itinerary(
             weather_data=weather_records,
             adjustment_request=request.adjustment_request,
             gati_plan=gati_plan,
+            selected_attraction_ids=request.selected_attraction_ids,
         )
     except (RuntimeError, ValueError) as exc:
         raise HTTPException(
@@ -515,6 +546,7 @@ def generate_ai_itinerary(
 
     result["gati"] = gati_plan
     result["deferred"] = gati_plan.get("deferred", [])
+    result["unscheduled"] = gati_plan.get("deferred", [])
     result["weather_warnings"] = weather_warnings
     result["weather_source"] = "Open-Meteo"
     result["generation_status"] = "ai_generated"
@@ -658,6 +690,31 @@ def preview_itinerary(
         for attraction in attractions
     ]
 
+    weather_records = []
+    base_days = duration_days // len(selected_destinations)
+    extra_days = duration_days % len(selected_destinations)
+    day_offset = 0
+
+    for index, destination in enumerate(selected_destinations):
+        assigned_days = base_days + (1 if index < extra_days else 0)
+        first_date = request.start_date + timedelta(days=day_offset)
+        last_date = first_date + timedelta(days=assigned_days - 1)
+        day_offset += assigned_days
+
+        coordinates = _resolve_coordinates(destination.id, db) or _resolve_coordinates(destination.name, db)
+        if coordinates:
+            try:
+                forecast = get_weather_forecast(
+                    latitude=coordinates[0],
+                    longitude=coordinates[1],
+                    start_date=first_date,
+                    end_date=last_date,
+                )
+                for item in forecast.get("daily", []):
+                    weather_records.append({"destination": destination.name, **item})
+            except Exception:
+                pass
+
     pace_choice, profile_choice = _extract_pacing_profile(request)
     gati_plan = gati_service.plan(
         stops=attraction_records,
@@ -666,6 +723,8 @@ def preview_itinerary(
         cities=[d.name for d in selected_destinations],
         pace=pace_choice,
         start_date=request.start_date,
+        selected_attraction_ids=request.selected_attraction_ids,
+        weather_data=weather_records,
     )
 
     days = []
@@ -696,6 +755,12 @@ def preview_itinerary(
                 effort=s.get("effort"),
                 level=s.get("level"),
                 city=s.get("city"),
+                safety_flag=s.get("safety_flag"),
+                safety_note=s.get("safety_note"),
+                accessibility_flag=s.get("accessibility_flag"),
+                accessibility_note=s.get("accessibility_note"),
+                weather_note=s.get("weather_note"),
+                is_mandatory=s.get("is_mandatory"),
             )
             for s in gd.get("stops", [])
         ]
@@ -762,6 +827,7 @@ def preview_itinerary(
             level=d_item.get("level"),
             code=d_item.get("code"),
             reason=d_item.get("reason"),
+            is_mandatory=d_item.get("is_mandatory"),
         )
         for d_item in gati_plan.get("deferred", [])
     ]

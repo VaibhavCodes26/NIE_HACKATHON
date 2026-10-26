@@ -58,6 +58,7 @@ def _validate_and_enforce_daily_structure(
     attractions: list[dict],
     food_spots: list[dict],
     gati_plan: Optional[dict] = None,
+    selected_attraction_ids: Optional[list[int]] = None,
 ) -> dict:
     """
     Validate and guarantee the required itinerary structure:
@@ -173,6 +174,16 @@ def _validate_and_enforce_daily_structure(
                     used_food_spot_ids.add(food_id)
                 continue
 
+            # Attempt to resolve attraction_id by name if not explicitly set
+            if attr_id is None and not food_id and meal_type is None:
+                stop_name_clean = str(stop.get("name", "")).strip().lower()
+                for gid, gst in gati_stop_by_id.items():
+                    gname = str(gst.get("name", "")).strip().lower()
+                    if stop_name_clean and (stop_name_clean == gname or stop_name_clean in gname or gname in stop_name_clean):
+                        attr_id = gid
+                        stop["attraction_id"] = gid
+                        break
+
             # It's an attraction/activity stop
             if attr_id is not None:
                 # If Gati explicitly deferred it, do NOT include in day schedule!
@@ -191,10 +202,23 @@ def _validate_and_enforce_daily_structure(
                 globally_placed_attractions.add(attr_id)
 
                 if attr_id in gati_stop_by_id:
-                    stop["effort"] = gati_stop_by_id[attr_id].get("effort")
-                    stop["level"] = gati_stop_by_id[attr_id].get("level")
+                    gst = gati_stop_by_id[attr_id]
+                    stop["effort"] = gst.get("effort")
+                    stop["level"] = gst.get("level")
+                    if gst.get("safety_flag"):
+                        stop["safety_flag"] = gst["safety_flag"]
+                    if gst.get("safety_note"):
+                        stop["safety_note"] = gst["safety_note"]
+                    if gst.get("accessibility_flag"):
+                        stop["accessibility_flag"] = gst["accessibility_flag"]
+                    if gst.get("accessibility_note"):
+                        stop["accessibility_note"] = gst["accessibility_note"]
+                    if gst.get("weather_note"):
+                        stop["weather_note"] = gst["weather_note"]
+                    if gst.get("is_mandatory") is not None:
+                        stop["is_mandatory"] = gst["is_mandatory"]
                     if not stop.get("category"):
-                        stop["category"] = gati_stop_by_id[attr_id].get("category", "Tourist attraction")
+                        stop["category"] = gst.get("category", "Tourist attraction")
 
             activity_stops.append(stop)
 
@@ -214,6 +238,12 @@ def _validate_and_enforce_daily_structure(
                         "source_status": gstop.get("source_status", "curated_reference"),
                         "effort": gstop.get("effort"),
                         "level": gstop.get("level"),
+                        "safety_flag": gstop.get("safety_flag"),
+                        "safety_note": gstop.get("safety_note"),
+                        "accessibility_flag": gstop.get("accessibility_flag"),
+                        "accessibility_note": gstop.get("accessibility_note"),
+                        "weather_note": gstop.get("weather_note"),
+                        "is_mandatory": gstop.get("is_mandatory"),
                     }
                     activity_stops.append(recovered)
                     day_scheduled_ids.add(required_id)
@@ -341,13 +371,51 @@ def _validate_and_enforce_daily_structure(
 
         day["stops"] = final_day_stops
 
-    # Attach Gati plan, deferred items, and warnings
+    # Attach Gati plan, deferred items, unscheduled items, and warnings
     if gati_plan:
         result["gati"] = gati_plan
         result["deferred"] = gati_plan.get("deferred", [])
+        result["unscheduled"] = gati_plan.get("deferred", [])
         for w in gati_plan.get("warnings", []):
             if w not in result["warnings"]:
                 result["warnings"].append(w)
+
+    # Final Integrity Check: ensure every feasible selected attraction appears in the schedule
+    if selected_attraction_ids:
+        all_scheduled_ids = set()
+        for d in days:
+            for s in d.get("stops", []):
+                sid = s.get("attraction_id")
+                if sid is not None:
+                    all_scheduled_ids.add(int(sid))
+
+        deferred_ids_all = {int(x["id"]) for x in result.get("deferred", []) if x.get("id") is not None}
+
+        for req_id in selected_attraction_ids:
+            req_id_int = int(req_id)
+            if req_id_int not in all_scheduled_ids and req_id_int not in deferred_ids_all:
+                matched_attr = next((a for a in (attractions or []) if int(a.get("id", -1)) == req_id_int), None)
+                if matched_attr:
+                    target_day = days[0]
+                    attr_city = str(matched_attr.get("city") or matched_attr.get("destination_id") or "").lower()
+                    for d in days:
+                        d_dest = str(d.get("destination", "")).lower()
+                        if attr_city and (attr_city in d_dest or d_dest in attr_city):
+                            target_day = d
+                            break
+                    target_day["stops"].insert(-1 if len(target_day["stops"]) > 1 else len(target_day["stops"]), {
+                        "time": matched_attr.get("suggested_time") or "Morning",
+                        "name": matched_attr.get("name", "Attraction"),
+                        "category": matched_attr.get("category") or "Tourist attraction",
+                        "meal_type": None,
+                        "description": matched_attr.get("description") or f"Explore {matched_attr.get('name')}.",
+                        "attraction_id": req_id_int,
+                        "food_spot_id": None,
+                        "source_status": matched_attr.get("source_status", "curated_reference"),
+                        "effort": matched_attr.get("effort") or 30,
+                        "level": "low" if (matched_attr.get("effort") or 30) < 25 else "medium",
+                        "is_mandatory": True,
+                    })
 
     return result
 
@@ -366,6 +434,7 @@ def generate_itinerary(
     weather_data: list[dict] | None = None,
     adjustment_request: str = "",
     gati_plan: dict | None = None,
+    selected_attraction_ids: list[int] | None = None,
 ) -> dict:
     """Generate a source-grounded Karnataka itinerary using Gemini with verified schema and Gati pacing."""
 
@@ -561,6 +630,7 @@ RULES
         attractions=attractions or [],
         food_spots=food_spots or [],
         gati_plan=gati_plan,
+        selected_attraction_ids=selected_attraction_ids,
     )
 
     logger.info(

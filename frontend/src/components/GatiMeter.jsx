@@ -59,7 +59,7 @@ export default function GatiMeter({ gati, compact = false, onSelectDay = null, a
   if (!gati?.days?.length) return null;
 
   const summary = gati.summary || {};
-  const capacity = summary.capacity || 110;
+  const capacity = summary.capacity || 150;
   const pace = summary.pace || "balanced";
   const pacedFor = summary.paced_for || [];
   const maxStops = summary.max_stops || 5;

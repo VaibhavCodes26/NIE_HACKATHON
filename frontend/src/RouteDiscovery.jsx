@@ -765,7 +765,7 @@ const saveItinerarySelection = () => {
     );
 
     if (typeof onOpenItinerary === 'function') {
-      onOpenItinerary();
+      onOpenItinerary(payload.selected_attraction_ids);
     } else {
       console.error('onOpenItinerary callback was not provided.');
       window.alert('Itinerary navigation is not configured yet.');
