@@ -30,12 +30,16 @@ import './auth.css';
 const reduced = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+
 const isLandingPageReload = () => {
   const navigationEntry = performance.getEntriesByType('navigation')[0];
 
   return (
     window.location.pathname === '/' &&
-    navigationEntry?.type === 'reload'
+    (
+      navigationEntry?.type === 'navigate' ||
+      navigationEntry?.type === 'reload'
+    )
   );
 };
 

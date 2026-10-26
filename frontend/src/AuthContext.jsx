@@ -33,7 +33,7 @@ const TOKEN_KEY = 'np_auth_token';
 
 export function getAuthHeaders() {
   if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = sessionStorage.getItem(TOKEN_KEY);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -46,19 +46,27 @@ export function AuthProvider({ children }) {
     () => import.meta.env.VITE_GOOGLE_CLIENT_ID || null
   );
 
-  // Check the backend session on every mount (page load / refresh).
+  // Check the backend session on mount / refresh within the current tab.
   const refresh = useCallback(async () => {
+    // Tab-scoped: if this tab has no token in sessionStorage, do not authenticate
+    const token = typeof window !== 'undefined' ? sessionStorage.getItem(TOKEN_KEY) : null;
+    if (!token) {
+      setUser(null);
+      setAuthLoading(false);
+      return;
+    }
+
     setAuthLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: getAuthHeaders(),
-        credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
         setUser(data);
       } else {
-        localStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        try { localStorage.removeItem(TOKEN_KEY); } catch {}
         setUser(null);
       }
     } catch {
@@ -69,6 +77,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    // Proactively purge any legacy localStorage tokens from previous persistent sessions
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {}
     refresh();
   }, [refresh]);
 
@@ -86,8 +98,10 @@ export function AuthProvider({ children }) {
 
   const login = useCallback((userData) => {
     if (userData?.token) {
-      localStorage.setItem(TOKEN_KEY, userData.token);
+      sessionStorage.setItem(TOKEN_KEY, userData.token);
     }
+    // Purge any lingering localStorage token
+    try { localStorage.removeItem(TOKEN_KEY); } catch {}
     setUser(userData);
   }, []);
 
@@ -96,12 +110,12 @@ export function AuthProvider({ children }) {
       await fetch(`${API_BASE}/api/auth/logout`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        credentials: 'include',
       });
     } catch {
       // Ignore network errors on logout.
     }
-    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    try { localStorage.removeItem(TOKEN_KEY); } catch {}
     setUser(null);
   }, []);
 
@@ -110,7 +124,7 @@ export function AuthProvider({ children }) {
       ...options.headers,
       ...getAuthHeaders(),
     };
-    return fetch(url, { ...options, headers, credentials: 'include' });
+    return fetch(url, { ...options, headers });
   }, []);
 
   return (

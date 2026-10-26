@@ -25,8 +25,8 @@ const DESTINATIONS = [
     { id: 'bidar', name: 'Bidar', region: 'North Karnataka' },
     { id: 'chitradurga', name: 'Chitradurga', region: 'Central Karnataka' },
     { id: 'belagavi', name: 'Belagavi', region: 'Northwest Karnataka' },
-    {id: "hubballi" ,name: "Hubballi", region: "North Karnataka"},
-    {id:"hassan",name:"Hassan",region:"South western Karnataka"},
+    { id: "hubballi", name: "Hubballi", region: "North Karnataka" },
+    { id: "hassan", name: "Hassan", region: "South western Karnataka" },
 ];
 
 const INTERESTS = [
@@ -207,59 +207,61 @@ export default function PlanJourney({
         }
 
         if (onDiveIntoJourney) {
+            sessionStorage.setItem('np_journey_processed', 'true');
             onDiveIntoJourney(preferences);
             return;
         }
 
         setLoading(true);
-        
-try {
-    const savedSelection = sessionStorage.getItem('np_selected_itinerary');
-    const itinerarySelection = savedSelection
-        ? JSON.parse(savedSelection)
-        : null;
 
-    const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            destinations: selectedDestinations,
-            start_date: startDate,
-            end_date: endDate,
-            traveller_count: Number(travellerCount),
-            travel_style: travelStyle,
-            total_budget: Number(totalBudget),
-            interests,
-            selected_attraction_ids:
-                itinerarySelection?.selected_attraction_ids ?? [],
-        }),
-    });
+        try {
+            const savedSelection = sessionStorage.getItem('np_selected_itinerary');
+            const itinerarySelection = savedSelection
+                ? JSON.parse(savedSelection)
+                : null;
 
-    const payload = await response.json().catch(() => ({}));
+            const response = await fetch(`${API_BASE}/api/itineraries/preview`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    destinations: selectedDestinations,
+                    start_date: startDate,
+                    end_date: endDate,
+                    traveller_count: Number(travellerCount),
+                    travel_style: travelStyle,
+                    total_budget: Number(totalBudget),
+                    interests,
+                    selected_attraction_ids:
+                        itinerarySelection?.selected_attraction_ids ?? [],
+                }),
+            });
 
-    if (!response.ok) {
-        const detail = Array.isArray(payload.detail)
-            ? payload.detail.map((item) => item.msg).join(', ')
-            : payload.detail;
+            const payload = await response.json().catch(() => ({}));
 
-        throw new Error(
-            detail || 'The planner could not build this draft.'
-        );
-    }
+            if (!response.ok) {
+                const detail = Array.isArray(payload.detail)
+                    ? payload.detail.map((item) => item.msg).join(', ')
+                    : payload.detail;
 
-    setResult(payload);
+                throw new Error(
+                    detail || 'The planner could not build this draft.'
+                );
+            }
 
-    if (onPreview) onPreview(payload);
-} catch (err) {
-    setError(
-        `Could not reach the NammaPrayana backend at ${API_BASE}. ` +
-        `Start the FastAPI server and try again. ${err.message || ''}`
-    );
-} finally {
-    setLoading(false);
-}
+            setResult(payload);
+            sessionStorage.setItem('np_journey_processed', 'true');
 
-       
+            if (onPreview) onPreview(payload);
+        } catch (err) {
+            setError(
+                `Could not reach the NammaPrayana backend at ${API_BASE}. ` +
+                `Start the FastAPI server and try again. ${err.message || ''}`
+            );
+        } finally {
+            setLoading(false);
+        }
+
+
     };
 
     const checkWeather = async (day) => {
@@ -285,14 +287,14 @@ try {
 
             <div className="journey-container">
                 {!landingSection && onBack && (
-                     <button
-    className={`journey-back ${!previewOnly ? "journey-home-button" : ""}`}
-    type="button"
-    onClick={onBack}
-  >
-    <ArrowLeft size={17} />
-    {previewOnly ? "Back to trip setup" : "Home page"}
-  </button>
+                    <button
+                        className={`journey-back ${!previewOnly ? "journey-home-button" : ""}`}
+                        type="button"
+                        onClick={onBack}
+                    >
+                        <ArrowLeft size={17} />
+                        {previewOnly ? "Back to trip setup" : "Home page"}
+                    </button>
                 )}
 
                 {!previewOnly && <>

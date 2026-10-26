@@ -23,6 +23,11 @@ const API_BASE =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export default function FoodSpots() {
+  // Show Route Discovery navigation only when a journey was processed.
+  const [journeyProcessed] = useState(
+    () => sessionStorage.getItem('np_journey_processed') === 'true'
+  );
+
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [foods, setFoods] = useState([]);
@@ -118,14 +123,16 @@ export default function FoodSpots() {
           Home
         </button>
 
-        <button
-          type="button"
-          className="foodspots-nav-btn foodspots-back-btn"
-          onClick={() => goToPage('/route-discovery')}
-        >
-          <span aria-hidden="true">←</span>
-          Back to Route Discovery
-        </button>
+        {journeyProcessed && (
+          <button
+            type="button"
+            className="foodspots-nav-btn foodspots-back-btn"
+            onClick={() => goToPage('/route-discovery')}
+          >
+            <span aria-hidden="true">←</span>
+            Back to Route Discovery
+          </button>
+        )}
       </div>
 
       <section className="fs-hero">
@@ -214,6 +221,7 @@ export default function FoodSpots() {
                     );
                   })}
                 </select>
+
                 <ArrowDown size={17} />
               </div>
             </div>
@@ -307,12 +315,6 @@ export default function FoodSpots() {
 
                   const imageUrl =
                     food.image_url || food.image || '';
-                  console.log('FOOD IMAGE DEBUG:', {
-                    restaurant,
-                    image_url: food.image_url,
-                    image: food.image,
-                    imageUrl,
-                  });
 
                   const mapsUrl =
                     food.google_maps_link ||
@@ -326,9 +328,7 @@ export default function FoodSpots() {
                       className="fs-food-card"
                       key={food.spot_id ?? food.id ?? `${restaurant}-${index}`}
                     >
-
                       <div className="fs-food-card__image-wrap">
-                        {/* Fallback stays underneath the image */}
                         <div className="fs-food-card__image-placeholder">
                           <Utensils size={34} />
                           <span>{dish || 'Karnataka Cuisine'}</span>
@@ -367,7 +367,6 @@ export default function FoodSpots() {
                           </h3>
                         )}
                       </div>
-
 
                       <div className="fs-food-card__body">
                         <span className="fs-food-card__city">

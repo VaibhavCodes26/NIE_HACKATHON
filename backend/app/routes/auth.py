@@ -22,47 +22,43 @@ from sqlalchemy.orm import Session
 from app.auth import generate_session_token, hash_password, session_expiry, verify_password
 from app.database import get_db
 from app.models import User, UserSession
+from app.services.rate_limiter import rate_limit_auth
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 # ---------------------------------------------------------------------------
-# Cookie configuration
+# Cookie cleanup helper (ensures legacy persistent cookies are removed)
 # ---------------------------------------------------------------------------
 
 COOKIE_NAME = "np_session"
-COOKIE_MAX_AGE = 30 * 24 * 60 * 60  # 30 days in seconds
 
 
 def _is_production() -> bool:
     return os.getenv("ENVIRONMENT", "development").lower() == "production"
 
 
-def _set_session_cookie(response: Response, token: str) -> None:
-    response.set_cookie(
+def _clear_session_cookie(response: Response) -> None:
+    """Clear legacy cookie from client browser to guarantee tab-scoped isolation."""
+    response.delete_cookie(
         key=COOKIE_NAME,
-        value=token,
-        max_age=COOKIE_MAX_AGE,
-        httponly=True,
+        path="/",
         samesite="lax",
         secure=_is_production(),
-        path="/",
     )
 
 
-def _clear_session_cookie(response: Response) -> None:
-    response.delete_cookie(key=COOKIE_NAME, path="/", samesite="lax")
-
-
 # ---------------------------------------------------------------------------
-# Session dependency — used by auth-protected endpoints
+# Session dependency — tab-scoped via explicit Bearer token in Authorization header
 # ---------------------------------------------------------------------------
 
 def get_session_token(
     request: Request,
-    np_session: str | None = Cookie(default=None),
 ) -> str | None:
-    if np_session:
-        return np_session
+    """Extract session token strictly from Authorization: Bearer header.
+    
+    Tab-scoped authentication requires that newly opened tabs without
+    tab-specific tokens in sessionStorage cannot be authenticated via ambient cookies.
+    """
     auth_header = request.headers.get("Authorization") or request.headers.get("authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
@@ -137,7 +133,7 @@ class UserResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 def _create_session(user: User, db: Session, response: Response) -> UserResponse:
-    """Create a new session record and set the session cookie."""
+    """Create a new session record and return the tab-scoped session token."""
     token = generate_session_token()
     session = UserSession(
         user_id=user.id,
@@ -147,7 +143,8 @@ def _create_session(user: User, db: Session, response: Response) -> UserResponse
     db.add(session)
     db.commit()
 
-    _set_session_cookie(response, token)
+    # Clear any old legacy cookie from the client browser
+    _clear_session_cookie(response)
 
     return UserResponse(
         id=user.id,
@@ -167,6 +164,7 @@ def signup(
     body: SignupRequest,
     response: Response,
     db: Session = Depends(get_db),
+    _rate_limit: None = Depends(rate_limit_auth),
 ) -> UserResponse:
     """Register a new user with username and password."""
     if body.password != body.confirm_password:
@@ -198,6 +196,7 @@ def login(
     body: LoginRequest,
     response: Response,
     db: Session = Depends(get_db),
+    _rate_limit: None = Depends(rate_limit_auth),
 ) -> UserResponse:
     """Authenticate with username and password."""
     username = body.username.strip()
@@ -240,9 +239,10 @@ def google_login(
             google_client_id,
         )
     except Exception as exc:
+        print(f"[GOOGLE AUTH ERROR] {type(exc).__name__}: {exc}")
         raise HTTPException(
             status_code=401,
-            detail=f"Google token verification failed: {exc}",
+            detail="Google authentication token verification failed.",
         ) from exc
 
     google_sub = id_info.get("sub")

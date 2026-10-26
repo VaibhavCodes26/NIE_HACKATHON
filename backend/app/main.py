@@ -34,6 +34,7 @@ from app.schemas import (
 from app.services import gati_service
 from app.services.gemini_service import generate_itinerary
 from app.services.railradar_service import railradar_get
+from app.services.rate_limiter import rate_limit_itinerary
 from app.services.stays_service import recommend_stays
 from app.services.weather_service import get_weather_forecast
 
@@ -90,10 +91,16 @@ def _extract_pacing_profile(request: ItineraryRequest) -> tuple[str, dict[str, b
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BACKEND_DIR / ".env")
 
+is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
+enable_docs = os.getenv("ENABLE_API_DOCS", "false" if is_production else "true").lower() in ("true", "1")
+
 app = FastAPI(
     title="NammaPrayana API",
     description="Karnataka travel itinerary planning API",
     version="1.0.0",
+    docs_url="/docs" if enable_docs else None,
+    redoc_url="/redoc" if enable_docs else None,
+    openapi_url="/openapi.json" if enable_docs else None,
 )
 
 app.include_router(trains_router)
@@ -103,18 +110,37 @@ app.include_router(drishti_router)
 app.include_router(auth_router)
 app.include_router(saved_itineraries_router)
 
+# Configurable CORS origins: strictly isolate to deployed domains in production
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+env_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+if is_production and env_origins:
+    allowed_origins = env_origins
+else:
+    allowed_origins = list(dict.fromkeys(default_origins + env_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    """Enforce defense-in-depth HTTP security headers."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
 
 
 @app.on_event("startup")
@@ -321,6 +347,7 @@ def get_attractions(
 def generate_ai_itinerary(
     request: ItineraryRequest,
     db: Session = Depends(get_db),
+    _rate_limit: None = Depends(rate_limit_itinerary),
 ):
     duration_days = (request.end_date - request.start_date).days + 1
 
@@ -533,9 +560,10 @@ def generate_ai_itinerary(
             selected_attraction_ids=request.selected_attraction_ids,
         )
     except (RuntimeError, ValueError) as exc:
+        print(f"[ITINERARY GENERATION ERROR] {type(exc).__name__}: {exc}")
         raise HTTPException(
             status_code=502,
-            detail=f"AI itinerary generation failed: {exc}",
+            detail="AI itinerary generation could not be completed. Please retry or adjust selected destinations.",
         ) from exc
     except Exception as exc:
         print(f"[ITINERARY AI ERROR] {type(exc).__name__}: {exc}")

@@ -36,8 +36,9 @@ def test_auth_and_itineraries_lifecycle():
     assert res.status_code == 201, f"Expected 201, got {res.status_code}"
     user_a_data = res.json()
     assert user_a_data["username"] == user_a_name
-    cookies_a = res.cookies
-    assert "np_session" in cookies_a
+    token_a = user_a_data["token"]
+    assert token_a, "Expected token in signup response"
+    headers_a = {"Authorization": f"Bearer {token_a}"}
 
     # Duplicate username signup rejected
     res = client.post("/api/auth/signup", json={
@@ -47,8 +48,8 @@ def test_auth_and_itineraries_lifecycle():
     })
     assert res.status_code == 409, f"Expected 409, got {res.status_code}"
 
-    # 3. Check current user for User A
-    res = client.get("/api/auth/me", cookies=cookies_a)
+    # 3. Check current user for User A using tab-scoped Bearer token
+    res = client.get("/api/auth/me", headers=headers_a)
     assert res.status_code == 200
     assert res.json()["username"] == user_a_name
 
@@ -88,7 +89,7 @@ def test_auth_and_itineraries_lifecycle():
         "total_budget": 5000,
         "travel_style": "heritage",
         "duration_days": 1
-    }, cookies=cookies_a)
+    }, headers=headers_a)
     assert res.status_code == 201, f"Expected 201, got {res.status_code}"
     itin_a = res.json()
     itin_a_id = itin_a["id"]
@@ -96,14 +97,14 @@ def test_auth_and_itineraries_lifecycle():
     assert itin_a["duration_days"] == 1
 
     # 5. List Itineraries for User A
-    res = client.get("/api/itineraries/saved", cookies=cookies_a)
+    res = client.get("/api/itineraries/saved", headers=headers_a)
     assert res.status_code == 200
     itineraries_list = res.json()
     assert len(itineraries_list) >= 1
     assert any(item["id"] == itin_a_id for item in itineraries_list)
 
     # 6. Get Specific Itinerary for User A
-    res = client.get(f"/api/itineraries/saved/{itin_a_id}", cookies=cookies_a)
+    res = client.get(f"/api/itineraries/saved/{itin_a_id}", headers=headers_a)
     assert res.status_code == 200
     detail = res.json()
     assert detail["id"] == itin_a_id
@@ -119,36 +120,37 @@ def test_auth_and_itineraries_lifecycle():
         "confirm_password": password_b
     })
     assert res.status_code == 201
-    cookies_b = res.cookies
+    token_b = res.json()["token"]
+    headers_b = {"Authorization": f"Bearer {token_b}"}
 
     # User B list should NOT contain User A's itinerary
-    res = client.get("/api/itineraries/saved", cookies=cookies_b)
+    res = client.get("/api/itineraries/saved", headers=headers_b)
     assert res.status_code == 200
     user_b_list = res.json()
     assert not any(item["id"] == itin_a_id for item in user_b_list)
 
     # User B cannot access User A's itinerary (returns 404)
-    res = client.get(f"/api/itineraries/saved/{itin_a_id}", cookies=cookies_b)
+    res = client.get(f"/api/itineraries/saved/{itin_a_id}", headers=headers_b)
     assert res.status_code == 404
 
     # User B cannot delete User A's itinerary (returns 404)
-    res = client.delete(f"/api/itineraries/saved/{itin_a_id}", cookies=cookies_b)
+    res = client.delete(f"/api/itineraries/saved/{itin_a_id}", headers=headers_b)
     assert res.status_code == 404
 
     # 8. User A can delete their own itinerary
-    res = client.delete(f"/api/itineraries/saved/{itin_a_id}", cookies=cookies_a)
+    res = client.delete(f"/api/itineraries/saved/{itin_a_id}", headers=headers_a)
     assert res.status_code == 204
 
     # Verify deleted
-    res = client.get(f"/api/itineraries/saved/{itin_a_id}", cookies=cookies_a)
+    res = client.get(f"/api/itineraries/saved/{itin_a_id}", headers=headers_a)
     assert res.status_code == 404
 
     # 9. Logout
-    res = client.post("/api/auth/logout", cookies=cookies_a)
+    res = client.post("/api/auth/logout", headers=headers_a)
     assert res.status_code == 200
 
     # User A session is now invalid
-    res = client.get("/api/auth/me", cookies=cookies_a)
+    res = client.get("/api/auth/me", headers=headers_a)
     assert res.status_code == 401
 
     print("ALL AUTH AND ITINERARY TESTS PASSED SUCCESSFULLY!")

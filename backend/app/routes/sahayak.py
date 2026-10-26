@@ -1,9 +1,10 @@
 from typing import Literal, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.services import sahayak_service as svc
+from app.services.rate_limiter import rate_limit_sahayak
 
 router = APIRouter(prefix="/api/sahayak", tags=["sahayak"])
 
@@ -34,6 +35,10 @@ def phrases(scenario: str):
 
 
 @router.post("/ask")
-def ask(req: AskRequest):
+def ask(
+    req: AskRequest,
+    _rate_limit: None = Depends(rate_limit_sahayak),
+):
     ctx = req.context.model_dump(exclude_none=True) if req.context else None
     return svc.ask(req.query, req.language, req.scenario, ctx)
+
