@@ -14,9 +14,15 @@ DEFAULT_SQLITE_PATH = BASE_DIR / "nammaprayana.db"
 raw_db_url = os.getenv("DATABASE_URL")
 
 if raw_db_url:
-    # Normalize legacy postgres:// scheme to postgresql:// for SQLAlchemy
     if raw_db_url.startswith("postgres://"):
-        raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+        raw_db_url = raw_db_url.replace(
+            "postgres://", "postgresql+psycopg2://", 1
+        )
+    elif raw_db_url.startswith("postgresql://"):
+        raw_db_url = raw_db_url.replace(
+            "postgresql://", "postgresql+psycopg2://", 1
+        )
+
     DATABASE_URL = raw_db_url
 else:
     DATABASE_URL = f"sqlite:///{DEFAULT_SQLITE_PATH.as_posix()}"
