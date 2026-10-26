@@ -1,21 +1,34 @@
 
 """Database configuration for NammaPrayana."""
 
+import os
 from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-# Store the database file inside the backend directory.
+# Default to SQLite inside the backend directory if DATABASE_URL is not set.
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = BASE_DIR / "nammaprayana.db"
+DEFAULT_SQLITE_PATH = BASE_DIR / "nammaprayana.db"
 
-DATABASE_URL = f"sqlite:///{DATABASE_PATH.as_posix()}"
+raw_db_url = os.getenv("DATABASE_URL")
 
-# SQLite requires this option for FastAPI's request handling.
+if raw_db_url:
+    # Normalize legacy postgres:// scheme to postgresql:// for SQLAlchemy
+    if raw_db_url.startswith("postgres://"):
+        raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = raw_db_url
+else:
+    DATABASE_URL = f"sqlite:///{DEFAULT_SQLITE_PATH.as_posix()}"
+
+# Configure engine arguments depending on dialect
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args["check_same_thread"] = False
+
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},
+    connect_args=connect_args,
 )
 
 # A database session will be created for each request.
