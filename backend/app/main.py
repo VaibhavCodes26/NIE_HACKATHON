@@ -6,7 +6,7 @@ import json
 import os
 from datetime import date, timedelta
 from pathlib import Path
-
+from app.seed import seed_database
 import httpx
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -138,7 +138,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup():
     create_tables()
-
+    
 
 @app.get("/")
 def home():
