@@ -58,7 +58,7 @@ export default function Hero({ onPlan, onFood, onCategory, onDestination }) {
           <div className="dots">
             {SLIDES.map((s, i) => (
               <button key={s.id} className={i === idx ? 'on' : ''} aria-label={`${t('car.goto')}: ${s.name} (${i + 1}/${N})`}
-                      aria-current={i === idx ? 'true' : undefined} onClick={() => go(i)}><i /></button>
+                aria-current={i === idx ? 'true' : undefined} onClick={() => go(i)}><i /></button>
             ))}
           </div>
         </div>

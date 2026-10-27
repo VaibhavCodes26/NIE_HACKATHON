@@ -44,8 +44,9 @@ def generate_session_token() -> str:
 # Session lifetime
 # ---------------------------------------------------------------------------
 
-SESSION_LIFETIME_DAYS = 30
+SESSION_LIFETIME_DAYS = 1
+SESSION_LIFETIME_HOURS = 24
 
 
 def session_expiry() -> datetime:
-    return datetime.now(timezone.utc) + timedelta(days=SESSION_LIFETIME_DAYS)
+    return datetime.now(timezone.utc) + timedelta(hours=SESSION_LIFETIME_HOURS)

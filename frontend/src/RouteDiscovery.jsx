@@ -660,26 +660,25 @@ export default function RouteDiscoveryPage({
       const params = new URLSearchParams({
         latitude: String(tourismDestination.lat),
         longitude: String(tourismDestination.lng),
-        daily:
-          'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
-        timezone: 'auto',
         start_date: targetDate,
         end_date: targetDate,
       });
 
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?${params.toString()}`
+        `${API_BASE}/api/weather/forecast?${params.toString()}`
       );
 
       if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
         throw new Error(
-          'Forecast unavailable for this date. Try a date within the forecast provider’s supported range.'
+          errJson.detail || 'Forecast unavailable for this date. Try a date within the forecast provider’s supported range.'
         );
       }
 
       const data = await response.json();
+      const forecastItem = data.daily?.[0];
 
-      if (!data.daily?.time?.length) {
+      if (!forecastItem) {
         throw new Error(
           'No forecast data was returned for this date.'
         );
@@ -688,13 +687,13 @@ export default function RouteDiscoveryPage({
       setWeatherByDay((current) => ({
         ...current,
         [dayIndex]: {
-          date: data.daily.time[0],
+          date: forecastItem.date,
           description: getWeatherDescription(
-            data.daily.weather_code?.[0]
+            forecastItem.weather_code
           ),
-          high: data.daily.temperature_2m_max?.[0],
-          low: data.daily.temperature_2m_min?.[0],
-          rain: data.daily.precipitation_probability_max?.[0],
+          high: forecastItem.temperature_max_c,
+          low: forecastItem.temperature_min_c,
+          rain: forecastItem.precipitation_probability_max,
         },
       }));
     } catch (error) {

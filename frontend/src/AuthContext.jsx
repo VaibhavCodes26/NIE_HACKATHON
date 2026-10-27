@@ -31,10 +31,23 @@ const getApiBase = () => {
 const API_BASE = getApiBase();
 const TOKEN_KEY = 'np_auth_token';
 
+// Clean up any legacy localStorage token to prevent persisting across tabs/closures
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Storage unavailable or restricted
+  }
+}
+
 export function getAuthHeaders() {
   if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem(TOKEN_KEY);
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
 }
 
 const AuthContext = createContext(null);
@@ -47,7 +60,26 @@ export function AuthProvider({ children }) {
   );
 
   // Check the backend session on every mount (page load / refresh).
+  // Tab-scoped: only restores the session if this specific tab holds a valid token.
   const refresh = useCallback(async () => {
+    if (typeof window === 'undefined') {
+      setAuthLoading(false);
+      return;
+    }
+
+    let token = null;
+    try {
+      token = sessionStorage.getItem(TOKEN_KEY);
+    } catch {
+      token = null;
+    }
+
+    if (!token) {
+      setUser(null);
+      setAuthLoading(false);
+      return;
+    }
+
     setAuthLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/auth/me`, {
@@ -58,7 +90,11 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         setUser(data);
       } else {
-        localStorage.removeItem(TOKEN_KEY);
+        try {
+          sessionStorage.removeItem(TOKEN_KEY);
+        } catch {
+          // ignore
+        }
         setUser(null);
       }
     } catch {
@@ -86,7 +122,11 @@ export function AuthProvider({ children }) {
 
   const login = useCallback((userData) => {
     if (userData?.token) {
-      localStorage.setItem(TOKEN_KEY, userData.token);
+      try {
+        sessionStorage.setItem(TOKEN_KEY, userData.token);
+      } catch (err) {
+        console.error('Failed to save session token in sessionStorage:', err);
+      }
     }
     setUser(userData);
   }, []);
@@ -101,7 +141,11 @@ export function AuthProvider({ children }) {
     } catch {
       // Ignore network errors on logout.
     }
-    localStorage.removeItem(TOKEN_KEY);
+    try {
+      sessionStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // ignore
+    }
     setUser(null);
   }, []);
 

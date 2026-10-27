@@ -156,5 +156,55 @@ def test_auth_and_itineraries_lifecycle():
     print("ALL AUTH AND ITINERARY TESTS PASSED SUCCESSFULLY!")
 
 
+def test_tab_scoped_and_session_lifecycle():
+    """Verify session cookie attributes, tab-scoped Bearer token isolation, and logout."""
+    tab1_client = TestClient(app)
+    username = f"tab_tester_{uuid.uuid4().hex[:6]}"
+    password = "TestPassword123!"
+
+    # 1. Login/Signup on Tab 1
+    signup_res = tab1_client.post("/api/auth/signup", json={
+        "username": username,
+        "password": password,
+        "confirm_password": password
+    })
+    assert signup_res.status_code == 201
+    data = signup_res.json()
+    token = data["token"]
+    assert token
+
+    # Check cookie: should NOT have Max-Age or Expires (pure session cookie)
+    set_cookie_header = signup_res.headers.get("set-cookie", "")
+    assert "np_session" in set_cookie_header
+    assert "Max-Age" not in set_cookie_header
+    assert "max-age" not in set_cookie_header
+
+    # 2. Page refresh simulation: client sends stored tab-scoped token
+    refresh_res = tab1_client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert refresh_res.status_code == 200
+    assert refresh_res.json()["username"] == username
+
+    # 3. In-app navigation simulation: access protected endpoint with tab-scoped token
+    nav_res = tab1_client.get("/api/itineraries/saved", headers={"Authorization": f"Bearer {token}"})
+    assert nav_res.status_code == 200
+
+    # 4. Tab 2 simulation (separate tab/client context without token)
+    tab2_client = TestClient(app)
+    # Without tab-scoped token, unauthenticated
+    new_tab_res = tab2_client.get("/api/auth/me")
+    assert new_tab_res.status_code == 401
+
+    # 5. Logout on Tab 1
+    logout_res = tab1_client.post("/api/auth/logout", headers={"Authorization": f"Bearer {token}"})
+    assert logout_res.status_code == 200
+
+    # Server session is deleted
+    after_logout_res = tab1_client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert after_logout_res.status_code == 401
+
+    print("ALL TAB-SCOPED SESSION LIFECYCLE TESTS PASSED SUCCESSFULLY!")
+
+
 if __name__ == "__main__":
     test_auth_and_itineraries_lifecycle()
+    test_tab_scoped_and_session_lifecycle()

@@ -7,7 +7,10 @@ from typing import Any, Optional
 from dotenv import load_dotenv
 from google import genai
 
+from app.net_utils import patch_ipv4_preference
 from app.services import gati_service
+
+patch_ipv4_preference()
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +18,7 @@ logger = logging.getLogger(__name__)
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BACKEND_DIR / ".env")
 
-MODEL_NAME = "gemini-3.1-flash-lite"
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
 
 def _clean_json_output(output: str) -> str:

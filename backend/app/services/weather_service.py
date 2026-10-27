@@ -21,7 +21,7 @@ def get_weather_forecast(
         raise ValueError("End date must be on or after start date.")
 
     today = date.today()
-    max_forecast_date = today + timedelta(days=15)
+    max_forecast_date = today + timedelta(days=14)
 
     if end_date < today:
         raise ValueError("Weather forecasts are not available for past dates.")
@@ -29,7 +29,7 @@ def get_weather_forecast(
     effective_start = max(start_date, today)
     if effective_start > max_forecast_date:
         raise ValueError(
-            f"Weather forecasts are only available up to {max_forecast_date.isoformat()} (16-day forecast horizon). "
+            f"Weather forecasts are only available up to {max_forecast_date.isoformat()} (15-day forecast horizon). "
             f"Requested start date {start_date.isoformat()} is beyond this window."
         )
 
@@ -52,9 +52,20 @@ def get_weather_forecast(
     try:
         with httpx.Client(timeout=12.0) as client:
             response = client.get(OPEN_METEO_URL, params=params)
+            if response.status_code == 400:
+                try:
+                    err_json = response.json()
+                    if err_json.get("reason"):
+                        raise ValueError(err_json["reason"])
+                except ValueError:
+                    raise
+                except Exception:
+                    pass
             response.raise_for_status()
             payload = response.json()
-    except (httpx.HTTPError, ValueError) as exc:
+    except ValueError:
+        raise
+    except (httpx.HTTPError, Exception) as exc:
         raise RuntimeError("Weather provider is temporarily unavailable.") from exc
 
     daily = payload.get("daily") or {}

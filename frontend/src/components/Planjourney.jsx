@@ -268,11 +268,34 @@ export default function PlanJourney({
         setWeatherLoading((current) => ({ ...current, [day.day_number]: true }));
         try {
             const destination = day.destination_id === 'badami' ? 'Badami & Aihole' : day.destination_name;
-            const params = new URLSearchParams({ destination, date: day.date });
-            const response = await fetch(`${API_BASE}/api/weather/forecast?${params.toString()}`);
+            let response = await fetch(`${API_BASE}/api/weather/forecast?${params.toString()}`);
+            if (!response.ok && day.date) {
+                const fallbackResponse = await fetch(`${API_BASE}/api/weather/forecast?destination=${encodeURIComponent(destination)}`);
+                if (fallbackResponse.ok) {
+                    response = fallbackResponse;
+                }
+            }
             const payload = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(payload.detail || 'Forecast unavailable for this date.');
-            setWeatherByDay((current) => ({ ...current, [day.day_number]: { ...payload, error: '' } }));
+            
+            const forecast = payload.daily?.[0] || {};
+            const rainProb = forecast.precipitation_probability_max ?? null;
+            const advice = (rainProb ?? 0) >= 40
+                ? "Rain is possible. Keep an umbrella handy."
+                : "Good weather expected for sightseeing.";
+
+            setWeatherByDay((current) => ({
+                ...current,
+                [day.day_number]: {
+                    ...payload,
+                    temperature_min_c: forecast.temperature_min_c,
+                    temperature_max_c: forecast.temperature_max_c,
+                    rain_probability_percent: rainProb,
+                    travel_advice: advice,
+                    source: payload.source || 'Open-Meteo',
+                    error: ''
+                }
+            }));
         } catch (err) {
             setWeatherByDay((current) => ({ ...current, [day.day_number]: { error: err.message || 'Forecast unavailable.' } }));
         } finally {

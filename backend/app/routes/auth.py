@@ -38,10 +38,10 @@ def _is_production() -> bool:
 
 
 def _set_session_cookie(response: Response, token: str) -> None:
+    # Session cookie (no max_age/expires) so the browser drops it on browser session end.
     response.set_cookie(
         key=COOKIE_NAME,
         value=token,
-        max_age=COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
         secure=_is_production(),
@@ -50,7 +50,13 @@ def _set_session_cookie(response: Response, token: str) -> None:
 
 
 def _clear_session_cookie(response: Response) -> None:
-    response.delete_cookie(key=COOKIE_NAME, path="/", samesite="lax")
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        samesite="lax",
+        secure=_is_production(),
+        httponly=True,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -61,11 +67,12 @@ def get_session_token(
     request: Request,
     np_session: str | None = Cookie(default=None),
 ) -> str | None:
-    if np_session:
-        return np_session
+    # Prioritize explicit tab-scoped Bearer token over ambient cookie
     auth_header = request.headers.get("Authorization") or request.headers.get("authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
+    if np_session:
+        return np_session
     return None
 
 

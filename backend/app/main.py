@@ -1,6 +1,10 @@
 
 """FastAPI application for NammaPrayana."""
 
+from app.net_utils import patch_ipv4_preference
+
+patch_ipv4_preference()
+
 import asyncio
 import json
 import os
@@ -404,11 +408,17 @@ def generate_ai_itinerary(
     attraction_map = {item.id: item for item in all_attractions}
 
     if request.selected_attraction_ids:
-        attractions = [
+        selected_set = set(request.selected_attraction_ids)
+        chosen = [
             attraction_map[item]
             for item in request.selected_attraction_ids
             if item in attraction_map
         ]
+        remainder = [
+            item for item in all_attractions
+            if item.id not in selected_set
+        ]
+        attractions = (chosen + remainder)[:40]
         if not attractions:
             attractions = all_attractions[:40]
     else:

@@ -589,7 +589,16 @@ const loadWeather = useCallback(async () => {
         if (startDate) url.searchParams.set("start_date", startDate);
         if (endDate) url.searchParams.set("end_date", endDate);
 
-        const response = await fetch(url);
+        let response = await fetch(url);
+        if (!response.ok && (startDate || endDate)) {
+          const fallbackUrl = new URL(`${API_BASE}/api/weather/forecast`);
+          fallbackUrl.searchParams.set("destination", city);
+          const fallbackResp = await fetch(fallbackUrl);
+          if (fallbackResp.ok) {
+            response = fallbackResp;
+          }
+        }
+
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
           throw new Error(
