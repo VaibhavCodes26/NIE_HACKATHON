@@ -179,6 +179,7 @@ def _fetch_google_weather(latitude: float, longitude: float) -> dict[str, dict]:
         "location.latitude": f"{latitude:.4f}",
         "location.longitude": f"{longitude:.4f}",
         "days": 10,
+        "pageSize": 10,
     }
 
     client_kwargs = {"timeout": _TIMEOUT}
