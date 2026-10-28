@@ -654,6 +654,9 @@ export default function ItineraryPage({
               source: value?.source ?? "Google Weather",
               forecast_notice: value?.forecast_notice ?? null,
               has_partial_forecast: Boolean(value?.has_partial_forecast),
+              is_cached: Boolean(value?.is_cached),
+              is_fallback: Boolean(value?.is_fallback),
+              cached_at: value?.cached_at ?? null,
               advice:
                 (forecast.precipitation_probability_max ?? 0) >= 40
                   ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
@@ -1157,7 +1160,7 @@ export default function ItineraryPage({
             </div>
           ) : weather?._error ? (
             <div className="itinerary-inline-state itinerary-inline-state--error">
-              Weather is unavailable for {cityLabel(activeWeatherCity)} right now.
+              Weather is unavailable for {cityLabel(activeWeatherCity)} right now. You can continue planning your trip without weather updates.
             </div>
           ) : weather ? (
             <div className="itinerary-weather-card">
@@ -1193,7 +1196,19 @@ export default function ItineraryPage({
                 </div>
               </div>
 
-              {weather?.source && <p className="itinerary-source">Source: {weather.source}</p>}
+              {weather?.source && (
+                <p className="itinerary-source">
+                  Source: {weather.source}
+                  {weather.is_fallback
+                    ? " · Cached fallback"
+                    : weather.is_cached
+                    ? " · Cached"
+                    : ""}
+                  {weather.cached_at
+                    ? ` (retrieved ${new Date(weather.cached_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
+                    : ""}
+                </p>
+              )}
 
               {weather?.forecast_notice && (
                 <div className="itinerary-weather-notice" role="status">

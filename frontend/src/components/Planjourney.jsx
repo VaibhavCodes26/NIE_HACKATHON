@@ -293,6 +293,9 @@ export default function PlanJourney({
                         [day.day_number]: {
                             error: payload.forecast_notice,
                             source: payload.source || 'Google Weather',
+                    is_cached: Boolean(payload.is_cached),
+                    is_fallback: Boolean(payload.is_fallback),
+                    cached_at: payload.cached_at || null,
                         }
                     }));
                     return;
@@ -314,6 +317,9 @@ export default function PlanJourney({
                     rain_probability_percent: rainProb,
                     travel_advice: advice,
                     source: payload.source || 'Google Weather',
+                    is_cached: Boolean(payload.is_cached),
+                    is_fallback: Boolean(payload.is_fallback),
+                    cached_at: payload.cached_at || null,
                     notice: payload.forecast_notice,
                     error: ''
                 }
@@ -541,7 +547,7 @@ export default function PlanJourney({
                                         <div className="multi-stop-list">{day.stops.map((stop, index) => <div className="multi-stop is-featured-attraction" key={`${day.day_number}-${stop.name}`}><span className="multi-stop-time">{stop.suggested_time}</span><span className="multi-stop-dot">{index + 1}</span><div><strong>{stop.name}<span className="featured-attraction-badge"><Sparkles size={11} /> ITINERARY PICK</span></strong><p>{stop.description}</p></div></div>)}</div>
 
                                         <div className="multi-day-tools"><button type="button" onClick={() => checkWeather(day)} disabled={Boolean(weatherLoading[day.day_number])}>{weatherLoading[day.day_number] ? <LoaderCircle className="multi-spin" size={15} /> : <CloudSun size={16} />} Check forecast</button></div>
-                                        {weatherByDay[day.day_number] && <div className={`multi-weather-result ${weatherByDay[day.day_number].error ? 'has-error' : ''}`}>{weatherByDay[day.day_number].error ? weatherByDay[day.day_number].error : <><CloudSun size={18} /><span><strong>{weatherByDay[day.day_number].temperature_min_c}°–{weatherByDay[day.day_number].temperature_max_c}°C</strong><small>Rain chance: {weatherByDay[day.day_number].rain_probability_percent == null ? 'not provided' : `${weatherByDay[day.day_number].rain_probability_percent}%`} · {weatherByDay[day.day_number].travel_advice}</small>{weatherByDay[day.day_number].notice && <small style={{ display: 'block', marginTop: '4px', color: '#92400e' }}>{weatherByDay[day.day_number].notice}</small>}<small>Forecast by {weatherByDay[day.day_number].source}; estimates can change.</small></span></>}</div>}
+                                        {weatherByDay[day.day_number] && <div className={`multi-weather-result ${weatherByDay[day.day_number].error ? 'has-error' : ''}`}>{weatherByDay[day.day_number].error ? weatherByDay[day.day_number].error : <><CloudSun size={18} /><span><strong>{weatherByDay[day.day_number].temperature_min_c}°–{weatherByDay[day.day_number].temperature_max_c}°C</strong><small>Rain chance: {weatherByDay[day.day_number].rain_probability_percent == null ? 'not provided' : `${weatherByDay[day.day_number].rain_probability_percent}%`} · {weatherByDay[day.day_number].travel_advice}</small>{weatherByDay[day.day_number].notice && <small style={{ display: 'block', marginTop: '4px', color: '#92400e' }}>{weatherByDay[day.day_number].notice}</small>}<small>Forecast by {weatherByDay[day.day_number].source}{weatherByDay[day.day_number].is_fallback ? ' (cached fallback)' : weatherByDay[day.day_number].is_cached ? ' (cached)' : ''}; estimates can change.</small></span></>}</div>}
                                     </article>
                                 </Fragment>
                             ))}

@@ -39,7 +39,7 @@ from app.services import gati_service
 from app.services.gemini_service import generate_itinerary
 from app.services.railradar_service import railradar_get
 from app.services.stays_service import recommend_stays
-from app.services.weather_service import get_weather_forecast
+from app.services.weather_service import close_weather_http_client, get_weather_forecast
 
 
 def _extract_pacing_profile(request: ItineraryRequest) -> tuple[str, dict[str, bool]]:
@@ -176,6 +176,11 @@ app.add_middleware(_BodySizeLimitMiddleware)
 @app.on_event("startup")
 def startup():
     create_tables()
+
+
+@app.on_event("shutdown")
+def shutdown():
+    close_weather_http_client()
     
 
 @app.get("/")

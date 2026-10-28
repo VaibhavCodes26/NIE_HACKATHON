@@ -3,6 +3,7 @@
 All tests mock Google Weather API HTTP calls using unittest.mock to avoid consuming real API quota.
 """
 
+import httpx
 import threading
 import time
 from datetime import date, timedelta
@@ -303,3 +304,235 @@ def test_end_before_start_raises_value_error():
     today = date.today()
     with pytest.raises(ValueError, match="End date"):
         get_weather_forecast(12.3, 76.65, today + timedelta(days=2), today)
+
+
+# ---------------------------------------------------------------------------
+# Section 8 Comprehensive Automated Test Suite
+# ---------------------------------------------------------------------------
+
+from starlette.testclient import TestClient
+from app.main import app
+
+api_client = TestClient(app)
+
+
+def _make_mock_client(get_side_effect=None, get_return_value=None):
+    mock_client = MagicMock()
+    mock_client.is_closed = False
+    if get_side_effect is not None:
+        mock_client.get.side_effect = get_side_effect
+    elif get_return_value is not None:
+        mock_client.get.return_value = get_return_value
+    return mock_client
+
+
+def test_transient_read_error_followed_by_success(monkeypatch):
+    """Case 2: A transient ReadError on attempt 1 followed by success on attempt 2."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_success = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_side_effect=[httpx.ReadError("connection reset"), mock_success])
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            res = get_weather_forecast(12.3, 76.65, today, today)
+            assert res["source"] == "Google Weather"
+            assert len(res["daily"]) == 1
+            assert mock_client.get.call_count == 2
+
+
+def test_connection_and_read_timeouts_with_success(monkeypatch):
+    """Case 3: Connection timeout on attempt 1, read timeout on attempt 2, success on attempt 3."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_success = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_side_effect=[
+        httpx.ConnectTimeout("connect timed out"),
+        httpx.ReadTimeout("read timed out"),
+        mock_success,
+    ])
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            res = get_weather_forecast(12.3, 76.65, today, today)
+            assert res["source"] == "Google Weather"
+            assert mock_client.get.call_count == 3
+
+
+def test_exhausted_retries_on_read_error(monkeypatch):
+    """Case 4: Transient ReadError persists across all retries, then raises RuntimeError."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_client = _make_mock_client(get_side_effect=httpx.ReadError("connection dropped"))
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            with pytest.raises(RuntimeError, match="temporarily unavailable"):
+                get_weather_forecast(12.3, 76.65, today, today)
+            assert mock_client.get.call_count == 3  # Initial + 2 retries
+
+
+def test_retry_on_429_with_retry_after(monkeypatch):
+    """Case 5a: HTTP 429 with Retry-After header retries and succeeds."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_429 = MagicMock()
+    mock_429.status_code = 429
+    mock_429.headers = {"Retry-After": "1"}
+    mock_success = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_side_effect=[mock_429, mock_success])
+
+    with patch("time.sleep") as mock_sleep:
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            res = get_weather_forecast(12.3, 76.65, today, today)
+            assert res["source"] == "Google Weather"
+            assert mock_client.get.call_count == 2
+            mock_sleep.assert_called_with(1.0)
+
+
+def test_retry_on_503_upstream_error(monkeypatch):
+    """Case 5b: Retryable upstream 503 response retries and succeeds."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_503 = MagicMock()
+    mock_503.status_code = 503
+    mock_success = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_side_effect=[mock_503, mock_success])
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            res = get_weather_forecast(12.3, 76.65, today, today)
+            assert res["source"] == "Google Weather"
+            assert mock_client.get.call_count == 2
+
+
+def test_non_retryable_client_errors_fail_fast(monkeypatch):
+    """Case 6: HTTP 400, 401, 403 fail immediately without retrying."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+
+    for status in (400, 401, 403):
+        mock_resp = MagicMock()
+        mock_resp.status_code = status
+        mock_resp.text = f"Simulated {status} client error"
+        mock_client = _make_mock_client(get_return_value=mock_resp)
+
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            with pytest.raises(RuntimeError, match="authentication failed"):
+                get_weather_forecast(12.3, 76.65, today, today)
+            assert mock_client.get.call_count == 1  # No retry!
+
+
+def test_cache_fallback_after_upstream_failure(monkeypatch):
+    """Case 7: Valid stale cache is served as fallback when upstream fails."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_success = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_return_value=mock_success)
+
+    # 1. Warm cache
+    with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+        res1 = get_weather_forecast(12.3, 76.65, today, today)
+        assert res1["is_cached"] is False
+        assert res1["is_fallback"] is False
+
+    # 2. Expire cache past fresh TTL (6h), but within 24h fallback window
+    coord_key = (round(12.3, 3), round(76.65, 3))
+    assert coord_key in _WEATHER_CACHE
+    _WEATHER_CACHE[coord_key]["expires_at"] = time.monotonic() - 10.0
+
+    # 3. Upstream fails with ReadError -> fallback cached data is returned
+    mock_fail_client = _make_mock_client(get_side_effect=httpx.ReadError("connection dropped"))
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_fail_client):
+            res2 = get_weather_forecast(12.3, 76.65, today, today)
+            assert res2["is_cached"] is True
+            assert res2["is_fallback"] is True
+            assert "Live weather is temporarily unavailable" in res2["forecast_notice"]
+            assert len(res2["daily"]) == 1
+
+
+def test_no_cache_failure_handling(monkeypatch):
+    """Case 8: When no cached data exists and upstream fails, raises RuntimeError."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_client = _make_mock_client(get_side_effect=httpx.ReadError("network down"))
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            with pytest.raises(RuntimeError, match="temporarily unavailable"):
+                get_weather_forecast(12.3, 76.65, today, today)
+
+
+def test_partial_success_across_destinations(monkeypatch):
+    """Case 9: Coorg succeeds while Shivamogga fails; Coorg remains 200, Shivamogga returns 502."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    coorg_resp = _mock_google_response(200, [today])
+
+    def mock_get_route(url, params=None, **kwargs):
+        lat = (params or {}).get("location.latitude")
+        if lat == "12.4244":  # Coorg
+            return coorg_resp
+        # Shivamogga: 13.9299 -> fails
+        raise httpx.ReadError("network failure for shivamogga")
+
+    mock_client = _make_mock_client(get_side_effect=mock_get_route)
+
+    with patch("time.sleep"):
+        with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+            # 1. Query Coorg -> 200 OK
+            r_coorg = api_client.get("/api/weather/forecast?destination=coorg")
+            assert r_coorg.status_code == 200
+            data_coorg = r_coorg.json()
+            assert data_coorg["source"] == "Google Weather"
+            assert len(data_coorg["daily"]) >= 1
+
+            # 2. Query Shivamogga -> 502 Bad Gateway
+            r_shivamogga = api_client.get("/api/weather/forecast?destination=shivamogga")
+            assert r_shivamogga.status_code == 502
+            assert r_shivamogga.json()["detail"] == "Weather forecast is temporarily unavailable."
+
+            # 3. Coorg's forecast was not discarded and can still be fetched
+            r_coorg_again = api_client.get("/api/weather/forecast?destination=coorg")
+            assert r_coorg_again.status_code == 200
+            assert r_coorg_again.json()["daily"] == data_coorg["daily"]
+
+
+def test_dates_beyond_horizon_honestly_empty(monkeypatch):
+    """Case 10: Dates completely beyond Google forecast horizon return empty daily and polite notice."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    # Mock Google returning 10 days from today
+    api_dates = [today + timedelta(days=i) for i in range(10)]
+    mock_resp = _mock_google_response(200, api_dates)
+    mock_client = _make_mock_client(get_return_value=mock_resp)
+
+    with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+        # Request dates from day 20 to day 22
+        res = get_weather_forecast(12.3, 76.65, today + timedelta(days=20), today + timedelta(days=22))
+        assert res["daily"] == []  # Never invent data
+        assert res["has_partial_forecast"] is True
+        assert res["forecast_notice"] == FORECAST_NOTICE_TEXT
+
+
+def test_weather_endpoint_schema_contract(monkeypatch):
+    """Case 11 & 12: Verify all expected schema fields for frontend consumption."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_resp = _mock_google_response(200, [today])
+    mock_client = _make_mock_client(get_return_value=mock_resp)
+
+    with patch("app.services.weather_service.get_weather_http_client", return_value=mock_client):
+        resp = api_client.get(f"/api/weather/forecast?destination=mysuru&start_date={today}&end_date={today}")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "latitude" in data
+        assert "longitude" in data
+        assert "source" in data
+        assert "daily" in data
+        assert "has_partial_forecast" in data
+        assert "forecast_notice" in data
+        assert "is_cached" in data
+        assert "is_fallback" in data
+        assert "cached_at" in data
