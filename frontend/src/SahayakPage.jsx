@@ -23,6 +23,7 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [listening, setListening] = useState(false);
   const [showPhrase, setShowPhrase] = useState(null); // full-screen "show to local"
   const [toast, setToast] = useState("");
   const [audioState, setAudioState] = useState({ text: "", loading: false, playing: false });
