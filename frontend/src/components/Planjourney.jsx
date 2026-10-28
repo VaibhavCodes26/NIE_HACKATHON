@@ -265,9 +265,16 @@ export default function PlanJourney({
     };
 
     const checkWeather = async (day) => {
+        if (weatherLoading[day.day_number]) return;
+        if (weatherByDay[day.day_number] && !weatherByDay[day.day_number].error) return;
+
         setWeatherLoading((current) => ({ ...current, [day.day_number]: true }));
         try {
             const destination = day.destination_id === 'badami' ? 'Badami & Aihole' : day.destination_name;
+            const params = new URLSearchParams({
+                destination,
+                ...(day.date ? { start_date: day.date, end_date: day.date } : {}),
+            });
             let response = await fetch(`${API_BASE}/api/weather/forecast?${params.toString()}`);
             if (!response.ok && day.date) {
                 const fallbackResponse = await fetch(`${API_BASE}/api/weather/forecast?destination=${encodeURIComponent(destination)}`);
@@ -276,7 +283,7 @@ export default function PlanJourney({
                 }
             }
             const payload = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(payload.detail || 'Forecast unavailable for this date.');
+            if (!response.ok) throw new Error(payload.detail || 'Weather forecast is temporarily unavailable.');
             
             const forecast = payload.daily?.[0] || {};
             const rainProb = forecast.precipitation_probability_max ?? null;

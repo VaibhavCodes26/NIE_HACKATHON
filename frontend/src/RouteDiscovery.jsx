@@ -634,6 +634,9 @@ export default function RouteDiscoveryPage({
   };
 
   const checkWeather = async (dayIndex) => {
+    if (weatherLoadingDay === dayIndex) return;
+    if (weatherByDay[dayIndex]) return;
+
     if (!tourismDestination?.lat || !tourismDestination?.lng) {
       setWeatherErrors((current) => ({
         ...current,

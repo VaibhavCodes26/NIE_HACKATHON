@@ -198,6 +198,8 @@ const [savedItinLoading, setSavedItinLoading] = useState(false);
 const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved | error
 const [savedId, setSavedId] = useState(null);
 const saveInFlightRef = useRef(false);
+const weatherInFlightRef = useRef(false);
+const lastWeatherKeyRef = useRef("");
 
 const [savedSelection, setSavedSelection] = useState(readSavedItinerarySelection);
 
@@ -557,6 +559,12 @@ const handleSaveItinerary = useCallback(async () => {
 const loadWeather = useCallback(async () => {
   if (!destinations.length) return;
 
+  const destinationsKey = `${destinations.slice().sort().join(",")}|${startDate}|${endDate}`;
+  if (weatherInFlightRef.current) return;
+  if (lastWeatherKeyRef.current === destinationsKey && Object.keys(weatherByCity).length > 0) return;
+
+  weatherInFlightRef.current = true;
+  lastWeatherKeyRef.current = destinationsKey;
   setWeatherLoading(true);
   setWeatherError("");
 
@@ -581,104 +589,101 @@ const loadWeather = useCallback(async () => {
     99: "Thunderstorm with heavy hail",
   };
 
-  const results = await Promise.all(
-    destinations.map(async (city) => {
-      try {
-        const url = new URL(`${API_BASE}/api/weather/forecast`);
-        url.searchParams.set("destination", city);
-        if (startDate) url.searchParams.set("start_date", startDate);
-        if (endDate) url.searchParams.set("end_date", endDate);
+  try {
+    const results = await Promise.all(
+      destinations.map(async (city) => {
+        try {
+          const url = new URL(`${API_BASE}/api/weather/forecast`);
+          url.searchParams.set("destination", city);
+          if (startDate) url.searchParams.set("start_date", startDate);
+          if (endDate) url.searchParams.set("end_date", endDate);
 
-        let response = await fetch(url);
-        if (!response.ok && (startDate || endDate)) {
-          const fallbackUrl = new URL(`${API_BASE}/api/weather/forecast`);
-          fallbackUrl.searchParams.set("destination", city);
-          const fallbackResp = await fetch(fallbackUrl);
-          if (fallbackResp.ok) {
-            response = fallbackResp;
+          const response = await fetch(url);
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(
+              errData.detail || `Weather request failed (${response.status})`
+            );
+          }
+          return [city, await response.json()];
+        } catch (error) {
+          return [city, { _error: error.message }];
+        }
+      })
+    );
+
+    const next = Object.fromEntries(
+      results.map(([city, value]) => {
+        if (value?._error) {
+          return [city, value];
+        }
+
+        const daily = Array.isArray(value?.daily) ? value.daily : [];
+        const dailyMap = {};
+
+        for (const item of daily) {
+          if (item?.date) {
+            const itemCode = Number(item.weather_code);
+            dailyMap[item.date] = {
+              date: item.date,
+              description:
+                WEATHER_CODE_DESCS[itemCode] ?? "Forecast received",
+              temperature:
+                item.temperature_max_c != null && item.temperature_min_c != null
+                  ? `${item.temperature_min_c}–${item.temperature_max_c}`
+                  : null,
+              rain_probability: item.precipitation_probability_max ?? null,
+              weather_code: itemCode,
+            };
           }
         }
 
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(
-            errData.detail || `Weather request failed (${response.status})`
-          );
-        }
-        return [city, await response.json()];
-      } catch (error) {
-        return [city, { _error: error.message }];
-      }
-    })
-  );
+        const forecast =
+          daily.find((item) => item.date === startDate) ?? daily[0] ?? {};
 
-  const next = Object.fromEntries(
-    results.map(([city, value]) => {
-      if (value?._error) {
-        return [city, value];
-      }
+        const code = Number(forecast.weather_code);
+        const description =
+          WEATHER_CODE_DESCS[code] ?? "Weather forecast";
 
-      const daily = Array.isArray(value?.daily) ? value.daily : [];
-      const dailyMap = {};
-
-      for (const item of daily) {
-        if (item?.date) {
-          const itemCode = Number(item.weather_code);
-          dailyMap[item.date] = {
-            date: item.date,
-            description:
-              WEATHER_CODE_DESCS[itemCode] ?? "Forecast received",
+        return [
+          city,
+          {
+            ...value,
+            daily,
+            dailyMap,
+            date: forecast.date ?? startDate,
+            description,
             temperature:
-              item.temperature_max_c != null && item.temperature_min_c != null
-                ? `${item.temperature_min_c}–${item.temperature_max_c}`
+              forecast.temperature_max_c != null &&
+              forecast.temperature_min_c != null
+                ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
                 : null,
-            rain_probability: item.precipitation_probability_max ?? null,
-            weather_code: itemCode,
-          };
-        }
-      }
-
-      const forecast =
-        daily.find((item) => item.date === startDate) ?? daily[0] ?? {};
-
-      const code = Number(forecast.weather_code);
-      const description =
-        WEATHER_CODE_DESCS[code] ?? "Weather forecast";
-
-      return [
-        city,
-        {
-          ...value,
-          daily,
-          dailyMap,
-          date: forecast.date ?? startDate,
-          description,
-          temperature:
-            forecast.temperature_max_c != null &&
-            forecast.temperature_min_c != null
-              ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
-              : null,
-          rain_probability: forecast.precipitation_probability_max ?? null,
-          source: value?.source ?? "Open-Meteo",
-          advice:
-            (forecast.precipitation_probability_max ?? 0) >= 40
-              ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
-              : "Check local conditions before starting outdoor activities.",
-        },
-      ];
-    })
-  );
-
-  setWeatherByCity(next);
-
-  const failed = results.filter(([, value]) => value?._error);
-  if (failed.length === results.length) {
-    setWeatherError(
-      "Weather data is currently unavailable for selected dates."
+            rain_probability: forecast.precipitation_probability_max ?? null,
+            source: value?.source ?? "Open-Meteo",
+            advice:
+              (forecast.precipitation_probability_max ?? 0) >= 40
+                ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
+                : "Check local conditions before starting outdoor activities.",
+          },
+        ];
+      })
     );
+
+    setWeatherByCity(next);
+
+    const failed = results.filter(([, value]) => value?._error);
+    if (failed.length === results.length) {
+      setWeatherError(
+        "Weather forecast is temporarily unavailable."
+      );
+    }
+  } catch (err) {
+    setWeatherError("Weather forecast is temporarily unavailable.");
+  } finally {
+    weatherInFlightRef.current = false;
+    setWeatherLoading(false);
   }
-  setWeatherLoading(false);
-}, [destinations, startDate, endDate]);
+}, [destinations, startDate, endDate, weatherByCity]);
 
 useEffect(() => {
   loadWeather();
