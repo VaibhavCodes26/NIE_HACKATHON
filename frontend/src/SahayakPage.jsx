@@ -24,9 +24,23 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPhrase, setShowPhrase] = useState(null); // full-screen "show to local"
-  const [listening, setListening] = useState(false);
   const [toast, setToast] = useState("");
+  const [audioState, setAudioState] = useState({ text: "", loading: false, playing: false });
   const recRef = useRef(null);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const dest = journeyConfig?.destinations?.[0];
   const context = {
@@ -112,6 +126,10 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
   // the 'voiceschanged' event fires, causing audio to silently fail in production.
   function getVoicesAsync() {
     return new Promise((resolve) => {
+      if (!("speechSynthesis" in window)) {
+        resolve([]);
+        return;
+      }
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) { resolve(voices); return; }
       const onChanged = () => {
@@ -119,31 +137,85 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
         resolve(window.speechSynthesis.getVoices());
       };
       window.speechSynthesis.addEventListener("voiceschanged", onChanged);
-      // Safety: resolve with whatever is available after 3 s to avoid hanging
+      // Safety: resolve with whatever is available after 1.5s to avoid hanging
       setTimeout(() => {
         window.speechSynthesis.removeEventListener("voiceschanged", onChanged);
         resolve(window.speechSynthesis.getVoices());
-      }, 3000);
+      }, 1500);
     });
   }
 
   async function speak(text) {
-    if (!("speechSynthesis" in window)) {
-      flash("Speech synthesis is not supported on this browser. Use 'Show' to display the phrase.");
+    const clean = (text || "").replace(/[….]/g, " ").trim();
+    if (!clean) return;
+
+    // If currently playing this exact phrase, toggle stop
+    if (audioRef.current && audioState.text === clean && audioState.playing) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setAudioState({ text: "", loading: false, playing: false });
       return;
     }
-    const voices = await getVoicesAsync();
-    const u = new SpeechSynthesisUtterance((text || "").replace("…", ""));
-    u.lang = "kn-IN";
-    u.rate = 0.85;
-    const v = voices.find((x) => x.lang.toLowerCase().startsWith("kn"));
-    if (v) {
-      u.voice = v;
-    } else {
-      flash("No Kannada voice installed on this device — browser will use its default voice. Use 'Show' to display the phrase instead.");
+
+    // Stop previous audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
     }
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    setAudioState({ text: clean, loading: true, playing: false });
+
+    // Fallback: only use local speech synthesis if a genuine Kannada voice is installed
+    const tryLocalVoiceFallback = async () => {
+      const voices = await getVoicesAsync();
+      const knVoice = voices.find((x) => x.lang?.toLowerCase().startsWith("kn"));
+      if (knVoice) {
+        const u = new SpeechSynthesisUtterance(clean);
+        u.voice = knVoice;
+        u.lang = "kn-IN";
+        u.rate = 0.85;
+        u.onend = () => setAudioState({ text: "", loading: false, playing: false });
+        u.onerror = () => setAudioState({ text: "", loading: false, playing: false });
+        window.speechSynthesis.speak(u);
+        setAudioState({ text: clean, loading: false, playing: true });
+        return true;
+      }
+      // Never use an incorrect non-Kannada voice; show polite fallback
+      setAudioState({ text: "", loading: false, playing: false });
+      flash("Kannada audio is temporarily unavailable. Use 'Show' to display the phrase to locals.");
+      return false;
+    };
+
+    // Primary: Backend Kannada TTS (works reliably on any device without local Kannada voice)
+    try {
+      const audioUrl = `${API}/api/sahayak/tts?text=${encodeURIComponent(clean)}`;
+      const audio = new Audio();
+      audioRef.current = audio;
+      audio.preload = "auto";
+      audio.src = audioUrl;
+
+      audio.onplay = () => {
+        setAudioState({ text: clean, loading: false, playing: true });
+      };
+
+      audio.onended = () => {
+        setAudioState({ text: "", loading: false, playing: false });
+      };
+
+      audio.onerror = async () => {
+        await tryLocalVoiceFallback();
+      };
+
+      await audio.play();
+    } catch (playErr) {
+      if (playErr.name !== "AbortError") {
+        await tryLocalVoiceFallback();
+      }
+    }
   }
 
   const translit = (p) => (lang === "en" ? p.roman : p.deva);
@@ -218,8 +290,20 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
               {lang !== "en" && <div className="rm2">{p.roman}</div>}
               <div className="mn">{p.meaning}</div>
               <div className="act">
-                <button onClick={() => speak(p.kn)}>🔊 Play</button>
-                <button onClick={() => setShowPhrase(p)}>Show</button>
+                <button
+                  type="button"
+                  onClick={() => speak(p.kn)}
+                  disabled={audioState.loading && audioState.text === (p.kn || "").replace(/[….]/g, " ").trim()}
+                  className={audioState.playing && audioState.text === (p.kn || "").replace(/[….]/g, " ").trim() ? "is-playing" : ""}
+                  aria-label={`Play audio for ${p.kn}`}
+                >
+                  {audioState.loading && audioState.text === (p.kn || "").replace(/[….]/g, " ").trim()
+                    ? "⏳ Loading…"
+                    : audioState.playing && audioState.text === (p.kn || "").replace(/[….]/g, " ").trim()
+                    ? "⏹ Stop"
+                    : "🔊 Play"}
+                </button>
+                <button type="button" onClick={() => setShowPhrase(p)}>Show</button>
               </div>
             </article>
           ))}
@@ -252,12 +336,19 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
           <div className="kn">{showPhrase.kn}</div>
           <div className="rm">{showPhrase.roman}</div>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               speak(showPhrase.kn);
             }}
+            disabled={audioState.loading && audioState.text === (showPhrase.kn || "").replace(/[….]/g, " ").trim()}
+            className={audioState.playing && audioState.text === (showPhrase.kn || "").replace(/[….]/g, " ").trim() ? "is-playing" : ""}
           >
-            🔊 Play
+            {audioState.loading && audioState.text === (showPhrase.kn || "").replace(/[….]/g, " ").trim()
+              ? "⏳ Loading…"
+              : audioState.playing && audioState.text === (showPhrase.kn || "").replace(/[….]/g, " ").trim()
+              ? "⏹ Stop"
+              : "🔊 Play"}
           </button>
           <small>Tap anywhere to close</small>
         </div>

@@ -1,9 +1,10 @@
 from typing import Literal, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 
 from app.services import sahayak_service as svc
+from app.services import tts_service
 
 router = APIRouter(prefix="/api/sahayak", tags=["sahayak"])
 
@@ -37,3 +38,25 @@ def phrases(scenario: str):
 def ask(req: AskRequest):
     ctx = req.context.model_dump(exclude_none=True) if req.context else None
     return svc.ask(req.query, req.language, req.scenario, ctx)
+
+
+@router.get("/tts")
+def kannada_tts(text: str = Query(..., min_length=1, max_length=500)):
+    """Return synthesized Kannada MP3 speech for the given phrase with HTTP caching headers."""
+    try:
+        audio_content = tts_service.synthesize_kannada_speech(text)
+        return Response(
+            content=audio_content,
+            media_type="audio/mpeg",
+            headers={
+                "Cache-Control": "public, max-age=604800, immutable",
+                "Content-Disposition": 'inline; filename="kannada_phrase.mp3"',
+            },
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Kannada speech audio is temporarily unavailable.",
+        )
