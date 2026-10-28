@@ -138,6 +138,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------------------------------------------------------------------
+# Body size limit middleware
+# A 10 MiB image ≈ 13.6 MiB as base64 + JSON overhead → allow 20 MiB on the
+# Drishti endpoints.  Everything else keeps a generous 2 MiB ceiling to prevent
+# accidental or malicious oversized payloads hanging the Uvicorn worker.
+# ---------------------------------------------------------------------------
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
+
+_DRISHTI_PATHS = {"/api/drishti/scan", "/api/drishti/translate"}
+_DRISHTI_MAX_BODY = 20 * 1024 * 1024   # 20 MiB — accommodates 10 MiB image as base64
+_DEFAULT_MAX_BODY = 2 * 1024 * 1024    # 2 MiB for all other endpoints
+
+
+class _BodySizeLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        limit = (
+            _DRISHTI_MAX_BODY
+            if request.url.path in _DRISHTI_PATHS
+            else _DEFAULT_MAX_BODY
+        )
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > limit:
+            return StarletteResponse(
+                content='{"detail":"Request body too large."}',
+                status_code=413,
+                media_type="application/json",
+            )
+        return await call_next(request)
+
+
+app.add_middleware(_BodySizeLimitMiddleware)
+
 
 @app.on_event("startup")
 def startup():

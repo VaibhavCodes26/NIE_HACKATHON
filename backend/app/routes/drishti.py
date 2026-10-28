@@ -57,7 +57,7 @@ async def translate_image(
     if len(content) > drishti_service.MAX_BYTES:
         raise HTTPException(
             status_code=413,
-            detail="Image size exceeds 5MB limit. Please upload a smaller image.",
+            detail="Image size exceeds 10 MB limit. Please upload a smaller image.",
         )
 
     try:

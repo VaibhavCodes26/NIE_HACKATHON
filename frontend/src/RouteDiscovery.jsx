@@ -235,6 +235,7 @@ export default function RouteDiscoveryPage({
   journeyConfig = null,
   onContinue,
   onOpenStays,
+  onOpenFood,
   initialDestinations = EMPTY_DESTINATIONS,
   initialStartDate,
   initialEndDate,
@@ -243,8 +244,7 @@ export default function RouteDiscoveryPage({
   onOpenItinerary,
   onOpenSahayak,
   onBack,
-  onGoHome
-
+  onGoHome,
 }) {
   const effectiveConfig = useMemo(() => {
     if (journeyConfig) return journeyConfig;
@@ -1088,9 +1088,18 @@ export default function RouteDiscoveryPage({
         aria-label="Explore travel options"
       >
         <div className="rd-container">
-          <a
+          <button
+            type="button"
             className="rd-quick-nav__item rd-quick-nav__item--primary"
-            href="/food-spots"
+            onClick={() => {
+              if (typeof onOpenFood === 'function') {
+                onOpenFood();
+              } else {
+                // Fallback: SPA-style navigation via history API
+                window.history.pushState({}, '', '/food-spots');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }
+            }}
           >
             <span className="rd-quick-nav__icon">
               <Utensils size={23} />
@@ -1105,7 +1114,7 @@ export default function RouteDiscoveryPage({
               className="rd-quick-nav__arrow"
               size={19}
             />
-          </a>
+          </button>
 
           <button
             type="button"

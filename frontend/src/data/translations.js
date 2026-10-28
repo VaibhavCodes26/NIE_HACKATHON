@@ -28,7 +28,8 @@ export const T = {
     'food.title': 'A Taste of Karnataka', 'food.intro': "Karnataka's cuisine shifts from region to region. These are a few examples, not a complete list.",
     
     'about.title': 'About NammaPrayana',
-    'about.body': 'NammaPrayana means “our journey”. We want Karnataka to be easier to explore through travel, food and cultural discovery — from the monuments everyone knows to the plates and places people often miss.',
+    'about.body': 'NammaPrayana means “Our Journey” — a vision to make exploring Karnataka simpler, smarter, and more meaningful. From the historic monuments of Hampi and the royal heritage of Mysuru to hidden gems, authentic local cuisine, and vibrant cultural experiences, NammaPrayana helps travellers discover the many stories Karnataka has to offer. Powered by AI-driven travel planning, it creates personalised itineraries based on destinations, travel dates, interests, and budgets, while bringing together tourist attraction discovery, local food spots, accommodation suggestions, travel route information, accessibility-aware planning through Namma Gati, visual assistance through Namma Drishti, and practical Kannada translations through Namma Sahayak. More than just a travel planner, NammaPrayana celebrates Karnataka’s heritage, encourages local discovery, and aims to make every journey more accessible, convenient, and memorable — helping travellers experience Karnataka beyond the ordinary, one journey at a time.',
+    'food.soon': 'ನಮ್ಮ ಕರ್ನಾಟಕ - ಸುಂದರ ಕರ್ನಾಟಕ',
 
     'plan.title': 'Plan Your Journey', 'plan.intro': 'YatriAI will help travellers personalise trips across Karnataka. It is not live yet — this form only previews the kind of preferences it will ask for.',
     'plan.interests': 'What draws you to Karnataka?', 'plan.days': 'Trip length', 'plan.d1': '2–3 days', 'plan.d2': '4–6 days', 'plan.d3': '7+ days',

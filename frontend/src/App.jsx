@@ -309,6 +309,10 @@ export default function App() {
           initialEndDate={journeyConfig?.endDate}
           onContinue={() => navigate('/plan-journey')}
           onOpenStays={() => navigate('/stays')}
+          onOpenFood={() => {
+            if (!guardedNavigate('/food-spots', 'food')) return;
+            setActive('food');
+          }}
           onOpenItinerary={() => {
             setViewingSavedItineraryId(null);
             navigate('/itinerary');

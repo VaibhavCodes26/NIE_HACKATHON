@@ -1,12 +1,27 @@
 
 """Compact daily weather forecasts from Open-Meteo."""
 
+import logging
 from datetime import date, timedelta
 
 import httpx
 
+logger = logging.getLogger(__name__)
 
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+
+# Separate connect and read timeouts so a slow DNS/TCP handshake on IPv6-broken
+# networks (e.g. Render free tier) cannot hang the endpoint indefinitely.
+_TIMEOUT = httpx.Timeout(connect=8.0, read=12.0, write=5.0, pool=5.0)
+
+# Force IPv4 transport so the request doesn't stall on hosts where IPv6
+# connectivity to api.open-meteo.com is broken (Render, some cloud VMs).
+# httpx uses its own HTTP/1.1 stack and is NOT affected by the socket.getaddrinfo
+# monkey-patch in net_utils.py, so we must configure transport directly.
+try:
+    _TRANSPORT = httpx.HTTPTransport(local_address="0.0.0.0")
+except Exception:  # pragma: no cover — older httpx versions
+    _TRANSPORT = None
 
 
 def get_weather_forecast(
@@ -50,7 +65,10 @@ def get_weather_forecast(
     }
 
     try:
-        with httpx.Client(timeout=12.0) as client:
+        client_kwargs = {"timeout": _TIMEOUT}
+        if _TRANSPORT is not None:
+            client_kwargs["transport"] = _TRANSPORT
+        with httpx.Client(**client_kwargs) as client:
             response = client.get(OPEN_METEO_URL, params=params)
             if response.status_code == 400:
                 try:
@@ -66,6 +84,7 @@ def get_weather_forecast(
     except ValueError:
         raise
     except (httpx.HTTPError, Exception) as exc:
+        logger.error("[weather] Open-Meteo request failed: %r", exc)
         raise RuntimeError("Weather provider is temporarily unavailable.") from exc
 
     daily = payload.get("daily") or {}

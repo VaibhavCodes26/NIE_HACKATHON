@@ -108,14 +108,40 @@ export default function SahayakPage({ journeyConfig, onBack, compact = false }) 
   }
 
   // ---- Kannada speech output ----
-  function speak(text) {
-    if (!("speechSynthesis" in window)) return flash("Speech is not supported on this browser.");
-    const u = new SpeechSynthesisUtterance(text.replace("…", ""));
+  // Chromium browsers load voices asynchronously. getVoices() returns [] until
+  // the 'voiceschanged' event fires, causing audio to silently fail in production.
+  function getVoicesAsync() {
+    return new Promise((resolve) => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { resolve(voices); return; }
+      const onChanged = () => {
+        window.speechSynthesis.removeEventListener("voiceschanged", onChanged);
+        resolve(window.speechSynthesis.getVoices());
+      };
+      window.speechSynthesis.addEventListener("voiceschanged", onChanged);
+      // Safety: resolve with whatever is available after 3 s to avoid hanging
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener("voiceschanged", onChanged);
+        resolve(window.speechSynthesis.getVoices());
+      }, 3000);
+    });
+  }
+
+  async function speak(text) {
+    if (!("speechSynthesis" in window)) {
+      flash("Speech synthesis is not supported on this browser. Use 'Show' to display the phrase.");
+      return;
+    }
+    const voices = await getVoicesAsync();
+    const u = new SpeechSynthesisUtterance((text || "").replace("…", ""));
     u.lang = "kn-IN";
     u.rate = 0.85;
-    const v = window.speechSynthesis.getVoices().find((x) => x.lang.toLowerCase().startsWith("kn"));
-    if (!v) flash("No Kannada voice on this device. Use 'Show' instead.");
-    else u.voice = v;
+    const v = voices.find((x) => x.lang.toLowerCase().startsWith("kn"));
+    if (v) {
+      u.voice = v;
+    } else {
+      flash("No Kannada voice installed on this device — browser will use its default voice. Use 'Show' to display the phrase instead.");
+    }
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   }

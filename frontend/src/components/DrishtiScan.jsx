@@ -35,7 +35,7 @@ const TARGET_LANGUAGES = [
 ];
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 export default function DrishtiScan({ onBack }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -63,7 +63,7 @@ export default function DrishtiScan({ onBack }) {
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError("Image size exceeds 5MB limit. Please choose a smaller photo.");
+      setError("Image size exceeds 10 MB. Please choose a smaller photo.");
       return;
     }
 
@@ -189,7 +189,7 @@ export default function DrishtiScan({ onBack }) {
               Drag & drop a photo here, or click to browse
             </p>
             <p className="drishti-drop-sub">
-              Supports JPEG, PNG, and WebP (up to 5MB)
+              Supports JPEG, PNG, and WebP (up to 10 MB)
             </p>
 
             <div className="drishti-upload-actions" onClick={(e) => e.stopPropagation()}>

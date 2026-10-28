@@ -29,7 +29,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BACKEND_DIR / ".env")
 
 VISION_MODEL = os.getenv("GEMINI_VISION_MODEL") or "gemini-3.8-flash"
-MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+MAX_BYTES = 10 * 1024 * 1024  # 10 MiB
 MAX_SCANS_PER_HOUR = int(os.getenv("DRISHTI_MAX_PER_HOUR", "60"))
 
 # Target language mappings
@@ -119,7 +119,7 @@ def validate_image_bytes(raw_bytes: bytes, mime_type: str):
     if mime_type.lower() not in ALLOWED_MIMES:
         raise ScanError(400, f"Unsupported image format ({mime_type}). Please upload a JPEG, PNG, or WebP image.")
     if len(raw_bytes) > MAX_BYTES:
-        raise ScanError(413, "Image file is too large (maximum 5MB). Please upload a smaller photo.")
+        raise ScanError(413, "Image file is too large (maximum 10 MB). Please upload a smaller photo.")
 
 
 def decode_data_url(data_url: str) -> Tuple[str, bytes]:
