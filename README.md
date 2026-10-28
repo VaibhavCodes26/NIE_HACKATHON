@@ -39,8 +39,8 @@ Use this account to explore the demo, if it is available in the currently deploy
 
 | Field | Demo value |
 |---|---|
-| Username | `User` |
-| Password | `User@1234` |
+| Username | `Test` |
+| Password | `Test12345` |
 
 This is a shared demonstration account, not a personal account. Do not enter personal, confidential or payment information. Demo account availability depends on the deployed database; if the credentials are not accepted, use the sign-up flow where available.
 
