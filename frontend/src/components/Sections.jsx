@@ -36,7 +36,7 @@ export function AboutSection() {
       <div className="container about">
         <h2>{t('about.title')}</h2>
         <p>{t('about.body')}</p>
-        <p className="notice">{t('about.ai')}</p>
+
       </div>
     </section>
   );
@@ -48,19 +48,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <p className="footer-note">{t('footer.note')}</p>
-        <details className="credits">
-          <summary>{t('footer.credits')}</summary>
-          <ul>
-            {files.map(([n, f]) => (
-              <li key={f}>{n}: <a href={commonsPage(f)} target="_blank" rel="noreferrer">Wikimedia Commons file page</a></li>
-            ))}
-            {CATEGORIES.filter((c) => c.file && !files.some((x) => x[1] === c.file)).map((c) => (
-              <li key={c.id}><a href={c.credit} target="_blank" rel="noreferrer">{c.id}</a></li>
-            ))}
-            <li>State outline: GADM-derived India admin boundaries (Karnataka), simplified for display. GADM data is free for non-commercial use with attribution — see gadm.org/license.</li>
-          </ul>
-        </details>
+        
       </div>
     </footer>
   );

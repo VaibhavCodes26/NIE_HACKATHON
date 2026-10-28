@@ -26,7 +26,6 @@ export const T = {
     'cat.coastal.t': 'Coastal Karnataka', 'cat.coastal.s': 'Where the sea meets serenity',
     'cat.historical.t': 'Historical Sites', 'cat.historical.s': 'Walk through time',
     'food.title': 'A Taste of Karnataka', 'food.intro': "Karnataka's cuisine shifts from region to region. These are a few examples, not a complete list.",
-    
     'about.title': 'About NammaPrayana',
     'about.body': 'NammaPrayana means “Our Journey” — a vision to make exploring Karnataka simpler, smarter, and more meaningful. From the historic monuments of Hampi and the royal heritage of Mysuru to hidden gems, authentic local cuisine, and vibrant cultural experiences, NammaPrayana helps travellers discover the many stories Karnataka has to offer. Powered by AI-driven travel planning, it creates personalised itineraries based on destinations, travel dates, interests, and budgets, while bringing together tourist attraction discovery, local food spots, accommodation suggestions, travel route information, accessibility-aware planning through Namma Gati, visual assistance through Namma Drishti, and practical Kannada translations through Namma Sahayak. More than just a travel planner, NammaPrayana celebrates Karnataka’s heritage, encourages local discovery, and aims to make every journey more accessible, convenient, and memorable — helping travellers experience Karnataka beyond the ordinary, one journey at a time.',
     'food.soon': 'ನಮ್ಮ ಕರ್ನಾಟಕ - ಸುಂದರ ಕರ್ನಾಟಕ',
@@ -42,7 +41,7 @@ export const T = {
     'help.l5': 'Planning and food recommendation tools are coming in later phases and are labelled as such.',
     'dest.facts': 'Good to know', 'dest.learn': 'Learn more on Wikipedia',
     'cat.places': 'Places to start with',
-    
+
   },
   hi: {
     tagline: 'खोजिए। चखिए। घूमिए।',
@@ -65,7 +64,7 @@ export const T = {
     'food.title': 'कर्नाटक का स्वाद', 'food.intro': 'कर्नाटक का खान-पान हर क्षेत्र में बदलता है। ये कुछ उदाहरण हैं, पूरी सूची नहीं।',
     'food.nophoto': 'फ़ोटो जोड़ी जानी है',
     'about.title': 'नम्मा प्रयाण के बारे में',
-    'about.body': 'नम्मा प्रयाण का अर्थ है “हमारी यात्रा”। हम चाहते हैं कि यात्रा, भोजन और सांस्कृतिक खोज के ज़रिए कर्नाटक को जानना आसान हो।',
+    'about.body': 'नम्मा प्रयाण (NammaPrayana) का अर्थ है "हमारी यात्रा" — जिसका उद्देश्य कर्नाटक की सैर को सरल, स्मार्ट और अधिक सार्थक बनाना है। हम्पी के ऐतिहासिक स्मारकों और मैसूर की शाही विरासत से लेकर छिपे हुए अनमोल स्थानों, असली स्थानीय व्यंजनों और जीवंत सांस्कृतिक अनुभवों तक, "नम्मा प्रयाण" यात्रियों को कर्नाटक की उन अनेक कहानियों को खोजने में मदद करता है जो यहाँ मौजूद हैं। AI-आधारित ट्रैवल प्लानिंग की मदद से, यह आपकी पसंद की जगहों, यात्रा की तारीखों, रुचियों और बजट के अनुसार एक कस्टमाइज़्ड यात्रा योजना (itinerary) तैयार करता है। इसमें पर्यटन स्थलों की खोज, स्थानीय खान-पान की जगहें, ठहरने के सुझाव और यात्रा रूट की जानकारी शामिल है। इसके अलावा, "नम्मा गति" (Namma Gati) के ज़रिए सुलभ यात्रा की योजना, "नम्मा दृष्टि" (Namma Drishti) के ज़रिए विज़ुअल सहायता, और "नम्मा सहायक" (Namma Sahayak) के ज़रिए कन्नड़ भाषा के व्यावहारिक अनुवाद की सुविधा भी मिलती है। सिर्फ एक ट्रैवल प्लानर से कहीं बढ़कर, "नम्मा प्रयाण" कर्नाटक की विरासत का जश्न मनाता है और स्थानीय जगहों को खोजने के लिए प्रेरित करता है। इसका लक्ष्य हर यात्रा को अधिक सुलभ, सुविधाजनक और यादगार बनाना है — ताकि यात्री कर्नाटक को एक अलग और खास नज़रिए से देख सकें।',
     'plan.title': 'अपनी यात्रा की योजना बनाएँ',
     'plan.interests': 'कर्नाटक में आपको क्या आकर्षित करता है?', 'plan.days': 'यात्रा की अवधि', 'plan.d1': '2–3 दिन', 'plan.d2': '4–6 दिन', 'plan.d3': '7+ दिन',
     'plan.submit': 'मेरी पसंद सहेजें',
@@ -73,6 +72,7 @@ export const T = {
     'dest.facts': 'जानने योग्य बातें', 'dest.learn': 'विकिपीडिया पर और जानें',
     'cat.places': 'शुरुआत के लिए स्थान',
     'footer.credits': 'श्रेय',
+
   },
   kn: {
     tagline: 'ಅನ್ವೇಷಿಸಿ. ಸವಿಯಿರಿ. ಪ್ರಯಾಣಿಸಿ.',
@@ -95,7 +95,7 @@ export const T = {
     'food.title': 'ಕರ್ನಾಟಕದ ರುಚಿ', 'food.intro': 'ಕರ್ನಾಟಕದ ಆಹಾರ ಪ್ರದೇಶದಿಂದ ಪ್ರದೇಶಕ್ಕೆ ಬದಲಾಗುತ್ತದೆ. ಇವು ಕೆಲವು ಉದಾಹರಣೆಗಳು ಮಾತ್ರ.',
     'food.nophoto': 'ಚಿತ್ರ ಸೇರಿಸಬೇಕಿದೆ',
     'about.title': 'ನಮ್ಮ ಪ್ರಯಾಣದ ಬಗ್ಗೆ',
-    'about.body': 'ನಮ್ಮ ಪ್ರಯಾಣ ಎಂದರೆ “ನಮ್ಮ ಯಾತ್ರೆ”. ಪ್ರವಾಸ, ಆಹಾರ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ಅನ್ವೇಷಣೆಯ ಮೂಲಕ ಕರ್ನಾಟಕವನ್ನು ಅರಿಯುವುದನ್ನು ಸುಲಭಗೊಳಿಸುವುದು ನಮ್ಮ ಗುರಿ.',
+    'about.body': 'ನಮ್ಮ ಪ್ರಯಾಣ ಎಂದರೆ "ನಮ್ಮ ಪ್ರಯಾಣ" - ಕರ್ನಾಟಕವನ್ನು ಅನ್ವೇಷಿಸುವುದನ್ನು ಸರಳ, ಚುರುಕಾದ ಮತ್ತು ಹೆಚ್ಚು ಅರ್ಥಪೂರ್ಣವಾಗಿಸುವ ದೃಷ್ಟಿಕೋನ. ಹಂಪಿಯ ಐತಿಹಾಸಿಕ ಸ್ಮಾರಕಗಳು ಮತ್ತು ಮೈಸೂರಿನ ರಾಜಮನೆತನದ ಪರಂಪರೆಯಿಂದ ಹಿಡಿದು ಗುಪ್ತ ರತ್ನಗಳು, ಅಧಿಕೃತ ಸ್ಥಳೀಯ ಪಾಕಪದ್ಧತಿ ಮತ್ತು ರೋಮಾಂಚಕ ಸಾಂಸ್ಕೃತಿಕ ಅನುಭವಗಳವರೆಗೆ, ನಮ್ಮ ಪ್ರಯಾಣವು ಪ್ರಯಾಣಿಕರಿಗೆ ಕರ್ನಾಟಕವು ನೀಡುವ ಅನೇಕ ಕಥೆಗಳನ್ನು ಕಂಡುಹಿಡಿಯಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ. AI-ಚಾಲಿತ ಪ್ರಯಾಣ ಯೋಜನೆಯಿಂದ ನಡೆಸಲ್ಪಡುವ ಇದು, ಪ್ರವಾಸಿ ಆಕರ್ಷಣೆಯ ಅನ್ವೇಷಣೆ, ಸ್ಥಳೀಯ ಆಹಾರ ತಾಣಗಳು, ವಸತಿ ಸಲಹೆಗಳು, ಪ್ರಯಾಣ ಮಾರ್ಗ ಮಾಹಿತಿ, ನಮ್ಮ ಗತಿ ಮೂಲಕ ಪ್ರವೇಶ-ಅರಿವು ಯೋಜನೆ, ನಮ್ಮ ದೃಷ್ಟಿ ಮೂಲಕ ದೃಶ್ಯ ಸಹಾಯ ಮತ್ತು ನಮ್ಮ ಸಹಾಯಕ್ ಮೂಲಕ ಪ್ರಾಯೋಗಿಕ ಕನ್ನಡ ಅನುವಾದಗಳನ್ನು ಒಟ್ಟುಗೂಡಿಸುವಾಗ, ಗಮ್ಯಸ್ಥಾನಗಳು, ಪ್ರಯಾಣ ದಿನಾಂಕಗಳು, ಆಸಕ್ತಿಗಳು ಮತ್ತು ಬಜೆಟ್‌ಗಳ ಆಧಾರದ ಮೇಲೆ ವೈಯಕ್ತಿಕಗೊಳಿಸಿದ ಪ್ರಯಾಣ ಯೋಜನೆಗಳನ್ನು ರಚಿಸುತ್ತದೆ. ಕೇವಲ ಪ್ರಯಾಣ ಯೋಜಕರಿಗಿಂತ ಹೆಚ್ಚಾಗಿ, ನಮ್ಮ ಪ್ರಯಾಣವು ಕರ್ನಾಟಕದ ಪರಂಪರೆಯನ್ನು ಆಚರಿಸುತ್ತದೆ, ಸ್ಥಳೀಯ ಅನ್ವೇಷಣೆಯನ್ನು ಪ್ರೋತ್ಸಾಹಿಸುತ್ತದೆ ಮತ್ತು ಪ್ರತಿ ಪ್ರಯಾಣವನ್ನು ಹೆಚ್ಚು ಪ್ರವೇಶಿಸಬಹುದಾದ, ಅನುಕೂಲಕರ ಮತ್ತು ಸ್ಮರಣೀಯವಾಗಿಸುವ ಗುರಿಯನ್ನು ಹೊಂದಿದೆ - ಪ್ರಯಾಣಿಕರು ಕರ್ನಾಟಕವನ್ನು ಸಾಮಾನ್ಯಕ್ಕಿಂತ ಮೀರಿ ಅನುಭವಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ, ಒಂದು ಸಮಯದಲ್ಲಿ ಒಂದು ಪ್ರಯಾಣ.',
     'plan.title': 'ನಿಮ್ಮ ಪ್ರಯಾಣವನ್ನು ಯೋಜಿಸಿ',
     'plan.interests': 'ಕರ್ನಾಟಕದಲ್ಲಿ ನಿಮ್ಮನ್ನು ಸೆಳೆಯುವುದು ಯಾವುದು?', 'plan.days': 'ಪ್ರಯಾಣದ ಅವಧಿ', 'plan.d1': '2–3 ದಿನಗಳು', 'plan.d2': '4–6 ದಿನಗಳು', 'plan.d3': '7+ ದಿನಗಳು',
     'plan.submit': 'ನನ್ನ ಆದ್ಯತೆಗಳನ್ನು ಉಳಿಸಿ',

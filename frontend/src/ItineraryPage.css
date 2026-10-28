@@ -4070,3 +4070,61 @@
 }
 
 
+/* Explore Route Discovery — Karnataka theme button */
+.itinerary-intercity-card__hint-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  margin-left: 4px;
+
+  background-color: #c8102e;
+  color: #ffd54f;
+
+  border: 1px solid #c8102e;
+  border-radius: 8px;
+
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.itinerary-intercity-card__hint-link:hover {
+  background-color: #6d071a;
+  border-color: #6d071a;
+  color: #ffdf70;
+  box-shadow: 0 3px 8px rgba(109, 7, 26, 0.22);
+}
+
+.itinerary-intercity-card__hint-link:active {
+  transform: translateY(1px);
+}
+
+.itinerary-intercity-card__hint-link:focus-visible {
+  outline: 2px solid #ffd54f;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .itinerary-intercity-card__hint-link {
+    padding: 7px 11px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itinerary-intercity-card__hint-link {
+    transition: none;
+  }
+}
