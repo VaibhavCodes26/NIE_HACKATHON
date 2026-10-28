@@ -682,6 +682,13 @@ export default function RouteDiscoveryPage({
       const forecastItem = data.daily?.[0];
 
       if (!forecastItem) {
+        if (data.forecast_notice) {
+          setWeatherErrors((current) => ({
+            ...current,
+            [dayIndex]: data.forecast_notice,
+          }));
+          return;
+        }
         throw new Error(
           'No forecast data was returned for this date.'
         );
@@ -697,6 +704,8 @@ export default function RouteDiscoveryPage({
           high: forecastItem.temperature_max_c,
           low: forecastItem.temperature_min_c,
           rain: forecastItem.precipitation_probability_max,
+          notice: data.forecast_notice,
+          source: data.source || 'Google Weather',
         },
       }));
     } catch (error) {

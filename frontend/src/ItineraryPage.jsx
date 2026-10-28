@@ -659,7 +659,9 @@ const loadWeather = useCallback(async () => {
                 ? `${forecast.temperature_min_c}–${forecast.temperature_max_c}`
                 : null,
             rain_probability: forecast.precipitation_probability_max ?? null,
-            source: value?.source ?? "Open-Meteo",
+            source: value?.source ?? "Google Weather",
+            forecast_notice: value?.forecast_notice ?? null,
+            has_partial_forecast: Boolean(value?.has_partial_forecast),
             advice:
               (forecast.precipitation_probability_max ?? 0) >= 40
                 ? "Rain is possible. Carry an umbrella and keep outdoor plans flexible."
@@ -1269,6 +1271,12 @@ return (
 
             {weather?.source && (
               <p className="itinerary-source">Source: {weather.source}</p>
+            )}
+
+            {weather?.forecast_notice && (
+              <div className="itinerary-weather-notice" role="status">
+                ℹ️ {weather.forecast_notice}
+              </div>
             )}
           </div>
         ) : (

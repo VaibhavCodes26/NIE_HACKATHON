@@ -285,7 +285,21 @@ export default function PlanJourney({
             const payload = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(payload.detail || 'Weather forecast is temporarily unavailable.');
             
-            const forecast = payload.daily?.[0] || {};
+            const forecast = payload.daily?.[0];
+            if (!forecast) {
+                if (payload.forecast_notice) {
+                    setWeatherByDay((current) => ({
+                        ...current,
+                        [day.day_number]: {
+                            error: payload.forecast_notice,
+                            source: payload.source || 'Google Weather',
+                        }
+                    }));
+                    return;
+                }
+                throw new Error('Forecast unavailable for this date.');
+            }
+
             const rainProb = forecast.precipitation_probability_max ?? null;
             const advice = (rainProb ?? 0) >= 40
                 ? "Rain is possible. Keep an umbrella handy."
@@ -299,7 +313,8 @@ export default function PlanJourney({
                     temperature_max_c: forecast.temperature_max_c,
                     rain_probability_percent: rainProb,
                     travel_advice: advice,
-                    source: payload.source || 'Open-Meteo',
+                    source: payload.source || 'Google Weather',
+                    notice: payload.forecast_notice,
                     error: ''
                 }
             }));
@@ -526,7 +541,7 @@ export default function PlanJourney({
                                         <div className="multi-stop-list">{day.stops.map((stop, index) => <div className="multi-stop is-featured-attraction" key={`${day.day_number}-${stop.name}`}><span className="multi-stop-time">{stop.suggested_time}</span><span className="multi-stop-dot">{index + 1}</span><div><strong>{stop.name}<span className="featured-attraction-badge"><Sparkles size={11} /> ITINERARY PICK</span></strong><p>{stop.description}</p></div></div>)}</div>
 
                                         <div className="multi-day-tools"><button type="button" onClick={() => checkWeather(day)} disabled={Boolean(weatherLoading[day.day_number])}>{weatherLoading[day.day_number] ? <LoaderCircle className="multi-spin" size={15} /> : <CloudSun size={16} />} Check forecast</button></div>
-                                        {weatherByDay[day.day_number] && <div className={`multi-weather-result ${weatherByDay[day.day_number].error ? 'has-error' : ''}`}>{weatherByDay[day.day_number].error ? weatherByDay[day.day_number].error : <><CloudSun size={18} /><span><strong>{weatherByDay[day.day_number].temperature_min_c}°–{weatherByDay[day.day_number].temperature_max_c}°C</strong><small>Rain chance: {weatherByDay[day.day_number].rain_probability_percent == null ? 'not provided' : `${weatherByDay[day.day_number].rain_probability_percent}%`} · {weatherByDay[day.day_number].travel_advice}</small><small>Forecast by {weatherByDay[day.day_number].source}; estimates can change.</small></span></>}</div>}
+                                        {weatherByDay[day.day_number] && <div className={`multi-weather-result ${weatherByDay[day.day_number].error ? 'has-error' : ''}`}>{weatherByDay[day.day_number].error ? weatherByDay[day.day_number].error : <><CloudSun size={18} /><span><strong>{weatherByDay[day.day_number].temperature_min_c}°–{weatherByDay[day.day_number].temperature_max_c}°C</strong><small>Rain chance: {weatherByDay[day.day_number].rain_probability_percent == null ? 'not provided' : `${weatherByDay[day.day_number].rain_probability_percent}%`} · {weatherByDay[day.day_number].travel_advice}</small>{weatherByDay[day.day_number].notice && <small style={{ display: 'block', marginTop: '4px', color: '#92400e' }}>{weatherByDay[day.day_number].notice}</small>}<small>Forecast by {weatherByDay[day.day_number].source}; estimates can change.</small></span></>}</div>}
                                     </article>
                                 </Fragment>
                             ))}

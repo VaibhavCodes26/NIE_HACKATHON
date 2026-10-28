@@ -1,23 +1,25 @@
-"""Daily weather forecasts with multi-provider resilience and in-memory caching."""
+"""Daily weather forecasts powered exclusively by Google Weather API.
+
+Endpoints and data conform strictly to the official Google Weather API:
+https://weather.googleapis.com/v1/forecast/days:lookup
+"""
 
 import logging
 import os
 import threading
 import time
-from datetime import date, datetime, timedelta, timezone
-from email.utils import parsedate_to_datetime
+from datetime import date, timedelta
 
 import httpx
 
 logger = logging.getLogger(__name__)
 
-OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
-WEATHERAPI_URL = "https://api.weatherapi.com/v1/forecast.json"
+GOOGLE_WEATHER_URL = "https://weather.googleapis.com/v1/forecast/days:lookup"
 
-# Timeout for upstream weather provider calls
+# Client timeouts for Google Weather API calls
 _TIMEOUT = httpx.Timeout(connect=8.0, read=12.0, write=5.0, pool=5.0)
 
-# Force IPv4 transport for hosts where IPv6 to api.open-meteo.com is broken (e.g. Render)
+# Force IPv4 transport for cloud hosts where IPv6 handshake stalls
 try:
     _TRANSPORT = httpx.HTTPTransport(local_address="0.0.0.0")
 except Exception:  # pragma: no cover
@@ -26,260 +28,157 @@ except Exception:  # pragma: no cover
 # Cache TTL: 6 hours
 CACHE_TTL_SECONDS = 6 * 3600
 
-# Cache storage: cache_key -> {"expires_at": float, "data": dict, "cached_at": float}
-_FORECAST_CACHE: dict[tuple, dict] = {}
+# Cache storage: (round(lat, 3), round(lon, 3)) -> {"expires_at": float, "data": dict, "cached_at": float}
+_WEATHER_CACHE: dict[tuple, dict] = {}
 _CACHE_LOCK = threading.Lock()
 
-# Deduplication of concurrent upstream fetches
+# Deduplication for simultaneous in-flight requests
 _INFLIGHT_LOCK = threading.Lock()
 _INFLIGHT_EVENTS: dict[tuple, threading.Event] = {}
 
-# Cooldown timestamp for Open-Meteo on HTTP 429
-_OPEN_METEO_COOLDOWN_UNTIL: float = 0.0
+FORECAST_NOTICE_TEXT = (
+    "Weather forecasts are currently available for up to 10 days from today. "
+    "Sorry for the inconvenience! Weather updates for your remaining trip dates aren't available yet."
+)
 
-# Mapping of WeatherAPI condition code to approximate WMO weather code
-_WEATHERAPI_TO_WMO = {
-    1000: 0,   # Sunny / Clear
-    1003: 1,   # Partly cloudy
-    1006: 2,   # Cloudy
-    1009: 3,   # Overcast
-    1030: 45,  # Mist
-    1063: 61,  # Patchy rain possible
-    1066: 71,  # Patchy snow possible
-    1069: 51,  # Patchy sleet possible
-    1072: 56,  # Patchy freezing drizzle
-    1087: 95,  # Thundery outbreaks possible
-    1114: 75,  # Blowing snow
-    1117: 75,  # Blizzard
-    1135: 45,  # Fog
-    1147: 48,  # Freezing fog
-    1150: 51,  # Patchy light drizzle
-    1153: 51,  # Light drizzle
-    1168: 56,  # Freezing drizzle
-    1171: 57,  # Heavy freezing drizzle
-    1180: 61,  # Patchy light rain
-    1183: 61,  # Light rain
-    1186: 63,  # Moderate rain at times
-    1189: 63,  # Moderate rain
-    1192: 65,  # Heavy rain at times
-    1195: 65,  # Heavy rain
-    1198: 66,  # Light freezing rain
-    1201: 67,  # Moderate/heavy freezing rain
-    1204: 57,  # Light sleet
-    1207: 57,  # Moderate/heavy sleet
-    1210: 71,  # Patchy light snow
-    1213: 71,  # Light snow
-    1216: 73,  # Patchy moderate snow
-    1219: 73,  # Moderate snow
-    1222: 75,  # Patchy heavy snow
-    1225: 75,  # Heavy snow
-    1237: 77,  # Ice pellets
-    1240: 80,  # Light rain shower
-    1243: 81,  # Moderate/heavy rain shower
-    1246: 82,  # Torrential rain shower
-    1249: 57,  # Light sleet showers
-    1252: 57,  # Moderate/heavy sleet showers
-    1255: 85,  # Light snow showers
-    1258: 86,  # Moderate/heavy snow showers
-    1261: 77,  # Light showers of ice pellets
-    1264: 77,  # Moderate/heavy showers of ice pellets
-    1273: 95,  # Patchy light rain with thunder
-    1276: 96,  # Moderate/heavy rain with thunder
-    1279: 95,  # Patchy light snow with thunder
-    1282: 99,  # Moderate/heavy snow with thunder
+# Comprehensive mapping of Google Weather API condition types/descriptions to WMO weather codes
+_GOOGLE_CONDITION_TO_WMO = {
+    # Clear / Sunny
+    "CLEAR": 0,
+    "SUNNY": 0,
+    "CLEAR_DAY": 0,
+    "CLEAR_NIGHT": 0,
+    "MOSTLY_CLEAR": 1,
+    "MOSTLY_SUNNY": 1,
+    "FAIR": 1,
+    # Cloudy
+    "PARTLY_CLOUDY": 2,
+    "PARTLY_SUNNY": 2,
+    "MOSTLY_CLOUDY": 3,
+    "CLOUDY": 3,
+    "OVERCAST": 3,
+    # Fog / Mist / Haze
+    "FOG": 45,
+    "FOGGY": 45,
+    "MIST": 45,
+    "HAZE": 45,
+    "SMOKE": 45,
+    "DUST": 45,
+    "SAND": 45,
+    # Drizzle
+    "DRIZZLE": 51,
+    "LIGHT_DRIZZLE": 51,
+    "PATCHY_LIGHT_DRIZZLE": 51,
+    "FREEZING_DRIZZLE": 56,
+    "HEAVY_FREEZING_DRIZZLE": 57,
+    # Rain
+    "LIGHT_RAIN": 61,
+    "PATCHY_LIGHT_RAIN": 61,
+    "RAIN": 63,
+    "MODERATE_RAIN": 63,
+    "HEAVY_RAIN": 65,
+    "TORRENTIAL_RAIN": 65,
+    "FREEZING_RAIN": 66,
+    "LIGHT_FREEZING_RAIN": 66,
+    "HEAVY_FREEZING_RAIN": 67,
+    # Showers
+    "LIGHT_RAIN_SHOWERS": 80,
+    "CHANCE_OF_SHOWERS": 80,
+    "SCATTERED_SHOWERS": 80,
+    "RAIN_SHOWERS": 81,
+    "SHOWERS": 81,
+    "HEAVY_RAIN_SHOWERS": 82,
+    "VIOLENT_RAIN_SHOWERS": 82,
+    # Thunderstorm
+    "THUNDERSTORM": 95,
+    "LIGHT_THUNDERSTORM_RAIN": 95,
+    "SCATTERED_THUNDERSTORMS": 95,
+    "THUNDERSHOWER": 95,
+    "HEAVY_THUNDERSTORM": 96,
+    "THUNDERSTORM_WITH_HAIL": 96,
+    "SEVERE_THUNDERSTORM": 99,
+    # Snow
+    "LIGHT_SNOW": 71,
+    "SNOW": 73,
+    "HEAVY_SNOW": 75,
+    "SNOW_SHOWERS": 85,
+    "BLIZZARD": 75,
+    "SLEET": 57,
+    "ICE_PELLETS": 77,
+    "HAIL": 96,
+    # Wind
+    "WINDY": 1,
+    "BREEZY": 1,
+    "WIND_AND_RAIN": 63,
 }
 
 
-def _map_weatherapi_code_to_wmo(code: int | None) -> int:
-    """Map WeatherAPI condition code to approximate WMO code, defaulting to 2 (partly cloudy)."""
-    if code is None:
-        return 2
-    try:
-        return _WEATHERAPI_TO_WMO.get(int(code), 2)
-    except (ValueError, TypeError):
-        return 2
-
-
 def clear_weather_cache():
-    """Clear in-memory cache and reset rate-limiting state. Useful in unit tests."""
-    global _OPEN_METEO_COOLDOWN_UNTIL
+    """Clear in-memory cache and inflight events (used in unit tests)."""
     with _CACHE_LOCK:
-        _FORECAST_CACHE.clear()
+        _WEATHER_CACHE.clear()
     with _INFLIGHT_LOCK:
         _INFLIGHT_EVENTS.clear()
-    _OPEN_METEO_COOLDOWN_UNTIL = 0.0
 
 
-class OpenMeteoRateLimitError(Exception):
-    """Raised when Open-Meteo returns HTTP 429."""
+def _map_google_condition_to_wmo(cond_type: str | None, description: str | None = None) -> int:
+    """Map Google Weather API condition type or description to approximate WMO code."""
+    if cond_type:
+        normalized = str(cond_type).strip().upper().replace(" ", "_")
+        if normalized in _GOOGLE_CONDITION_TO_WMO:
+            return _GOOGLE_CONDITION_TO_WMO[normalized]
 
-    def __init__(self, retry_after: float):
-        super().__init__(f"Open-Meteo rate limit exceeded. Retry after {retry_after:.1f}s")
-        self.retry_after = retry_after
+        # Substring heuristics for compound enum names
+        if "THUNDER" in normalized:
+            return 96 if "HAIL" in normalized else 95
+        if "HEAVY_RAIN" in normalized or "TORRENTIAL" in normalized:
+            return 65
+        if "RAIN" in normalized or "SHOWER" in normalized:
+            return 61
+        if "DRIZZLE" in normalized:
+            return 51
+        if "SNOW" in normalized:
+            return 71
+        if any(f in normalized for f in ("FOG", "MIST", "HAZE")):
+            return 45
+        if "CLEAR" in normalized or "SUN" in normalized:
+            return 0
+        if "CLOUD" in normalized or "OVERCAST" in normalized:
+            return 2
 
+    if description:
+        desc_upper = str(description).strip().upper()
+        if "THUNDER" in desc_upper:
+            return 95
+        if "RAIN" in desc_upper or "SHOWER" in desc_upper:
+            return 61
+        if "DRIZZLE" in desc_upper:
+            return 51
+        if "FOG" in desc_upper or "MIST" in desc_upper:
+            return 45
+        if "CLEAR" in desc_upper or "SUN" in desc_upper:
+            return 0
+        if "CLOUD" in desc_upper:
+            return 2
 
-def _parse_retry_after(header_val: str | None) -> float:
-    """Parse HTTP Retry-After header as seconds or HTTP-date."""
-    if not header_val:
-        return 60.0
-    try:
-        val = float(header_val)
-        return max(1.0, min(val, 3600.0))
-    except ValueError:
-        pass
-    try:
-        dt = parsedate_to_datetime(header_val)
-        now_dt = datetime.now(timezone.utc)
-        diff = (dt - now_dt).total_seconds()
-        return max(1.0, min(diff, 3600.0))
-    except Exception:
-        return 60.0
-
-
-def _fetch_open_meteo(
-    latitude: float,
-    longitude: float,
-    effective_start: date,
-    effective_end: date,
-) -> dict:
-    """Fetch forecast from primary provider (Open-Meteo)."""
-    global _OPEN_METEO_COOLDOWN_UNTIL
-
-    now = time.monotonic()
-    if now < _OPEN_METEO_COOLDOWN_UNTIL:
-        remaining = _OPEN_METEO_COOLDOWN_UNTIL - now
-        logger.info(
-            "[weather] Open-Meteo is in cooldown period (%.1fs remaining); bypassing to fallback",
-            remaining,
-        )
-        raise OpenMeteoRateLimitError(remaining)
-
-    params = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "daily": (
-            "weather_code,"
-            "temperature_2m_max,"
-            "temperature_2m_min,"
-            "precipitation_probability_max"
-        ),
-        "timezone": "auto",
-        "start_date": effective_start.isoformat(),
-        "end_date": effective_end.isoformat(),
-    }
-
-    client_kwargs = {"timeout": _TIMEOUT}
-    if _TRANSPORT is not None:
-        client_kwargs["transport"] = _TRANSPORT
-
-    try:
-        with httpx.Client(**client_kwargs) as client:
-            response = client.get(OPEN_METEO_URL, params=params)
-
-            if response.status_code == 429:
-                retry_after_hdr = response.headers.get("Retry-After")
-                retry_after_sec = _parse_retry_after(retry_after_hdr)
-                _OPEN_METEO_COOLDOWN_UNTIL = time.monotonic() + retry_after_sec
-                logger.warning(
-                    "[weather] Open-Meteo returned 429 Too Many Requests (Retry-After: %s). Cooldown set for %.1fs.",
-                    retry_after_hdr,
-                    retry_after_sec,
-                )
-                raise OpenMeteoRateLimitError(retry_after_sec)
-
-            if response.status_code == 400:
-                try:
-                    err_json = response.json()
-                    if err_json.get("reason"):
-                        raise ValueError(err_json["reason"])
-                except ValueError:
-                    raise
-                except Exception:
-                    pass
-
-            response.raise_for_status()
-            payload = response.json()
-    except (ValueError, OpenMeteoRateLimitError):
-        raise
-    except (httpx.HTTPError, Exception) as exc:
-        logger.error("[weather] Open-Meteo request failed: %r", exc)
-        raise RuntimeError("Weather provider is temporarily unavailable.") from exc
-
-    daily = payload.get("daily") or {}
-    dates = daily.get("time") or []
-
-    if not dates:
-        raise RuntimeError("Weather provider returned no forecast data.")
-
-    forecasts = []
-    for index, forecast_date in enumerate(dates):
-        forecasts.append({
-            "date": forecast_date,
-            "weather_code": (daily.get("weather_code") or [None] * len(dates))[index],
-            "temperature_max_c": (
-                daily.get("temperature_2m_max") or [None] * len(dates)
-            )[index],
-            "temperature_min_c": (
-                daily.get("temperature_2m_min") or [None] * len(dates)
-            )[index],
-            "precipitation_probability_max": (
-                daily.get("precipitation_probability_max") or [None] * len(dates)
-            )[index],
-        })
-
-    return {
-        "latitude": latitude,
-        "longitude": longitude,
-        "source": "Open-Meteo",
-        "daily": forecasts,
-    }
+    return 2  # Default to 2 (partly cloudy)
 
 
-def _fetch_weatherapi(
-    latitude: float,
-    longitude: float,
-    effective_start: date,
-    effective_end: date,
-) -> dict:
-    """Fetch forecast from secondary fallback provider (WeatherAPI.com)."""
-    api_key = os.getenv("WEATHERAPI_KEY", "").strip()
+def _fetch_google_weather(latitude: float, longitude: float) -> dict[str, dict]:
+    """Call Google Weather API days:lookup endpoint and parse the up-to-10-day forecast.
+
+    Returns dict mapping date_string (YYYY-MM-DD) -> daily forecast object.
+    """
+    api_key = os.getenv("GOOGLE_WEATHER_KEY", "").strip()
     if not api_key:
-        logger.info("[weather] WEATHERAPI_KEY not configured; fallback skipped")
-        raise RuntimeError("WeatherAPI fallback key is not configured.")
-
-    today = date.today()
-    max_weatherapi_date = today + timedelta(days=2)
-
-    # WeatherAPI free tier advertises up to 3 days of forecast (today, today+1, today+2)
-    if effective_start > max_weatherapi_date:
-        logger.warning(
-            "[weather] Requested start date %s is beyond WeatherAPI free plan horizon (%s)",
-            effective_start.isoformat(),
-            max_weatherapi_date.isoformat(),
-        )
-        raise RuntimeError(
-            f"Requested forecast date ({effective_start.isoformat()}) exceeds WeatherAPI free plan horizon."
-        )
-
-    if effective_end > max_weatherapi_date:
-        logger.warning(
-            "[weather] Requested end date %s extends beyond WeatherAPI free plan horizon (%s)",
-            effective_end.isoformat(),
-            max_weatherapi_date.isoformat(),
-        )
-        raise RuntimeError(
-            f"Requested forecast date range extends beyond WeatherAPI free plan horizon ({max_weatherapi_date.isoformat()})."
-        )
-
-    days_needed = (effective_end - today).days + 1
-    days_param = max(1, min(days_needed, 3))
+        logger.error("[weather] GOOGLE_WEATHER_KEY is not configured in backend environment.")
+        raise RuntimeError("Google Weather API key is not configured.")
 
     params = {
         "key": api_key,
-        "q": f"{latitude:.4f},{longitude:.4f}",
-        "days": days_param,
-        "aqi": "no",
-        "alerts": "no",
+        "location.latitude": f"{latitude:.4f}",
+        "location.longitude": f"{longitude:.4f}",
+        "days": 10,
     }
 
     client_kwargs = {"timeout": _TIMEOUT}
@@ -288,57 +187,108 @@ def _fetch_weatherapi(
 
     try:
         with httpx.Client(**client_kwargs) as client:
-            response = client.get(WEATHERAPI_URL, params=params)
-            if response.status_code == 400:
-                logger.warning("[weather] WeatherAPI returned 400")
-                raise RuntimeError("WeatherAPI rejected query parameters.")
+            response = client.get(GOOGLE_WEATHER_URL, params=params)
+
+            if response.status_code in (400, 401, 403):
+                # Never log the secret key
+                logger.error("[weather] Google Weather API error (%s): %s", response.status_code, response.text[:200])
+                raise RuntimeError("Google Weather API request or authentication failed.")
+
+            if response.status_code == 429:
+                logger.warning("[weather] Google Weather API rate limit reached (429).")
+                raise RuntimeError("Weather provider rate limit reached. Please try again shortly.")
+
             response.raise_for_status()
             payload = response.json()
     except (httpx.HTTPError, Exception) as exc:
-        # Never log API key or query parameters that contain secret tokens
-        logger.error("[weather] WeatherAPI request failed: %s", type(exc).__name__)
-        raise RuntimeError("WeatherAPI provider failed.") from exc
+        logger.error("[weather] Google Weather request failed: %s", type(exc).__name__)
+        raise RuntimeError("Weather provider is temporarily unavailable.") from exc
 
-    forecast_days = (payload.get("forecast") or {}).get("forecastday") or []
-    if not forecast_days:
-        raise RuntimeError("WeatherAPI returned no forecast day data.")
+    raw_days = payload.get("forecastDays") or []
+    days_by_date: dict[str, dict] = {}
 
-    days_by_date = {item.get("date"): item for item in forecast_days if item.get("date")}
+    for item in raw_days:
+        # Date string formatting
+        date_str = None
+        disp = item.get("displayDate")
+        if isinstance(disp, dict) and "year" in disp and "month" in disp and "day" in disp:
+            date_str = f"{int(disp['year']):04d}-{int(disp['month']):02d}-{int(disp['day']):02d}"
+        elif item.get("interval", {}).get("startTime"):
+            date_str = str(item["interval"]["startTime"])[:10]
+        elif item.get("date"):
+            date_str = str(item["date"])[:10]
 
-    curr = effective_start
-    forecasts = []
-    while curr <= effective_end:
-        d_str = curr.isoformat()
-        if d_str not in days_by_date:
-            raise RuntimeError(f"WeatherAPI missing forecast for date: {d_str}")
+        if not date_str:
+            continue
 
-        fday = days_by_date[d_str]
-        day_data = fday.get("day") or {}
-        cond = day_data.get("condition") or {}
-        raw_code = cond.get("code")
-        w_code = _WEATHERAPI_TO_WMO.get(int(raw_code), 2) if raw_code is not None else 2
+        # Max temperature
+        max_c = None
+        if item.get("maxTemperature") and item["maxTemperature"].get("degrees") is not None:
+            max_c = item["maxTemperature"]["degrees"]
+        elif item.get("daytimeForecast", {}).get("maxTemperature", {}).get("degrees") is not None:
+            max_c = item["daytimeForecast"]["maxTemperature"]["degrees"]
+        elif item.get("daytimeForecast", {}).get("temperature", {}).get("degrees") is not None:
+            max_c = item["daytimeForecast"]["temperature"]["degrees"]
 
-        pop = day_data.get("daily_chance_of_rain")
-        try:
-            pop_int = int(round(float(pop))) if pop is not None else None
-        except (ValueError, TypeError):
-            pop_int = None
+        if max_c is not None:
+            try:
+                max_c = round(float(max_c), 1)
+            except (ValueError, TypeError):
+                max_c = None
 
-        forecasts.append({
-            "date": d_str,
+        # Min temperature
+        min_c = None
+        if item.get("minTemperature") and item["minTemperature"].get("degrees") is not None:
+            min_c = item["minTemperature"]["degrees"]
+        elif item.get("nighttimeForecast", {}).get("minTemperature", {}).get("degrees") is not None:
+            min_c = item["nighttimeForecast"]["minTemperature"]["degrees"]
+        elif item.get("nighttimeForecast", {}).get("temperature", {}).get("degrees") is not None:
+            min_c = item["nighttimeForecast"]["temperature"]["degrees"]
+
+        if min_c is not None:
+            try:
+                min_c = round(float(min_c), 1)
+            except (ValueError, TypeError):
+                min_c = None
+
+        # Precipitation probability
+        daytime = item.get("daytimeForecast") or {}
+        precip = daytime.get("precipitation") or item.get("precipitation") or {}
+        prob_val = None
+        if isinstance(precip.get("probability"), dict):
+            prob_val = precip["probability"].get("percent")
+        elif precip.get("probability") is not None:
+            prob_val = precip.get("probability")
+        elif item.get("precipitationProbability") is not None:
+            prob_val = item.get("precipitationProbability")
+
+        if prob_val is not None:
+            try:
+                prob_int = int(round(float(prob_val)))
+            except (ValueError, TypeError):
+                prob_int = None
+        else:
+            prob_int = None
+
+        # Weather condition
+        cond_obj = daytime.get("weatherCondition") or item.get("weatherCondition") or {}
+        cond_type = cond_obj.get("type") or cond_obj.get("icon")
+        cond_desc = (
+            cond_obj.get("description", {}).get("text")
+            if isinstance(cond_obj.get("description"), dict)
+            else cond_obj.get("description")
+        )
+        w_code = _map_google_condition_to_wmo(cond_type, cond_desc)
+
+        days_by_date[date_str] = {
+            "date": date_str,
             "weather_code": w_code,
-            "temperature_max_c": day_data.get("maxtemp_c"),
-            "temperature_min_c": day_data.get("mintemp_c"),
-            "precipitation_probability_max": pop_int,
-        })
-        curr += timedelta(days=1)
+            "temperature_max_c": max_c,
+            "temperature_min_c": min_c,
+            "precipitation_probability_max": prob_int,
+        }
 
-    return {
-        "latitude": latitude,
-        "longitude": longitude,
-        "source": "WeatherAPI",
-        "daily": forecasts,
-    }
+    return days_by_date
 
 
 def get_weather_forecast(
@@ -347,121 +297,95 @@ def get_weather_forecast(
     start_date: date,
     end_date: date,
 ) -> dict:
-    """Return daily forecast data with 6-hour caching and WeatherAPI fallback."""
+    """Return daily forecast data from Google Weather API with 6-hour caching.
 
+    Respects the 10-day forecast horizon. If dates are beyond the horizon,
+    returns real data for available dates and a polite inline forecast notice
+    without inventing data or throwing unhandled errors.
+    """
     if end_date < start_date:
         raise ValueError("End date must be on or after start date.")
 
     today = date.today()
-    max_forecast_date = today + timedelta(days=14)
 
     if end_date < today:
         raise ValueError("Weather forecasts are not available for past dates.")
 
     effective_start = max(start_date, today)
-    if effective_start > max_forecast_date:
-        raise ValueError(
-            f"Weather forecasts are only available up to {max_forecast_date.isoformat()} (15-day forecast horizon). "
-            f"Requested start date {start_date.isoformat()} is beyond this window."
-        )
+    effective_end = end_date
 
-    effective_end = min(end_date, max_forecast_date)
+    coord_key = (round(latitude, 3), round(longitude, 3))
 
-    cache_key = (
-        round(latitude, 3),
-        round(longitude, 3),
-        effective_start.isoformat(),
-        effective_end.isoformat(),
-    )
-
-    # 1. Check in-process cache (fresh entries valid for 6 hours)
+    # 1. Check in-process cache (valid for 6 hours)
     now = time.monotonic()
+    cached_days = None
     with _CACHE_LOCK:
-        entry = _FORECAST_CACHE.get(cache_key)
+        entry = _WEATHER_CACHE.get(coord_key)
         if entry and now < entry["expires_at"]:
-            return entry["data"]
+            cached_days = entry["data"]
 
-    # 2. Avoid duplicate simultaneous upstream requests for the same cache key
-    my_event = None
-    with _INFLIGHT_LOCK:
-        if cache_key in _INFLIGHT_EVENTS:
-            waiting_event = _INFLIGHT_EVENTS[cache_key]
-        else:
-            waiting_event = None
-            my_event = threading.Event()
-            _INFLIGHT_EVENTS[cache_key] = my_event
+    # 2. In-flight request deduplication
+    if cached_days is None:
+        my_event = None
+        with _INFLIGHT_LOCK:
+            if coord_key in _INFLIGHT_EVENTS:
+                waiting_event = _INFLIGHT_EVENTS[coord_key]
+            else:
+                waiting_event = None
+                my_event = threading.Event()
+                _INFLIGHT_EVENTS[coord_key] = my_event
 
-    if waiting_event is not None:
-        # Another request for this identical key is already in flight; wait for it
-        waiting_event.wait(timeout=15.0)
-        with _CACHE_LOCK:
-            entry = _FORECAST_CACHE.get(cache_key)
-            if entry and time.monotonic() < entry["expires_at"]:
-                return entry["data"]
-            if entry and "data" in entry:
-                stale_copy = dict(entry["data"])
-                orig_source = stale_copy.get("source", "Weather")
-                stale_copy["source"] = f"{orig_source} (stale cache)"
-                stale_copy["is_stale"] = True
-                return stale_copy
-        # If still no cached data after wait, leader may have succeeded right as event set
-        with _CACHE_LOCK:
-            if cache_key in _FORECAST_CACHE:
-                return _FORECAST_CACHE[cache_key]["data"]
-
-    # 3. We are the leader thread: fetch upstream with fallback
-    last_error: Exception | None = None
-    result: dict | None = None
-
-    try:
-        # Try Open-Meteo first
-        try:
-            result = _fetch_open_meteo(latitude, longitude, effective_start, effective_end)
-        except OpenMeteoRateLimitError as exc:
-            last_error = exc
-            logger.warning("[weather] Open-Meteo 429/cooldown triggered fallback: %s", exc)
-        except (RuntimeError, httpx.HTTPError) as exc:
-            last_error = exc
-            logger.warning("[weather] Open-Meteo failed, trying fallback: %s", exc)
-
-        # If Open-Meteo failed, try WeatherAPI fallback
-        if result is None:
-            try:
-                result = _fetch_weatherapi(latitude, longitude, effective_start, effective_end)
-            except Exception as fb_exc:
-                logger.error("[weather] WeatherAPI fallback also failed: %s", fb_exc)
-                if last_error is None:
-                    last_error = fb_exc
-
-        # If a provider succeeded, cache the result
-        if result is not None:
+        if waiting_event is not None:
+            waiting_event.wait(timeout=15.0)
             with _CACHE_LOCK:
-                _FORECAST_CACHE[cache_key] = {
-                    "expires_at": time.monotonic() + CACHE_TTL_SECONDS,
-                    "data": result,
-                    "cached_at": time.monotonic(),
-                }
-            return result
+                entry = _WEATHER_CACHE.get(coord_key)
+                if entry:
+                    cached_days = entry["data"]
 
-        # Both providers failed — use a clearly labelled stale cached forecast if one exists
-        with _CACHE_LOCK:
-            stale_entry = _FORECAST_CACHE.get(cache_key)
-            if stale_entry and "data" in stale_entry:
-                logger.warning(
-                    "[weather] Providers unavailable; returning stale cached forecast for %s",
-                    cache_key,
-                )
-                stale_copy = dict(stale_entry["data"])
-                orig_source = stale_copy.get("source", "Weather")
-                stale_copy["source"] = f"{orig_source} (stale cache)"
-                stale_copy["is_stale"] = True
-                return stale_copy
+        if cached_days is None:
+            try:
+                days_by_date = _fetch_google_weather(latitude, longitude)
+                with _CACHE_LOCK:
+                    _WEATHER_CACHE[coord_key] = {
+                        "expires_at": time.monotonic() + CACHE_TTL_SECONDS,
+                        "data": days_by_date,
+                        "cached_at": time.monotonic(),
+                    }
+                cached_days = days_by_date
+            finally:
+                if my_event is not None:
+                    my_event.set()
+                    with _INFLIGHT_LOCK:
+                        _INFLIGHT_EVENTS.pop(coord_key, None)
 
-        # Controlled service-unavailable response when no stale cache exists; never fabricate data
-        raise RuntimeError("Weather forecast is temporarily unavailable from all providers.") from last_error
+    # 3. Match requested trip dates against available Google forecast dates
+    max_avail_date = max(cached_days.keys()) if cached_days else None
 
-    finally:
-        if my_event is not None:
-            my_event.set()
-            with _INFLIGHT_LOCK:
-                _INFLIGHT_EVENTS.pop(cache_key, None)
+    # Check if any requested date falls outside the available 10-day forecast window
+    has_partial = False
+    if not cached_days:
+        has_partial = True
+    elif max_avail_date and (
+        effective_end.isoformat() > max_avail_date or effective_start.isoformat() > max_avail_date
+    ):
+        has_partial = True
+
+    # Build real forecast list for dates that actually exist
+    forecasts = []
+    curr = effective_start
+    while curr <= effective_end:
+        d_str = curr.isoformat()
+        if d_str in cached_days:
+            forecasts.append(cached_days[d_str])
+        curr += timedelta(days=1)
+
+    forecast_notice = FORECAST_NOTICE_TEXT if has_partial else None
+
+    return {
+        "latitude": latitude,
+        "longitude": longitude,
+        "source": "Google Weather",
+        "daily": forecasts,
+        "has_partial_forecast": has_partial,
+        "forecast_notice": forecast_notice,
+    }

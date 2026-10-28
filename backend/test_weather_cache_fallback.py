@@ -1,6 +1,6 @@
-"""Unit tests for weather service caching, deduplication, HTTP 429 handling, and WeatherAPI fallback.
+"""Unit tests for Google Weather API service: caching, deduplication, condition mapping, and horizon handling.
 
-All tests mock provider HTTP calls using unittest.mock to avoid consuming any real API quota.
+All tests mock Google Weather API HTTP calls using unittest.mock to avoid consuming real API quota.
 """
 
 import threading
@@ -12,265 +12,219 @@ import pytest
 
 from app.services.weather_service import (
     CACHE_TTL_SECONDS,
-    _FORECAST_CACHE,
-    _map_weatherapi_code_to_wmo,
+    _WEATHER_CACHE,
+    _map_google_condition_to_wmo,
     clear_weather_cache,
     get_weather_forecast,
+    FORECAST_NOTICE_TEXT,
 )
+
+
 
 
 @pytest.fixture(autouse=True)
 def reset_cache_state():
-    """Ensure each test runs with a completely fresh in-memory cache and reset cooldown."""
+    """Ensure each test runs with a completely fresh in-memory cache."""
     clear_weather_cache()
     yield
     clear_weather_cache()
 
 
-def _mock_open_meteo_response(status_code=200, daily_dates=None, headers=None):
-    """Helper to create a mocked Open-Meteo HTTP response."""
-    resp = MagicMock()
-    resp.status_code = status_code
-    resp.headers = headers or {}
-    if status_code == 200:
-        dates = daily_dates or [date.today().isoformat()]
-        resp.json.return_value = {
-            "latitude": 12.3,
-            "longitude": 76.65,
-            "daily": {
-                "time": dates,
-                "weather_code": [1] * len(dates),
-                "temperature_2m_max": [31.5] * len(dates),
-                "temperature_2m_min": [21.0] * len(dates),
-                "precipitation_probability_max": [25] * len(dates),
+def _make_google_day(date_obj: date, cond_type: str = "SUNNY", max_c: float = 31.5, min_c: float = 21.0, precip_pct: int = 25) -> dict:
+    """Helper to build a single Google forecastDays entry."""
+    return {
+        "displayDate": {"year": date_obj.year, "month": date_obj.month, "day": date_obj.day},
+        "maxTemperature": {"degrees": max_c, "unit": "CELSIUS"},
+        "minTemperature": {"degrees": min_c, "unit": "CELSIUS"},
+        "daytimeForecast": {
+            "weatherCondition": {
+                "type": cond_type,
+                "description": {"text": cond_type.replace("_", " ").title()},
             },
-        }
-        resp.raise_for_status.return_value = None
-    elif status_code == 429:
-        resp.raise_for_status.side_effect = Exception("HTTP 429 Too Many Requests")
-    else:
-        resp.raise_for_status.side_effect = Exception(f"HTTP {status_code}")
-    return resp
+            "precipitation": {"probability": {"percent": precip_pct}},
+        },
+    }
 
 
-def _mock_weatherapi_response(status_code=200, forecast_dates=None):
-    """Helper to create a mocked WeatherAPI.com HTTP response."""
+def _mock_google_response(status_code: int = 200, forecast_dates=None) -> MagicMock:
+    """Helper to create a mocked Google Weather API HTTP response."""
     resp = MagicMock()
     resp.status_code = status_code
     if status_code == 200:
-        dates = forecast_dates or [date.today().isoformat()]
-        forecastday = []
-        for d in dates:
-            forecastday.append({
-                "date": d,
-                "day": {
-                    "maxtemp_c": 30.2,
-                    "mintemp_c": 20.4,
-                    "daily_chance_of_rain": 40,
-                    "condition": {
-                        "text": "Patchy rain possible",
-                        "code": 1063,  # Maps to WMO 61 (slight rain)
-                    },
-                },
-            })
-        resp.json.return_value = {
-            "location": {"name": "Mysuru", "lat": 12.3, "lon": 76.65},
-            "forecast": {"forecastday": forecastday},
-        }
+        dates = forecast_dates or [date.today()]
+        resp.json.return_value = {"forecastDays": [_make_google_day(d) for d in dates]}
         resp.raise_for_status.return_value = None
     else:
         resp.raise_for_status.side_effect = Exception(f"HTTP {status_code}")
     return resp
 
 
-def test_open_meteo_success_and_6hour_cache():
-    """Verify primary provider success and subsequent hits served directly from cache."""
+# ---------------------------------------------------------------------------
+# Cache tests
+# ---------------------------------------------------------------------------
+
+def test_success_and_6hour_cache(monkeypatch):
+    """Google Weather success + subsequent hits served from cache."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
     today = date.today()
-    mock_resp = _mock_open_meteo_response(200, [today.isoformat()])
+    mock_resp = _mock_google_response(200, [today])
 
     with patch("httpx.Client.get", return_value=mock_resp) as mock_get:
-        # First call: hits Open-Meteo
         res1 = get_weather_forecast(12.3, 76.65, today, today)
-        assert res1["source"] == "Open-Meteo"
+        assert res1["source"] == "Google Weather"
         assert res1["latitude"] == 12.3
         assert res1["longitude"] == 76.65
         assert len(res1["daily"]) == 1
         assert res1["daily"][0]["date"] == today.isoformat()
-        assert res1["daily"][0]["weather_code"] == 1
         assert res1["daily"][0]["temperature_max_c"] == 31.5
         assert res1["daily"][0]["temperature_min_c"] == 21.0
         assert res1["daily"][0]["precipitation_probability_max"] == 25
         assert mock_get.call_count == 1
 
-        # Second call with identical destination and date range: must hit cache without HTTP call
+        # Second call with identical coords: must hit cache without any HTTP call
         res2 = get_weather_forecast(12.3, 76.65, today, today)
-        assert res2["source"] == "Open-Meteo"
+        assert res2["source"] == "Google Weather"
         assert res2["daily"] == res1["daily"]
-        assert mock_get.call_count == 1  # No additional network call made!
+        assert mock_get.call_count == 1  # No additional network call!
 
 
-def test_cache_ttl_expiration():
-    """Verify that cached responses are re-fetched after the 6-hour TTL expires."""
+def test_cache_ttl_expiration(monkeypatch):
+    """Cached responses are re-fetched after the 6-hour TTL expires."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
     today = date.today()
-    mock_resp = _mock_open_meteo_response(200, [today.isoformat()])
+    mock_resp = _mock_google_response(200, [today])
 
     with patch("httpx.Client.get", return_value=mock_resp) as mock_get:
-        res1 = get_weather_forecast(12.3, 76.65, today, today)
+        get_weather_forecast(12.3, 76.65, today, today)
         assert mock_get.call_count == 1
 
-        # Find the cache entry and simulate that 6 hours + 1 second have passed
-        cache_key = (round(12.3, 3), round(76.65, 3), today.isoformat(), today.isoformat())
-        assert cache_key in _FORECAST_CACHE
-        _FORECAST_CACHE[cache_key]["expires_at"] = time.monotonic() - 1.0
+        # Expire the cache entry
+        coord_key = (round(12.3, 3), round(76.65, 3))
+        assert coord_key in _WEATHER_CACHE
+        _WEATHER_CACHE[coord_key]["expires_at"] = time.monotonic() - 1.0
 
         # Next call should re-fetch from upstream
         res2 = get_weather_forecast(12.3, 76.65, today, today)
         assert mock_get.call_count == 2
-        assert res2["source"] == "Open-Meteo"
+        assert res2["source"] == "Google Weather"
 
 
-def test_http_429_triggers_weatherapi_fallback(monkeypatch):
-    """Verify that HTTP 429 from Open-Meteo triggers WeatherAPI.com fallback."""
-    monkeypatch.setenv("WEATHERAPI_KEY", "test-secret-key-12345")
+def test_missing_api_key_raises_runtime_error(monkeypatch):
+    """Missing GOOGLE_WEATHER_KEY raises a RuntimeError without crashing."""
+    monkeypatch.delenv("GOOGLE_WEATHER_KEY", raising=False)
+    today = date.today()
+    with pytest.raises(RuntimeError, match="key is not configured"):
+        get_weather_forecast(12.3, 76.65, today, today)
+
+
+def test_http_429_raises_runtime_error(monkeypatch):
+    """Google Weather HTTP 429 raises a controlled RuntimeError."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
     today = date.today()
 
-    om_429 = _mock_open_meteo_response(429, headers={"Retry-After": "60"})
-    wa_200 = _mock_weatherapi_response(200, [today.isoformat()])
+    with patch("app.services.weather_service.httpx.Client") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_resp = MagicMock()
+        mock_resp.status_code = 429
+        mock_client.get.return_value = mock_resp
+        mock_cls.return_value = mock_client
 
-    def mock_get(url, *args, **kwargs):
-        if "open-meteo" in url:
-            return om_429
-        elif "weatherapi" in url:
-            # Verify secret key was sent
-            assert kwargs["params"]["key"] == "test-secret-key-12345"
-            return wa_200
-        raise ValueError(f"Unexpected URL: {url}")
-
-    with patch("httpx.Client.get", side_effect=mock_get):
-        result = get_weather_forecast(12.3, 76.65, today, today)
-
-        assert result["source"] == "WeatherAPI"
-        assert len(result["daily"]) == 1
-        daily_item = result["daily"][0]
-        assert daily_item["date"] == today.isoformat()
-        assert daily_item["weather_code"] == 61  # 1063 mapped to WMO 61
-        assert daily_item["temperature_max_c"] == 30.2
-        assert daily_item["temperature_min_c"] == 20.4
-        assert daily_item["precipitation_probability_max"] == 40
-
-
-def test_schema_compatibility_between_providers(monkeypatch):
-    """Ensure both providers return the exact same schema structure expected by frontend."""
-    monkeypatch.setenv("WEATHERAPI_KEY", "test-key")
-    today = date.today()
-
-    required_keys = {"date", "weather_code", "temperature_max_c", "temperature_min_c", "precipitation_probability_max"}
-
-    # 1. Open-Meteo schema test
-    om_200 = _mock_open_meteo_response(200, [today.isoformat()])
-    with patch("httpx.Client.get", return_value=om_200):
-        om_res = get_weather_forecast(12.3, 76.65, today, today)
-        assert set(om_res.keys()) == {"latitude", "longitude", "source", "daily"}
-        assert set(om_res["daily"][0].keys()) == required_keys
-
-    clear_weather_cache()
-
-    # 2. WeatherAPI schema test
-    om_429 = _mock_open_meteo_response(429)
-    wa_200 = _mock_weatherapi_response(200, [today.isoformat()])
-    with patch("httpx.Client.get", side_effect=[om_429, wa_200]):
-        wa_res = get_weather_forecast(12.3, 76.65, today, today)
-        assert set(wa_res.keys()) == {"latitude", "longitude", "source", "daily"}
-        assert set(wa_res["daily"][0].keys()) == required_keys
-        assert wa_res["source"] == "WeatherAPI"
-
-
-def test_both_providers_fail_returns_stale_cache(monkeypatch):
-    """Verify that when both providers fail, a stale cached entry is returned and clearly labelled."""
-    monkeypatch.setenv("WEATHERAPI_KEY", "test-key")
-    today = date.today()
-
-    # Seed the cache with an earlier successful Open-Meteo response
-    om_200 = _mock_open_meteo_response(200, [today.isoformat()])
-    with patch("httpx.Client.get", return_value=om_200):
-        initial = get_weather_forecast(12.3, 76.65, today, today)
-        assert initial["source"] == "Open-Meteo"
-
-    # Expire the cache entry
-    cache_key = (round(12.3, 3), round(76.65, 3), today.isoformat(), today.isoformat())
-    _FORECAST_CACHE[cache_key]["expires_at"] = time.monotonic() - 10.0
-
-    # Now both providers fail
-    om_429 = _mock_open_meteo_response(429)
-    wa_500 = _mock_weatherapi_response(500)
-
-    with patch("httpx.Client.get", side_effect=[om_429, wa_500]):
-        stale_res = get_weather_forecast(12.3, 76.65, today, today)
-        assert "stale" in stale_res["source"].lower()
-        assert stale_res.get("is_stale") is True
-        assert len(stale_res["daily"]) == 1
-        assert stale_res["daily"][0]["date"] == today.isoformat()
-
-
-def test_both_providers_fail_no_cache_raises_runtime_error(monkeypatch):
-    """Verify controlled RuntimeError when both providers fail and no stale cache exists."""
-    monkeypatch.setenv("WEATHERAPI_KEY", "test-key")
-    today = date.today()
-
-    om_429 = _mock_open_meteo_response(429)
-    wa_500 = _mock_weatherapi_response(500)
-
-    with patch("httpx.Client.get", side_effect=[om_429, wa_500]):
-        with pytest.raises(RuntimeError, match="temporarily unavailable from all providers"):
+        with pytest.raises(RuntimeError):
             get_weather_forecast(12.3, 76.65, today, today)
 
 
-def test_missing_weatherapi_key_handles_gracefully(monkeypatch):
-    """Verify that missing WEATHERAPI_KEY doesn't crash but skips fallback and raises controlled error."""
-    monkeypatch.delenv("WEATHERAPI_KEY", raising=False)
+def test_network_failure_raises_runtime_error(monkeypatch):
+    """Network failure raises a controlled RuntimeError."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    import httpx
     today = date.today()
 
-    om_429 = _mock_open_meteo_response(429)
+    with patch("app.services.weather_service.httpx.Client") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get.side_effect = httpx.ConnectTimeout("simulated")
+        mock_cls.return_value = mock_client
 
-    with patch("httpx.Client.get", return_value=om_429) as mock_get:
         with pytest.raises(RuntimeError, match="temporarily unavailable"):
             get_weather_forecast(12.3, 76.65, today, today)
-        # Only Open-Meteo was called; WeatherAPI was not called because key is missing
-        assert mock_get.call_count == 1
 
 
-def test_weatherapi_date_beyond_free_plan_window(monkeypatch):
-    """Verify that requested dates beyond the 3-day free tier window are not queried or fabricated."""
-    monkeypatch.setenv("WEATHERAPI_KEY", "test-key")
+# ---------------------------------------------------------------------------
+# Schema tests
+# ---------------------------------------------------------------------------
+
+def test_response_schema(monkeypatch):
+    """Response matches the NammaPrayana weather schema expected by frontend."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
     today = date.today()
-    far_future = today + timedelta(days=5)
+    required_day_keys = {"date", "weather_code", "temperature_max_c", "temperature_min_c", "precipitation_probability_max"}
 
-    om_429 = _mock_open_meteo_response(429)
+    mock_resp = _mock_google_response(200, [today])
+    with patch("httpx.Client.get", return_value=mock_resp):
+        res = get_weather_forecast(12.3, 76.65, today, today)
+        assert "latitude" in res and "longitude" in res
+        assert res["source"] == "Google Weather"
+        assert isinstance(res["daily"], list)
+        assert len(res["daily"]) >= 1
+        assert set(res["daily"][0].keys()) == required_day_keys
 
-    with patch("httpx.Client.get", return_value=om_429) as mock_get:
-        with pytest.raises(RuntimeError, match="temporarily unavailable"):
-            get_weather_forecast(12.3, 76.65, far_future, far_future)
-        # WeatherAPI was skipped because day 5 is outside free 3-day horizon
-        assert mock_get.call_count == 1
 
+# ---------------------------------------------------------------------------
+# Forecast horizon tests
+# ---------------------------------------------------------------------------
 
-def test_simultaneous_requests_deduplicated():
-    """Verify that concurrent requests for the same destination & dates are deduplicated upstream."""
+def test_dates_within_window_no_notice(monkeypatch):
+    """Dates within 10-day window → has_partial_forecast=False, no notice."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
     today = date.today()
-    mock_resp = _mock_open_meteo_response(200, [today.isoformat()])
+    dates = [today + timedelta(days=i) for i in range(4)]
+    mock_resp = _mock_google_response(200, dates)
+
+    with patch("httpx.Client.get", return_value=mock_resp):
+        res = get_weather_forecast(12.3, 76.65, today, today + timedelta(days=3))
+        assert res["has_partial_forecast"] is False
+        assert res["forecast_notice"] is None
+        assert len(res["daily"]) == 4
+
+
+def test_dates_beyond_window_returns_notice(monkeypatch):
+    """Dates beyond available forecast window → has_partial_forecast=True with polite notice."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    api_dates = [today + timedelta(days=i) for i in range(10)]
+    mock_resp = _mock_google_response(200, api_dates)
+
+    with patch("httpx.Client.get", return_value=mock_resp):
+        res = get_weather_forecast(12.3, 76.65, today, today + timedelta(days=14))
+        assert res["has_partial_forecast"] is True
+        assert res["forecast_notice"] == FORECAST_NOTICE_TEXT
+        assert len(res["daily"]) == 10  # Only real available days returned
+
+
+# ---------------------------------------------------------------------------
+# Deduplication test
+# ---------------------------------------------------------------------------
+
+def test_simultaneous_requests_deduplicated(monkeypatch):
+    """Concurrent requests for the same coords are deduplicated upstream (1 HTTP call)."""
+    monkeypatch.setenv("GOOGLE_WEATHER_KEY", "test-api-key")
+    today = date.today()
+    mock_resp = _mock_google_response(200, [today])
     call_counter = 0
 
     def slow_mock_get(*args, **kwargs):
         nonlocal call_counter
         call_counter += 1
-        time.sleep(0.15)  # simulate slow network call
+        time.sleep(0.15)
         return mock_resp
 
     results = []
 
     def worker():
-        res = get_weather_forecast(12.3, 76.65, today, today)
-        results.append(res)
+        results.append(get_weather_forecast(12.3, 76.65, today, today))
 
     with patch("httpx.Client.get", side_effect=slow_mock_get):
         threads = [threading.Thread(target=worker) for _ in range(5)]
@@ -279,21 +233,73 @@ def test_simultaneous_requests_deduplicated():
         for t in threads:
             t.join()
 
-    # All 5 threads received valid responses
     assert len(results) == 5
     for r in results:
-        assert r["source"] == "Open-Meteo"
-    # But only 1 upstream network request was made!
-    assert call_counter == 1
+        assert r["source"] == "Google Weather"
+    assert call_counter == 1  # Only 1 upstream HTTP call despite 5 threads
 
 
-def test_condition_code_mapping():
-    """Verify condition codes are accurately mapped from WeatherAPI to WMO."""
-    assert _map_weatherapi_code_to_wmo(1000) == 0   # Sunny -> Clear
-    assert _map_weatherapi_code_to_wmo(1003) == 1   # Partly cloudy -> Mainly clear
-    assert _map_weatherapi_code_to_wmo(1009) == 3   # Overcast -> Overcast
-    assert _map_weatherapi_code_to_wmo(1030) == 45  # Mist -> Fog
-    assert _map_weatherapi_code_to_wmo(1087) == 95  # Thunder -> Thunderstorm
-    assert _map_weatherapi_code_to_wmo(1186) == 63  # Moderate rain
-    assert _map_weatherapi_code_to_wmo(1225) == 75  # Heavy snow
-    assert _map_weatherapi_code_to_wmo(9999) == 2   # Unknown code -> default 2
+# ---------------------------------------------------------------------------
+# Condition mapping tests
+# ---------------------------------------------------------------------------
+
+def test_condition_mapping_clear():
+    assert _map_google_condition_to_wmo("CLEAR") == 0
+    assert _map_google_condition_to_wmo("SUNNY") == 0
+    assert _map_google_condition_to_wmo("MOSTLY_CLEAR") == 1
+    assert _map_google_condition_to_wmo("FAIR") == 1
+
+
+def test_condition_mapping_cloudy():
+    assert _map_google_condition_to_wmo("PARTLY_CLOUDY") == 2
+    assert _map_google_condition_to_wmo("MOSTLY_CLOUDY") == 3
+    assert _map_google_condition_to_wmo("OVERCAST") == 3
+
+
+def test_condition_mapping_rain():
+    assert _map_google_condition_to_wmo("LIGHT_RAIN") == 61
+    assert _map_google_condition_to_wmo("MODERATE_RAIN") == 63
+    assert _map_google_condition_to_wmo("HEAVY_RAIN") == 65
+
+
+def test_condition_mapping_thunder():
+    assert _map_google_condition_to_wmo("THUNDERSTORM") == 95
+    assert _map_google_condition_to_wmo("HEAVY_THUNDERSTORM") == 96
+    assert _map_google_condition_to_wmo("SEVERE_THUNDERSTORM") == 99
+
+
+def test_condition_mapping_fog():
+    assert _map_google_condition_to_wmo("FOG") == 45
+    assert _map_google_condition_to_wmo("MIST") == 45
+    assert _map_google_condition_to_wmo("HAZE") == 45
+
+
+def test_condition_mapping_snow():
+    assert _map_google_condition_to_wmo("LIGHT_SNOW") == 71
+    assert _map_google_condition_to_wmo("HEAVY_SNOW") == 75
+
+
+def test_condition_mapping_unknown_defaults():
+    assert _map_google_condition_to_wmo(None, None) == 2
+    assert _map_google_condition_to_wmo("XYZZY") == 2
+
+
+def test_condition_mapping_description_fallback():
+    assert _map_google_condition_to_wmo(None, "Heavy rain showers") == 61
+    assert _map_google_condition_to_wmo(None, "Thunderstorm with lightning") == 95
+
+
+# ---------------------------------------------------------------------------
+# Input validation tests
+# ---------------------------------------------------------------------------
+
+def test_past_date_raises_value_error():
+    yesterday = date.today() - timedelta(days=1)
+    with pytest.raises(ValueError, match="past dates"):
+        get_weather_forecast(12.3, 76.65, yesterday, yesterday)
+
+
+def test_end_before_start_raises_value_error():
+    today = date.today()
+    with pytest.raises(ValueError, match="End date"):
+        get_weather_forecast(12.3, 76.65, today + timedelta(days=2), today)
