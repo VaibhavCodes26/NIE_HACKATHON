@@ -110,18 +110,20 @@ Food discovery and accommodation recommendations help round out the trip. Route 
 
 ```mermaid
 flowchart TD
-    U[Traveller] --> FE[React + Vite frontend]
-    FE -->|HTTPS / JSON| API[FastAPI backend]
-    FE -->|Session cookie / auth headers| AUTH[Authentication & saved itineraries]
-    API --> DB[(SQLite local / PostgreSQL configured)]
-    API --> AI[Google Gemini services]
+    U[Traveller] --> FE[React + Vite Frontend]
+    FE -->|HTTPS / JSON| API[FastAPI + Python Backend]
+
+    API --> DB[(SQLite / PostgreSQL)]
+    API --> AI[Google Gemini AI]
     API --> WX[Google Weather API]
-    API --> MAP[Configured route / map providers]
-    API --> RAIL[RailRadar integration, when configured]
-    API --> GATI[Namma Gati pacing engine]
-    API --> DRISHTI[Namma Drishti image translation]
-    API --> SAHAYAK[Namma Sahayak phrases & TTS]
-    AUTH --> DB
+    API --> ROUTES[Route & Transport Services]
+
+    API --> GATI[Namma Gati]
+    API --> DRISHTI[Namma Drishti]
+    API --> SAHAYAK[Namma Sahayak]
+
+    FE -.-> HOST1[Vercel]
+    API -.-> HOST2[Render]
 ```
 
 ### Technology stack
