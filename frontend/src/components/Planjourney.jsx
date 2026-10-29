@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { commonsImg } from '../data/destinations';
 import {
     ArrowDown, ArrowLeft, ArrowUp, CalendarDays, Check, CloudSun, ExternalLink,
@@ -67,6 +67,7 @@ export default function PlanJourney({
     initialResult = null,
     landingSection = false,
     onDiveIntoJourney = null,
+    resetKey = 0,
 }) {
     const today = useMemo(() => dateString(new Date()), []);
     const defaultEnd = useMemo(() => {
@@ -95,7 +96,7 @@ export default function PlanJourney({
         } catch {
             return null;
         }
-    }, []);
+    }, [resetKey]);
 
     const [selectedDestinations, setSelectedDestinations] = useState(
         () => savedConfig?.destinations ?? []
@@ -124,6 +125,23 @@ export default function PlanJourney({
     const [error, setError] = useState('');
     const [weatherByDay, setWeatherByDay] = useState({});
     const [weatherLoading, setWeatherLoading] = useState({});
+
+    // Reset all journey-planning state when resetKey changes or journey finishes
+    useEffect(() => {
+        if (resetKey > 0) {
+            setSelectedDestinations([]);
+            setDestinationToAdd('mysuru');
+            setStartDate(today);
+            setEndDate(defaultEnd);
+            setTravellerCount(3);
+            setTravelStyle('premium');
+            setTotalBudget(10000);
+            setInterests(['Heritage & culture', 'Local food']);
+            setResult(null);
+            setError('');
+            setWeatherByDay({});
+        }
+    }, [resetKey, today, defaultEnd]);
 
     const durationDays = startDate && endDate
         ? Math.floor((new Date(`${endDate}T12:00:00`) - new Date(`${startDate}T12:00:00`)) / 86400000) + 1
@@ -284,7 +302,7 @@ export default function PlanJourney({
             }
             const payload = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(payload.detail || 'Weather forecast is temporarily unavailable.');
-            
+
             const forecast = payload.daily?.[0];
             if (!forecast) {
                 if (payload.forecast_notice) {
@@ -293,9 +311,9 @@ export default function PlanJourney({
                         [day.day_number]: {
                             error: payload.forecast_notice,
                             source: payload.source || 'Google Weather',
-                    is_cached: Boolean(payload.is_cached),
-                    is_fallback: Boolean(payload.is_fallback),
-                    cached_at: payload.cached_at || null,
+                            is_cached: Boolean(payload.is_cached),
+                            is_fallback: Boolean(payload.is_fallback),
+                            cached_at: payload.cached_at || null,
                         }
                     }));
                     return;

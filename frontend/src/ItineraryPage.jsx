@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Car,
   Check,
+  CheckCircle2,
   ChevronDown,
   Cloud,
   CloudRain,
@@ -187,6 +188,7 @@ export default function ItineraryPage({
   onBack,
   onModifyJourney,
   onNavigateRouteDiscovery,
+  onFinishJourney,
 }) {
   console.log("ITINERARY PAGE IS RUNNING");
   const config = journeyConfig ?? {};
@@ -209,10 +211,27 @@ export default function ItineraryPage({
     }
   }, []);
 
+  const handleFinishJourney = useCallback(() => {
+    // Reset local component states
+    setSavedSelection(null);
+    setItinerary(null);
+    setWeatherByCity({});
+    setStays([]);
+    setPageError("");
+    setSavedId(null);
+    setSaveStatus("idle");
+
+    if (typeof onFinishJourney === "function") {
+      onFinishJourney();
+    } else if (typeof onBack === "function") {
+      onBack();
+    }
+  }, [onFinishJourney, onBack]);
+
   const destinations = useMemo(() => {
     const fromSaved =
       Array.isArray(savedSelection?.destinations) &&
-      savedSelection.destinations.length > 0
+        savedSelection.destinations.length > 0
         ? savedSelection.destinations
         : null;
     const fromConfig = readDestinations(config);
@@ -236,7 +255,7 @@ export default function ItineraryPage({
   const effectiveSelectedAttractionIds = useMemo(() => {
     const ids =
       Array.isArray(savedSelection?.selected_attraction_ids) &&
-      savedSelection.selected_attraction_ids.length > 0
+        savedSelection.selected_attraction_ids.length > 0
         ? savedSelection.selected_attraction_ids
         : selectedAttractionIds;
     return Array.from(new Set(ids.map(Number))).filter(Number.isFinite);
@@ -248,10 +267,10 @@ export default function ItineraryPage({
       30,
       Number(
         savedSelection?.traveller_count ??
-          config.travellerCount ??
-          config.traveller_count ??
-          config.travelers ??
-          3
+        config.travellerCount ??
+        config.traveller_count ??
+        config.travelers ??
+        3
       )
     )
   );
@@ -383,8 +402,7 @@ export default function ItineraryPage({
         return true;
       } catch (error) {
         setPageError(
-          `We couldn't generate the itinerary. ${
-            error.message || "Check that the backend is running."
+          `We couldn't generate the itinerary. ${error.message || "Check that the backend is running."
           }`
         );
 
@@ -1202,8 +1220,8 @@ export default function ItineraryPage({
                   {weather.is_fallback
                     ? " · Cached fallback"
                     : weather.is_cached
-                    ? " · Cached"
-                    : ""}
+                      ? " · Cached"
+                      : ""}
                   {weather.cached_at
                     ? ` (retrieved ${new Date(weather.cached_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
                     : ""}
@@ -1492,6 +1510,37 @@ export default function ItineraryPage({
             travellerCount={travellerCount}
             estimatedBudget={estimatedBudget}
           />
+        </section>
+
+        {/* Finish Journey Section */}
+        <section className="itinerary-finish-section">
+          <div className="itinerary-finish-card">
+            <div className="itinerary-finish-card__content">
+              <div className="itinerary-finish-card__kicker">
+                <Sparkles size={15} />
+                <span>JOURNEY COMPLETE · ಹೊಸ ಪ್ರಯಾಣ</span>
+              </div>
+              <h3 className="itinerary-finish-card__title">
+                Ready to plan your next Karnataka adventure?
+              </h3>
+              <p className="itinerary-finish-card__desc">
+                Finish this journey to clear active selections and start fresh with new destinations, dates, and experiences.
+              </p>
+            </div>
+            <div className="itinerary-finish-card__action">
+              <button
+                type="button"
+                className="itinerary-finish-button"
+                onClick={handleFinishJourney}
+                id="finish-journey-button"
+                aria-label="Finish Journey"
+              >
+                <CheckCircle2 size={18} />
+                <span>Finish Journey</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
         </section>
 
         <footer className="itinerary-footer">

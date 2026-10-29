@@ -2986,6 +2986,142 @@
 
 
 
+/* -------------------------------------------------------------------------
+   Finish Journey Section & Button
+   ------------------------------------------------------------------------- */
+.itinerary-finish-section {
+  margin: 36px 0 10px;
+  width: 100%;
+}
+
+.itinerary-finish-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  border: 1px solid var(--it-line);
+  background:
+    radial-gradient(ellipse at 95% 15%, rgba(245, 198, 50, 0.22), transparent 45%),
+    radial-gradient(ellipse at 5% 90%, rgba(163, 19, 27, 0.09), transparent 40%),
+    var(--it-paper);
+  box-shadow: 0 8px 24px rgba(48, 40, 32, 0.06);
+  overflow: hidden;
+}
+
+.itinerary-finish-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--it-red) 0%, var(--it-red) 50%, var(--it-yellow) 50%, var(--it-yellow) 100%);
+}
+
+.itinerary-finish-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.itinerary-finish-card__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--it-red);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.itinerary-finish-card__kicker svg {
+  color: var(--it-yellow);
+}
+
+.itinerary-finish-card__title {
+  margin: 0 0 8px;
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--it-ink);
+  line-height: 1.3;
+}
+
+.itinerary-finish-card__desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--it-muted);
+  line-height: 1.6;
+  max-width: 580px;
+}
+
+.itinerary-finish-card__action {
+  flex-shrink: 0;
+}
+
+.itinerary-finish-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: 1px solid rgba(245, 198, 50, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--it-red) 0%, var(--it-red-dark) 100%);
+  color: #fffaf0 !important;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(118, 11, 19, 0.28), 0 2px 0 var(--it-red-dark);
+  cursor: pointer;
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+
+.itinerary-finish-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #b71821 0%, var(--it-red) 100%);
+  box-shadow: 0 6px 20px rgba(118, 11, 19, 0.38), 0 3px 0 var(--it-red-dark);
+  border-color: var(--it-yellow);
+}
+
+.itinerary-finish-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(118, 11, 19, 0.24);
+}
+
+.itinerary-finish-button svg:first-child {
+  color: var(--it-yellow);
+}
+
+@media (max-width: 768px) {
+  .itinerary-finish-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px;
+    gap: 18px;
+  }
+
+  .itinerary-finish-card__action {
+    width: 100%;
+  }
+
+  .itinerary-finish-button {
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 13px;
+  }
+
+  .itinerary-finish-card__title {
+    font-size: 19px;
+  }
+}
+
 .itinerary-footer {
 
   display: flex;

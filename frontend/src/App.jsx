@@ -26,6 +26,7 @@ import LoginRequiredModal from './components/LoginRequiredModal.jsx';
 import { useAuth } from './AuthContext.jsx';
 import { Loader2 } from 'lucide-react';
 import './auth.css';
+import { clearJourneyPlanningSession } from './utils/journeyStorage';
 
 const reduced = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -145,6 +146,25 @@ export default function App() {
     setPanel(null);
     window.scrollTo(0, 0);
   }, []);
+
+  const [journeyResetKey, setJourneyResetKey] = useState(0);
+
+  // End active journey-planning session, clear temporary planning state, and reset to fresh Plan Journey
+  const handleFinishJourney = useCallback(() => {
+    // 1. Clear journey-related storage keys
+    clearJourneyPlanningSession();
+
+    // 2. Clear App-level active journey state
+    setJourneyConfig(null);
+    setSelectedAttractionIds([]);
+    setViewingSavedItineraryId(null);
+
+    // 3. Trigger remount / state reset in planning components
+    setJourneyResetKey((k) => k + 1);
+
+    // 4. Navigate to Plan Your Journey
+    navigate('/plan-journey');
+  }, [navigate]);
 
   const handleOpenItinerary = () => {
     navigate("/itinerary");
@@ -274,7 +294,7 @@ export default function App() {
       return (
         <YourItinerariesPage
           onBack={() => navigate('/')}
-          onPlanJourney={() => navigate('/plan-journey')}
+          onPlanJourney={handleFinishJourney}
           onViewItinerary={(id) => {
             setViewingSavedItineraryId(id);
             navigate('/itinerary');
@@ -287,6 +307,8 @@ export default function App() {
     if (currentPage === '/plan-journey' && user) {
       return (
         <PlanJourney
+          key={`plan-journey-${journeyResetKey}`}
+          resetKey={journeyResetKey}
           onBack={() => navigate('/')}
           onDiveIntoJourney={(preferences) => {
             setJourneyConfig(preferences);
@@ -301,6 +323,7 @@ export default function App() {
     if (currentPage === '/route-discovery' && user) {
       return (
         <RouteDiscoveryPage
+          key={`route-discovery-${journeyResetKey}`}
           journeyConfig={journeyConfig}
           onBack={() => navigate('/plan-journey')}
           onGoHome={() => navigate('/')}
@@ -313,7 +336,10 @@ export default function App() {
             if (!guardedNavigate('/food-spots', 'food')) return;
             setActive('food');
           }}
-          onOpenItinerary={() => {
+          onOpenItinerary={(attractionIds) => {
+            if (Array.isArray(attractionIds)) {
+              setSelectedAttractionIds(attractionIds);
+            }
             setViewingSavedItineraryId(null);
             navigate('/itinerary');
           }}
@@ -345,10 +371,12 @@ export default function App() {
     if (currentPage === '/itinerary' && user) {
       return (
         <ItineraryPage
+          key={`itinerary-${journeyResetKey}`}
           journeyConfig={journeyConfig}
           selectedAttractionIds={selectedAttractionIds}
           savedItineraryId={viewingSavedItineraryId}
           onRequireLogin={() => setShowLoginModal(true)}
+          onFinishJourney={handleFinishJourney}
           onBack={() => {
             if (viewingSavedItineraryId) {
               setViewingSavedItineraryId(null);
