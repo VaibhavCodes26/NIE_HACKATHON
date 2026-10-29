@@ -19,7 +19,7 @@ export function FoodSection() {
               <span className="dish-icon" aria-hidden="true"><Utensils size={22} /></span>
               <h3>{d.name}</h3>
               <p>{d.note}</p>
-              <small>{t('food.nophoto')}</small>
+           
             </li>
           ))}
         </ul>
